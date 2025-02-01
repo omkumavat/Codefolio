@@ -28,6 +28,15 @@ app.get('/', (req, res) => {
 
 import UserRoute from './Routes/UserRoute.js';
 app.use('/server',UserRoute);
+
+import LeetCodeRoute from './Routes/LeetCodeRoute.js';
+app.use('/server/leetcode',LeetCodeRoute);
+
+import GeeksforGeeksRoute from './Routes/GeeksforGeeksRoute.js';
+app.use('/server/gfg',GeeksforGeeksRoute);
+
+import CodeForces from './Routes/CodeForces.js';
+app.use('/server/codeforces',CodeForces);
 // app.use(express.static("uploads"));
 // import user from './Routes/useroute.js';
 // app.use('/server', user)
