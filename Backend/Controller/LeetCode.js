@@ -1,14 +1,17 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 
-// Load environment variables from a .env file
 dotenv.config();
 
 export const fetchLeetCode = async (req, res) => {
     try {
         const { username } = req.body;
+        if (!username) {
+            return res.status(400).json({ error: 'Username is required in the request body.' });
+        }
         
-        // Making the GET requests to the URL stored in the environment variable
+       
+        // const leetcode_profile = await axios.get(`${process.env.leetcode_api}/userProfile/${username}`);
         const leetcode_profile = await axios.get(`${process.env.leetcode_api}/${username}`);
         const leetcode_badges = await axios.get(`${process.env.leetcode_api}/${username}/badges`);
         const leetcode_solved = await axios.get(`${process.env.leetcode_api}/${username}/solved`);
@@ -28,7 +31,6 @@ export const fetchLeetCode = async (req, res) => {
             active_2025: leetcode_active_2025.data,
         };
 
-        // Send the combined response
         res.status(200).json(response);
 
     } catch (error) {

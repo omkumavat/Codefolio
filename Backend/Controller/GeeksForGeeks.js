@@ -2,9 +2,16 @@ import axios from 'axios';
 import { JSDOM } from 'jsdom';
 
 export const fetchGFG = async (req, res) => {
-  const { username } = req.body;  // Get the username from the request body
 
   try {
+    console.log(req.body)
+  const { username } = req.body;  // Get the username from the request body
+  console.log(username);
+
+  if (!username) {
+    return res.status(400).json({ error: 'Username is required in the request body.' });
+}
+
     // Fetch HTML of the GeeksForGeeks user profile page
     const { data } = await axios.get(`https://www.geeksforgeeks.org/user/${username}`);
 
