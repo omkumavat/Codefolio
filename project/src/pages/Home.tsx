@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Code, Users, Target, Rocket, Award, Star, TrendingUp, Brain, Zap, Trophy } from 'lucide-react';
 import { useTheme } from '../App';
-
+import ContestSection from './ContestSection';
 const Home = () => {
   const [ref, inView] = useInView({
     triggerOnce: true,
@@ -29,6 +29,7 @@ const Home = () => {
             className={`w-full h-full object-cover ${isDarkMode ? 'opacity-1000' : 'opacity-100'}`}
           />
         </div>
+       
         <div className="container mx-auto px-4 z-10 text-center">
           <motion.h1
             initial={{ y: 20, opacity: 0 }}
@@ -60,9 +61,13 @@ const Home = () => {
           >
             Get Started
           </motion.button>
-        </div>
+          
+        </div >
       </motion.section>
-
+      <div className="py-8">
+      <ContestSection/>
+      </div>
+      
       {/* Platforms Section */}
       <section className={`py-20 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className="container mx-auto px-4">
