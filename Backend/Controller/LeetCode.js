@@ -20,7 +20,7 @@ export const fetchLeetCode = async (req, res) => {
         // Combine all the responses into one object to send back
         const response = {
             profile: leetcode_profile.data,
-            badges: leetcode_badges.data,
+            badges: leetcode_badges.dataconst ,
             solved: leetcode_solved.data,
             contest: leetcode_contest.data,
             last_20: leetcode_last_20.data,

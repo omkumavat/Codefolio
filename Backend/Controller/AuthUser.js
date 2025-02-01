@@ -44,7 +44,7 @@ export const Signup = async (req, res) => {
         });
     }
     catch (err) {
-        console.error(err)
+        console.error(err);
         return res.status(500).json({
             success: false,
             message: "User cannot be register,Please try again later",
@@ -104,7 +104,6 @@ export const Login = async (req, res) => {
             });
         }
         else {
-            // password not match
             return res.status(403).json({
                 success: false,
                 message: "Password does not match",

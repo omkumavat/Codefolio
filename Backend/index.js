@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 dotenv.config();
-connectDB();
+// connectDB();
 app.use(cors({
   origin: '*',  
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowing these methods
