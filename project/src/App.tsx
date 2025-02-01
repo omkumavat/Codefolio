@@ -25,10 +25,8 @@ function App() {
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-      <Router>
         <div className={`flex flex-col min-h-screen ${isDarkMode ? 'dark' : ''}`}>
-          <Navbar />
-          <main className="flex-grow pt-16">
+          <main className="flex-grow pt-0">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
@@ -38,7 +36,6 @@ function App() {
           </main>
           <Footer />
         </div>
-      </Router>
     </ThemeContext.Provider>
   );
 }

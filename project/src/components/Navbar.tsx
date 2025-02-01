@@ -1,27 +1,68 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, Home, Info, Code, LogIn, Moon, Sun, Settings, Github, Edit3, Award } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X, Home, Info, Code, LogIn, Moon, Sun, Settings, Github, Edit3, LogOut, Award } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../App'; // Ensure correct path
+import { useAuth } from '../Context/AuthProvider';
+import Loader from './Loader';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const { currentUser, logout } = useAuth();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Dummy state for demo
+  // const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Use theme context instead of local state
-  const { isDarkMode, toggleTheme } = useTheme();
+  useEffect(() => {
+    // setLoading(true);
+    if (currentUser && currentUser._id) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+    // setLoading(false);
+  }, [currentUser]);
+
+  const handleLogOut = async () => {
+    // setLoading(true);
+    try {
+      toast.success("LogOut Successfuly..")
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate a delay
+      await logout();
+      navigate('/');
+      setIsLoggedIn(false);
+      window.location.reload();
+    } catch (error) {
+      toast.error("Failed to LogOut, try again later..")
+      console.error("Error during logout:", error);
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-[10vh] w-full mx-auto mt-12 mb-10">
+  //       <Loader />
+  //     </div>
+  //   );
+  // }
+
 
   return (
-    <nav className={`fixed w-full z-50 shadow-lg transition-colors duration-300 ${
-      isDarkMode 
-        ? 'bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white' 
+    <nav className={`fixed w-full z-50 shadow-lg transition-colors duration-300 ${isDarkMode
+        ? 'bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white'
         : 'bg-gradient-to-r from-sky-500 via-blue-500 to-blue-600 text-white'
-    }`}>
+      }`}>
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="flex items-center space-x-2 group"
           >
             <motion.div
@@ -31,7 +72,7 @@ const Navbar = () => {
               <Code className="h-8 w-8 text-white" />
             </motion.div>
             <span className="text-white font-bold text-xl group-hover:text-sky-200 transition-colors">
-              DevProfiles
+              CodeFolio
             </span>
           </Link>
 
@@ -39,7 +80,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-6">
             <NavLink to="/" icon={<Home className="h-5 w-5" />} text="Home" />
             <NavLink to="/about" icon={<Info className="h-5 w-5" />} text="About" />
-            
+
             {/* Theme Toggle */}
             <motion.button
               whileHover={{ scale: 1.1 }}
@@ -50,7 +91,7 @@ const Navbar = () => {
               {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </motion.button>
 
-            {!isLoggedIn ? (
+            {isLoggedIn ? (
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
@@ -58,7 +99,7 @@ const Navbar = () => {
                 className="relative"
               >
                 <img
-                  src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80"
+                  src={currentUser.profilePicture}
                   alt="Profile"
                   className="w-10 h-10 rounded-full border-2 border-white hover:border-sky-200 transition-colors"
                 />
@@ -111,7 +152,7 @@ const Navbar = () => {
             <div className="px-2 pt-2 pb-3 space-y-1">
               <MobileNavLink to="/" text="Home" isDarkMode={isDarkMode} />
               <MobileNavLink to="/about" text="About" isDarkMode={isDarkMode} />
-              {!isLoggedIn && (
+              {isLoggedIn && (
                 <MobileNavLink to="/login" text="Login" isDarkMode={isDarkMode} />
               )}
               {isLoggedIn && (
@@ -120,11 +161,10 @@ const Navbar = () => {
                     setIsDrawerOpen(true);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                    isDarkMode 
-                      ? 'text-white hover:bg-gray-700' 
+                  className={`w-full text-left px-3 py-2 rounded-md text-base font-medium ${isDarkMode
+                      ? 'text-white hover:bg-gray-700'
                       : 'text-gray-700 hover:bg-sky-50 hover:text-sky-600'
-                  } transition-colors duration-200`}
+                    } transition-colors duration-200`}
                 >
                   Profile
                 </button>
@@ -146,27 +186,25 @@ const Navbar = () => {
               onClick={() => setIsDrawerOpen(false)}
               className="fixed inset-0 bg-black z-40"
             />
-            
+
             {/* Drawer */}
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 20 }}
-              className={`fixed right-0 top-0 h-full w-80 ${
-                isDarkMode ? 'bg-gray-900' : 'bg-white'
-              } shadow-2xl z-50 overflow-y-auto`}
+              className={`fixed right-0 top-0 h-full w-80 ${isDarkMode ? 'bg-gray-900' : 'bg-white'
+                } shadow-2xl z-50 overflow-y-auto`}
             >
               <div className="p-4">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Profile</h2>
                   <button
                     onClick={() => setIsDrawerOpen(false)}
-                    className={`p-2 rounded-full ${
-                      isDarkMode 
-                        ? 'hover:bg-gray-800 text-gray-400 hover:text-white' 
+                    className={`p-2 rounded-full ${isDarkMode
+                        ? 'hover:bg-gray-800 text-gray-400 hover:text-white'
                         : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
-                    } transition-colors`}
+                      } transition-colors`}
                   >
                     <X className="h-6 w-6" />
                   </button>
@@ -174,13 +212,13 @@ const Navbar = () => {
 
                 <div className="flex items-center space-x-4 mb-8">
                   <img
-                    src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80"
+                    src={currentUser.profilePicture}
                     alt="Profile"
                     className="w-16 h-16 rounded-full border-2 border-sky-500"
                   />
                   <div>
-                    <h3 className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>John Doe</h3>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>john@example.com</p>
+                    <h3 className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{currentUser.username}</h3>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{currentUser.name}</p>
                   </div>
                 </div>
 
@@ -194,21 +232,32 @@ const Navbar = () => {
                     { icon: <Award />, text: 'GeeksforGeeks', link: '/profiles/gfg' },
                     { icon: <Edit3 />, text: 'Edit Profile', link: '/profile/edit' },
                     { icon: <Settings />, text: 'Settings', link: '/settings' },
+                    // { icon: <LogOut />, text: 'LogOut', link: '/settings' },
                   ].map((item, index) => (
                     <Link
                       key={index}
                       to={item.link}
                       onClick={() => setIsDrawerOpen(false)}
-                      className={`flex items-center space-x-3 p-3 rounded-lg ${
-                        isDarkMode 
-                          ? 'hover:bg-gray-800 text-gray-300 hover:text-white' 
+                      className={`flex items-center space-x-3 p-3 rounded-lg ${isDarkMode
+                          ? 'hover:bg-gray-800 text-gray-300 hover:text-white'
                           : 'hover:bg-sky-50 text-gray-700 hover:text-sky-600'
-                      } transition-colors`}
+                        } transition-colors`}
                     >
                       {item.icon}
                       <span>{item.text}</span>
                     </Link>
                   ))}
+                  <Link
+                    // to={}
+                    onClick={handleLogOut}
+                    className={`flex items-center space-x-3 p-3 rounded-lg ${isDarkMode
+                        ? 'hover:bg-gray-800 text-gray-300 hover:text-white'
+                        : 'hover:bg-sky-50 text-red-700 hover:text-sky-600'
+                      } transition-colors`}
+                  >
+                    {<LogOut />}
+                    <span>LogOut</span>
+                  </Link>
                 </div>
               </div>
             </motion.div>
@@ -234,11 +283,10 @@ const NavLink = ({ to, icon, text }) => (
 const MobileNavLink = ({ to, text, isDarkMode }) => (
   <Link
     to={to}
-    className={`block px-3 py-2 rounded-md text-base font-medium ${
-      isDarkMode 
-        ? 'text-white hover:bg-gray-700' 
+    className={`block px-3 py-2 rounded-md text-base font-medium ${isDarkMode
+        ? 'text-white hover:bg-gray-700'
         : 'text-gray-700 hover:bg-sky-50 hover:text-sky-600'
-    } transition-colors duration-200`}
+      } transition-colors duration-200`}
   >
     {text}
   </Link>
