@@ -80,12 +80,24 @@ const Signup = () => {
 
     if (!formData.username || !formData.name ||
       !formData.email || !formData.password ||
-      !formData.confirmPassword ||
-      formData.password !== formData.confirmPassword ||
-      usernameAvailable === false || checkingUsername ||
-      !emailVerified
+      !formData.confirmPassword
     ) {
       toast.error("Please fill all fields correctly.");
+      return;
+    }
+
+    if(!emailVerified){
+      toast.error("Verification is must !");
+      return;
+    }
+
+    if(formData.password !== formData.confirmPassword){
+      toast.error("Password & ConfirmPassword are not matched !");
+      return;
+    }
+
+    if(!usernameAvailable){
+      toast.error("Username is not available !");
       return;
     }
 
@@ -100,16 +112,16 @@ const Signup = () => {
       });
 
       const data = await response.data;
-      const res = await axios.post("http://localhost:4000/server/user/email/email-signup", {
-        name:formData.name,
-        email:formData.email
-      });
 
-      if (response.success) {
+      if (response.data.success) {
+        const res = await axios.post("http://localhost:4000/server/user/email/email-signup", {
+          name:formData.name,
+          email:formData.email
+        });
         toast.success("Signup successful! Redirecting to login...");
         navigate("/login");
       } else {
-        toast.error(data.message || "Signup failed. Try again.");
+        toast.error("Signup failed. Try again.");
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again.");

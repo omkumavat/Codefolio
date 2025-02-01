@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import About from './pages/About';
+import ContestSection from './pages/ContestSection'
 
 // Create theme context
 export const ThemeContext = createContext({
@@ -37,6 +38,8 @@ function App() {
           <Footer />
         </div>
     </ThemeContext.Provider>
+    // <ContestSection/>
+   
   );
 }
 
