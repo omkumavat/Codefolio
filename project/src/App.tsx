@@ -7,7 +7,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import About from './pages/About';
 import ContestSection from './pages/ContestSection'
-
+import Loader from "./components/Loader"
 // Create theme context
 export const ThemeContext = createContext({
   isDarkMode: false,
@@ -27,7 +27,7 @@ function App() {
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
       <Router>
-        <div className={`flex flex-col min-h-screen ${isDarkMode ? 'dark' : ''}`}>
+        <div className={`flex flex-col min-h-screen ${isDarkMode ? 'dark' : 'white'}`}>
           <Navbar />
           <main className="flex-grow pt-16">
             <Routes>
@@ -41,6 +41,7 @@ function App() {
         </div>
       </Router>
     </ThemeContext.Provider>
+    // <Loader/>
     // <ContestSection/>
    
   );
