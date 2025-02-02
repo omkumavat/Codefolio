@@ -59,10 +59,11 @@ const Footer = () => {
           >
             <h4 className="text-lg font-semibold mb-4">Platforms</h4>
             <ul className="space-y-2">
-              <FooterLink href="#" text="LeetCode" />
+              <FooterLink href="www.leetcode.com" text="LeetCode" />
               <FooterLink href="#" text="CodeChef" />
               <FooterLink href="#" text="CodeForces" />
-              <FooterLink href="#" text="HackerRank" />
+              <FooterLink href="#" text="GeeksforGeeks" />
+              <FooterLink href="#" text="GitHub" />
             </ul>
           </motion.div>
           
