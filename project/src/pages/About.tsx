@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Code, Award, Users, Zap, Star, Trophy, Target } from 'lucide-react';
 import { useTheme } from '../App';
+import Navbar from '../components/Navbar';
 
 const About = () => {
   const [ref, inView] = useInView({
@@ -13,6 +14,7 @@ const About = () => {
   const { isDarkMode } = useTheme();
 
   return (
+    <><Navbar/>
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Hero Section */}
       <motion.section
@@ -179,6 +181,7 @@ const About = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

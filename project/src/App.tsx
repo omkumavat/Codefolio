@@ -11,7 +11,7 @@ import Loader from "./components/Loader"
 // Create theme context
 export const ThemeContext = createContext({
   isDarkMode: false,
-  toggleTheme: () => {},
+  toggleTheme: () => { },
 });
 
 export const useTheme = () => useContext(ThemeContext);
@@ -26,10 +26,8 @@ function App() {
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-      <Router>
-        <div className={`flex flex-col min-h-screen ${isDarkMode ? 'dark' : 'white'}`}>
-          <Navbar />
-          <main className="flex-grow pt-16">
+        <div className={`flex flex-col min-h-screen ${isDarkMode ? 'dark' : ''}`}>
+          <main className="flex-grow pt-0">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
@@ -39,12 +37,12 @@ function App() {
           </main>
           <Footer />
         </div>
-      </Router>
     </ThemeContext.Provider>
-    // <Loader/>
-    // <ContestSection/>
-   
   );
 }
+          {/* // <Loader/>
+    // <ContestSection/> */}
 
-export default App;
+   
+
+          export default App;

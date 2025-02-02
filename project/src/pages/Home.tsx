@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Code, Users, Target, Rocket, Award, Star, TrendingUp, Brain, Zap, Trophy } from 'lucide-react';
 import { useTheme } from '../App';
-import ContestSection from './ContestSection';
+import ContestSection from './ContestSection';import Navbar from '../components/Navbar';
+
 const Home = () => {
   const [ref, inView] = useInView({
     triggerOnce: true,
@@ -13,8 +14,9 @@ const Home = () => {
   const { isDarkMode } = useTheme();
 
   return (
+    <>
+    <Navbar />
     <div className="min-h-screen">
-      {/* Hero Section */}
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -208,6 +210,7 @@ const Home = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

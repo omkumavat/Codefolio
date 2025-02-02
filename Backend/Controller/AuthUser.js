@@ -8,7 +8,7 @@ export const Signup = async (req, res) => {
     try {
         // get data
         // // // console.log("alll ", req.body);
-        const { username, firstname, lastname,email, mobileno, password } = req.body;
+        const { username, name, email, password } = req.body;
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
@@ -30,9 +30,9 @@ export const Signup = async (req, res) => {
             })
         }
 
-        
+
         let users = await User.create({
-            firstname,lastname, email, mobileno, password: hashedPassword,username
+            name, email, password: hashedPassword, username
         });
 
         await users.save();
@@ -55,6 +55,7 @@ export const Signup = async (req, res) => {
 // Login
 export const Login = async (req, res) => {
     try {
+        console.log(req.body)
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({
@@ -118,3 +119,24 @@ export const Login = async (req, res) => {
         })
     }
 }
+
+export const checkUsername = async (req, res) => {
+    try {
+        const { username } = req.params;
+
+        if (!username) {
+            return res.status(400).json({ error: 'Username parameter is required' });
+        }
+
+        const user = await User.findOne({ username: username.toLowerCase() });
+
+        if (user) {
+            return res.status(200).json({ available: false });
+        }
+
+        return res.status(200).json({ available: true });
+    } catch (error) {
+        console.error('Error checking username availability:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
