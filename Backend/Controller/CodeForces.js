@@ -54,7 +54,8 @@ export const getLatestContest = async (req, res) => {
                     duration: contest.durationSeconds,
                     startTime: new Date(contest.startTimeSeconds * 1000).toISOString(),
                 }));
-
+                // console.log(formattedContests);
+                
                 // Send the response with upcoming contests
                 res.status(200).json({
                     success: true,

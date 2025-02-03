@@ -2,7 +2,7 @@ import axios from 'axios'
 import dotenv from 'dotenv'
 dotenv.config();
 
-export const getfuturecontest=async(requestAnimationFrame,res)=>{
+export const getfuturecontest=async(req,res)=>{
     try{
         const response=await axios.get(`${process.env.codechef_api}`)
         console.log(response)
