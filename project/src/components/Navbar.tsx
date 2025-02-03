@@ -152,9 +152,9 @@ const Navbar = () => {
             <div className="px-2 pt-2 pb-3 space-y-1">
               <MobileNavLink to="/" text="Home" isDarkMode={isDarkMode} />
               <MobileNavLink to="/about" text="About" isDarkMode={isDarkMode} />
-              {isLoggedIn && (
-                <MobileNavLink to="/login" text="Login" isDarkMode={isDarkMode} />
-              )}
+              {/* {isLoggedIn && (
+                // <MobileNavLink to="/login" text="Login" isDarkMode={isDarkMode} />
+              )} */}
               {isLoggedIn && (
                 <button
                   onClick={() => {
@@ -225,7 +225,7 @@ const Navbar = () => {
                 <div className="space-y-2">
                   {[
                     { icon: <Award />, text: 'My Profile', link: '/profiles/leetcode' },
-                    { icon: <Award />, text: 'LeetCode', link: '/profiles/leetcode' },
+                    { icon: <Award />, text: 'LeetCode', link: `/user/${currentUser.username}/leetcode` },
                     { icon: <Award />, text: 'CodeForces', link: '/profiles/codeforces' },
                     { icon: <Award />, text: 'CodeChef', link: '/profiles/codechef' },
                     { icon: <Github />, text: 'GitHub', link: '/profiles/github' },
