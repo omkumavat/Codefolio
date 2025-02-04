@@ -106,7 +106,7 @@ export const fetchLeetCode = async (req, res) => {
         existingUser.contests = contestData
             ? {
                 contestAttend: contestData.contestAttend,
-                contestRating: Math.floor(contestData.contestRating),
+                contestRating: Math.floor(parseFloat(contestData.contestRating)),
                 contestParticipation: contestData.contestParticipation || [],
             }
             : existingUser.contests;
@@ -128,6 +128,8 @@ export const fetchLeetCode = async (req, res) => {
                 submissionCalendar: submissionCalendar2025,
             }
             : existingUser.submissions_2025;
+
+        
 
         await existingUser.save();
         await User.findByIdAndUpdate(findUser._id, { LeetCode: existingUser._id });
@@ -232,6 +234,7 @@ export const AddLeetCodeAccount = async (req, res) => {
         const submissionsPromise2025 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${username}&year=2025`).catch(() => null);
         const submissionsPromise2024 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${username}&year=2024`).catch(() => null);
         const rankPromise = axios.get(`${process.env.leetcode_api}/${username}`).catch(() => null);
+console.log(profilePromise);
 
         // Await all API responses
         const [profileRes, contestRes, submissionsRes2024, submissionsRes2025, rankRes] = await Promise.all([
@@ -239,6 +242,11 @@ export const AddLeetCodeAccount = async (req, res) => {
         ]);
 
         let profileData;
+        let acceptanceRate = 0;
+        const profilePromise2 = await axios.get(`${process.env.leetcode_api_to_check_user2}/${username}`).catch(() => null);
+        if(profilePromise2?.data){
+            acceptanceRate=profilePromise2?.data.acceptanceRate;
+        }
         if (!(profileRes?.data)) {
             const profilePromise2 = await axios.get(`${process.env.leetcode_api_to_check_user2}/${username}`).catch(() => null);
             profileData = profilePromise2?.data || null;
@@ -268,7 +276,7 @@ export const AddLeetCodeAccount = async (req, res) => {
             }))
             : [];
 
-        const ac = profileData ? (profileData.totalSolved / (totalSubmissions[0].submissions)) * 100 : 0;
+       
         const newLeetCode = new LeetCodeUser({
             username,
             profile: profileData
@@ -278,7 +286,7 @@ export const AddLeetCodeAccount = async (req, res) => {
                     easySolved: profileData.easySolved,
                     mediumSolved: profileData.mediumSolved,
                     hardSolved: profileData.hardSolved,
-                    acceptanceRate: ac,
+                    acceptanceRate: acceptanceRate,
                     recentSubmissions: profileData.recentSubmissions,
                 }
                 : undefined,
@@ -307,6 +315,7 @@ export const AddLeetCodeAccount = async (req, res) => {
                 : undefined,
         });
 
+        console.log(newLeetCode);
         await newLeetCode.save();
         findUser.LeetCode = newLeetCode._id;
         await User.findByIdAndUpdate(findUser._id, { LeetCode: newLeetCode._id });
