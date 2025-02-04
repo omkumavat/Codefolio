@@ -43,11 +43,14 @@ export const fetchLeetCode = async (req, res) => {
             });
         }
 
+        // username==existingUser.username;
+        console.log(existingUser.username);
+
         // Fetch data from LeetCode APIs
-        const profilePromise = axios.get(`${process.env.leetcode_api_to_check_user1}/${username}`).catch(() => null);
-        const contestPromise = axios.get(`${process.env.leetcode_api}/${username}/contest`).catch(() => null);
-        const submissionsPromise2025 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${username}&year=2025`).catch(() => null);
-        const submissionsPromise2024 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${username}&year=2024`).catch(() => null);
+        const profilePromise = axios.get(`${process.env.leetcode_api_to_check_user1}/${existingUser.username}`).catch(() => null);
+        const contestPromise = axios.get(`${process.env.leetcode_api}/${existingUser.username}/contest`).catch(() => null);
+        const submissionsPromise2025 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${existingUser.username}&year=2025`).catch(() => null);
+        const submissionsPromise2024 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${existingUser.username}&year=2024`).catch(() => null);
 
         // Await all API responses
         const [profileRes, contestRes, submissionsRes2024, submissionsRes2025] = await Promise.all([
@@ -57,8 +60,8 @@ export const fetchLeetCode = async (req, res) => {
         let profileData;
         let acceptanceRate = 0;
         const profilePromise2 = await axios.get(`${process.env.leetcode_api_to_check_user2}/${username}`).catch(() => null);
-        if(profilePromise2?.data){
-            acceptanceRate=profilePromise2?.data.acceptanceRate;
+        if (profilePromise2?.data) {
+            acceptanceRate = profilePromise2?.data.acceptanceRate;
         }
         if (!profileRes?.data) {
             const profilePromise2 = await axios.get(`${process.env.leetcode_api_to_check_user2}/${username}`).catch(() => null);
@@ -106,7 +109,7 @@ export const fetchLeetCode = async (req, res) => {
         existingUser.contests = contestData
             ? {
                 contestAttend: contestData.contestAttend,
-                contestRating: Math.floor(contestData.contestRating),
+                contestRating: Number.isFinite(contestData.contestRating) ? Math.floor(contestData.contestRating) : 0,
                 contestParticipation: contestData.contestParticipation || [],
             }
             : existingUser.contests;
@@ -185,21 +188,47 @@ export const fetchUserExist = async (req, res) => {
 
 }
 
-export const fetchUserNameExists = async(req,res)=>{
+export const fetchUserNameExists = async (req, res) => {
     try {
-       const  {leetid}=req.params;
+        const { leetid } = req.params;
         let existingUser = await LeetCodeUser.findById(leetid).exec();
 
         if (!existingUser) {
             console.log("LeetCode user not found, creating a new one.");
             return res.status(400).json({
-                success:false,
-                message: "LeetCode user not found" });
-        }else{
+                success: false,
+                message: "LeetCode user not found"
+            });
+        } else {
             return res.status(400).json({
-                username:existingUser.username,
-                success:true,
-                message: "LeetCode user not found" });
+                data: existingUser.username,
+                success: true,
+                message: "LeetCode user not found"
+            });
+        }
+    } catch (error) {
+        console.error("Error storing LeetCode user data:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export const fetchFromDB = async (req, res) => {
+    try {
+        const { leetid } = req.params;
+        let existingUser = await LeetCodeUser.findById(leetid).exec();
+
+        if (!existingUser) {
+            console.log("LeetCode user not found, creating a new one.");
+            return res.status(400).json({
+                success: false,
+                message: "LeetCode user not found"
+            });
+        } else {
+            return res.status(200).json({
+                data: existingUser,
+                success: true,
+                message: "LeetCode user  found"
+            });
         }
     } catch (error) {
         console.error("Error storing LeetCode user data:", error);
@@ -210,7 +239,7 @@ export const AddLeetCodeAccount = async (req, res) => {
     try {
         const { email, username } = req.body;
 
-        console.log("Email:", email); 
+        console.log("Email:", email);
 
         // Find the user by email
         const findUser = await User.findOne({ email }).exec();
@@ -239,6 +268,11 @@ export const AddLeetCodeAccount = async (req, res) => {
         ]);
 
         let profileData;
+        let acceptanceRate = 0;
+        const profilePromise2 = await axios.get(`${process.env.leetcode_api_to_check_user2}/${username}`).catch(() => null);
+        if (profilePromise2?.data) {
+            acceptanceRate = profilePromise2?.data.acceptanceRate;
+        }
         if (!(profileRes?.data)) {
             const profilePromise2 = await axios.get(`${process.env.leetcode_api_to_check_user2}/${username}`).catch(() => null);
             profileData = profilePromise2?.data || null;
@@ -268,7 +302,7 @@ export const AddLeetCodeAccount = async (req, res) => {
             }))
             : [];
 
-        const ac = profileData ? (profileData.totalSolved / (totalSubmissions[0].submissions)) * 100 : 0;
+        // const ac = profileData ? (profileData.totalSolved / (totalSubmissions[0].submissions)) * 100 : 0;
         const newLeetCode = new LeetCodeUser({
             username,
             profile: profileData
@@ -278,7 +312,7 @@ export const AddLeetCodeAccount = async (req, res) => {
                     easySolved: profileData.easySolved,
                     mediumSolved: profileData.mediumSolved,
                     hardSolved: profileData.hardSolved,
-                    acceptanceRate: ac,
+                    acceptanceRate: acceptanceRate,
                     recentSubmissions: profileData.recentSubmissions,
                 }
                 : undefined,

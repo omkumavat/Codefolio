@@ -8,6 +8,7 @@ import Signup from './pages/Signup';
 import About from './pages/About';
 import ContestSection from './pages/ContestSection'
 import LeetCode from './Profiles/LeetCode';
+import CodeChef from './Profiles/CodeChef';
 
 // Create theme context
 export const ThemeContext = createContext({
@@ -35,6 +36,7 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/about" element={<About />} />
               <Route path="/user/:username/leetcode" element={<LeetCode />} />
+              <Route path="/user/:username/codechef" element={<CodeChef />} />
             </Routes>
           </main>
         </div>

@@ -20,6 +20,7 @@
     "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9",
     "path": "^0.12.7",
+    "puppeteer": "^24.1.1",
     "url": "^0.11.4",
     "use-react-gfg": "^1.0.7"
   }

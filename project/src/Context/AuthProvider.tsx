@@ -55,12 +55,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setCurrentUser(null);
     localStorage.removeItem('Users'); // Remove user data from localStorage
   };
-
   const updateProfile = (updatedUser: User): void => {
-    setCurrentUser(updatedUser);
-    localStorage.setItem('Users', JSON.stringify(updatedUser));
+    setCurrentUser((prevUser) => {
+      if (JSON.stringify(prevUser) === JSON.stringify(updatedUser)) {
+        return prevUser; // Prevent unnecessary updates
+      }
+      localStorage.setItem("Users", JSON.stringify(updatedUser));
+      return updatedUser;
+    });
   };
-
+  
   const value = {
     updateProfile,
     currentUser,

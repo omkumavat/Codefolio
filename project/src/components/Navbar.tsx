@@ -227,7 +227,7 @@ const Navbar = () => {
                     { icon: <Award />, text: 'My Profile', link: '/profiles/leetcode' },
                     { icon: <Award />, text: 'LeetCode', link: `/user/${currentUser.username}/leetcode` },
                     { icon: <Award />, text: 'CodeForces', link: '/profiles/codeforces' },
-                    { icon: <Award />, text: 'CodeChef', link: '/profiles/codechef' },
+                    { icon: <Award />, text: 'CodeChef', link: `/user/${currentUser.username}/codechef` },
                     { icon: <Github />, text: 'GitHub', link: '/profiles/github' },
                     { icon: <Award />, text: 'GeeksforGeeks', link: '/profiles/gfg' },
                     { icon: <Edit3 />, text: 'Edit Profile', link: '/profile/edit' },
