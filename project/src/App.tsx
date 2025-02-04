@@ -7,8 +7,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import About from './pages/About';
 import ContestSection from './pages/ContestSection'
-import Loader from "./components/Loader"
-import Edit from "./pages/edit.js"
+
 // Create theme context
 export const ThemeContext = createContext({
   isDarkMode: false,
@@ -34,10 +33,8 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/about" element={<About />} />
-              <Route path="/edit" element={<Edit/>}/>
             </Routes>
           </main>
-          <Footer />
         </div>
     </ThemeContext.Provider>
     

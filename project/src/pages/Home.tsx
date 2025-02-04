@@ -4,8 +4,10 @@ import { useInView } from 'react-intersection-observer';
 import { Code, Users, Target, Rocket, Award, Star, TrendingUp, Brain, Zap, Trophy } from 'lucide-react';
 import { useTheme } from '../App';
 import ContestSection from './ContestSection';import Navbar from '../components/Navbar';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+  const navigate=useNavigate();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -50,6 +52,7 @@ const Home = () => {
             One platform to showcase all your competitive programming profiles
           </motion.p>
           <motion.button
+           onClick={() => navigate("/login")}
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.6 }}
