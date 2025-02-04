@@ -2,6 +2,20 @@ import React from 'react';
 import { Github, Linkedin, Twitter, Mail, Code } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const FooterLink = ({ href, text }) => (
+  <li>
+    <motion.a
+      href={href}
+      target={href.startsWith("http") ? "_blank" : "_self"} // Open external links in a new tab
+      rel={href.startsWith("http") ? "noopener noreferrer" : ""} // Security for external links
+      whileHover={{ x: 5 }}
+      className="text-gray-400 hover:text-purple-400 transition-colors text-sm block"
+    >
+      {text}
+    </motion.a>
+  </li>
+);
+
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-br from-gray-900 to-gray-800 text-white relative">
@@ -59,11 +73,11 @@ const Footer = () => {
           >
             <h4 className="text-lg font-semibold mb-4">Platforms</h4>
             <ul className="space-y-2">
-              <FooterLink href="www.leetcode.com" text="LeetCode" />
-              <FooterLink href="#" text="CodeChef" />
-              <FooterLink href="#" text="CodeForces" />
-              <FooterLink href="#" text="GeeksforGeeks" />
-              <FooterLink href="#" text="GitHub" />
+              <FooterLink href="https://www.leetcode.com" text="LeetCode" />
+              <FooterLink href="https://www.codechef.com"  text="CodeChef" />
+              <FooterLink href="https://codeforces.com"  text="CodeForces" />
+              <FooterLink href="https://www.geeksforgeeks.org"  text="GeeksforGeeks" />
+              <FooterLink href="https://www.github.com"  text="GitHub" />
             </ul>
           </motion.div>
           
@@ -113,18 +127,6 @@ const SocialIcon = ({ href, icon }: { href: string; icon: React.ReactNode }) => 
   >
     {icon}
   </motion.a>
-);
-
-const FooterLink = ({ href, text }: { href: string; text: string }) => (
-  <li>
-    <motion.a
-      href={href}
-      whileHover={{ x: 5 }}
-      className="text-gray-400 hover:text-purple-400 transition-colors text-sm block"
-    >
-      {text}
-    </motion.a>
-  </li>
 );
 
 export default Footer;
