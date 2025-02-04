@@ -53,18 +53,18 @@ const LeetCodeUserSchema = new mongoose.Schema({
 });
 
 
-LeetCodeUserSchema.pre('findOneAndDelete', async function (next) {
-  const leetid = this.getQuery()._id;
+// LeetCodeUserSchema.pre('findOneAndDelete', async function (next) {
+//   const leetid = this.getQuery()._id;
 
-  try {
-    const User = mongoose.model('User');
-    const delteLeet = await User.deleteMany({ leetid });
-    next(); 
-  } catch (error) {
-    console.error(`Error in pre-delete middleware for product ${productId}:`, error);
-    next(error); // Pass the error to the next middleware
-  }
-}); 
+//   try {
+//     const User = mongoose.model('User');
+//     const delteLeet = await User.deleteMany({ leetid });
+//     next(); 
+//   } catch (error) {
+//     console.error(`Error in pre-delete middleware for product ${productId}:`, error);
+//     next(error); // Pass the error to the next middleware
+//   }
+// }); 
 
 export default mongoose.model("LeetCodeUser", LeetCodeUserSchema);
 

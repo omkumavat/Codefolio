@@ -1,18 +1,23 @@
 import axios from 'axios'
 import dotenv from 'dotenv'
+import { JSDOM } from 'jsdom';
+import puppeteer from 'puppeteer';
+import CodeChefUser from '../Models/CodeChef.js';
+import CodeChef from '../Models/CodeChef.js';
+import User from '../Models/User.js';
 dotenv.config();
 
-export const getfuturecontest=async(req,res)=>{
+export const getfuturecontest=async(requestAnimationFrame,res)=>{
     try{
         const response=await axios.get(`${process.env.codechef_api}`)
         console.log(response)
 
-        if(response.data.status ==='success'){
+        if (response.data.status === 'success') {
             const futureContest = response.data.future_contests;
 
-            if(futureContest && futureContest.length >0){
+            if (futureContest && futureContest.length > 0) {
 
-                const formattedContest=futureContest.map((contest)=>({
+                const formattedContest = futureContest.map((contest) => ({
                     contest_code: contest.contest_code,
                     contest_name: contest.contest_name,
                     contest_start_date: contest.contest_start_date,
@@ -23,24 +28,24 @@ export const getfuturecontest=async(req,res)=>{
                     distinct_users: contest.distinct_users,
                 }));
                 res.status(200).json({
-                    success:true,
-                    message:'Future contest fetched successfully',
-                    contests:formattedContest
+                    success: true,
+                    message: 'Future contest fetched successfully',
+                    contests: formattedContest
                 });
-             } else{
-                    res.status(404).json({
-                        success: false,
-                        message: 'No future contests found.',
-                    }); 
-                }
-
-            }
-            else {
-                // API did not return success
-                res.status(500).json({
+            } else {
+                res.status(404).json({
                     success: false,
-                    message: 'Failed to fetch contest data from the API.',
+                    message: 'No future contests found.',
                 });
+            }
+
+        }
+        else {
+            // API did not return success
+            res.status(500).json({
+                success: false,
+                message: 'Failed to fetch contest data from the API.',
+            });
         }
     }
     catch (error) {
@@ -50,5 +55,291 @@ export const getfuturecontest=async(req,res)=>{
             success: false,
             message: 'An error occurred while fetching contests.',
         });
+    }
+}
+export const fetchUserNameExists = async (req, res) => {
+    try {
+        const { username } = req.params;
+        console.log("Fetching for username:", username);
+
+        if (!username) {
+            return res.status(400).json({ error: 'Username is required in the request body.' });
+        }
+
+        const url = `https://www.codechef.com/users/${username}`;
+
+        // Use Puppeteer to fetch rendered HTML
+        const browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+        await page.goto(url, { waitUntil: 'networkidle2' });
+
+        // Check if the profile exists
+        const pageContent = await page.content();
+        if (pageContent.includes("The user you are looking for does not exist") ||
+            !(await page.$(".user-details-container"))) {
+            // The selector .user-details-container should exist on valid profiles
+            await browser.close();
+            return res.status(404).json({
+                success: false,
+                message: "CodeChef account not found for the given username.",
+            });
+        }
+
+        await page.waitForSelector("#rankContentDiv .dataTable tbody tr", { timeout: 5000 }).catch(() => null);
+        const html = await page.content();
+        await browser.close();
+
+        const dom = new JSDOM(html);
+        const document = dom.window.document;
+
+        const rows = document.querySelectorAll("#rankContentDiv .dataTable tbody tr");
+        console.log("Rows found:", rows.length);
+
+        let firstProblemInfo = "No solved problems found";
+
+        // Get the first solved problem
+        for (let row of rows) {
+            const problem = row.querySelector("td:nth-child(2) a")?.textContent.trim();
+            const resultIcon = row.querySelector("td:nth-child(3) img")?.getAttribute("src");
+            const result = resultIcon?.includes("tick-icon.gif") ? "Accepted" : "Wrong Answer";
+
+            // Only consider the first problem (break after finding it)
+            if (problem) {
+                firstProblemInfo = `${problem}${result}`;
+                break;
+            }
+        }
+
+        console.log("First problem info:", firstProblemInfo);
+
+        res.status(200).json({
+            success: true,
+            message: 'First problem fetched successfully',
+            problemsolved: firstProblemInfo
+        });
+
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred while fetching contests.',
+        });
+    }
+};
+
+
+export const AddCodeChefAccount = async (req, res) => {
+    try {
+        const { username, email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+
+        console.log("Email:", email);
+
+        // Find the user by email
+        const findUser = await User.findOne({ email }).exec();
+
+        if (!findUser) {
+            console.log("User not found in the database.");
+            return res.status(400).json({ message: "User not exists in database" });
+        }
+
+        // Check if the CodeChef user already exists in the database
+        const existingUser = await CodeChefUser.findOne({ username });
+        if (existingUser) {
+            return res.status(400).json({ message: "CodeChef account already exists in the database" });
+        }
+
+        const url = `https://www.codechef.com/users/${username}`;
+
+        const browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+
+        await page.goto(url, { waitUntil: "domcontentloaded" });
+
+        // Extract number of problems solved
+        const problemsSolved = await page.evaluate(() => {
+            const h3Elements = document.querySelectorAll(".rating-data-section.problems-solved h3");
+            return h3Elements.length > 0 ? h3Elements[3].innerText.trim() : "Not found";
+        });
+
+        console.log(`Problems Solved: ${problemsSolved}`);
+        await browser.close();
+
+        // Fetch CodeChef profile data
+        const profilePromise = axios.get(`${process.env.codechef_api_user}/${username}`).catch(() => null);
+        const [profileRes] = await Promise.all([profilePromise]);
+
+        const profileData = profileRes?.data || null;
+
+        if (!profileData) {
+            return res.status(400).json({ message: "Failed to fetch user data from CodeChef APIs" });
+        }
+
+        const simplifiedRatingData = profileData.ratingData.map(entry => ({
+            name: entry.name,
+            end_date: entry.end_date,
+            rating: entry.rating,
+            rank: entry.rank
+        }));
+
+        // Categorizing heat map activity by year
+        let year2022 = [], year2023 = [], year2024 = [], year2025 = [];
+
+        profileData.heatMap.forEach(item => {
+            const year = item.date.split("-")[0]; // Extract year from date
+            if (year === "2022") year2022.push(item);
+            else if (year === "2023") year2023.push(item);
+            else if (year === "2024") year2024.push(item);
+            else if (year === "2025") year2025.push(item);
+        });
+
+        // Create a new CodeChefUser document
+        const newCodeChef = new CodeChefUser({
+            username:username,
+            problemSolved: parseInt(problemsSolved.match(/\d+/)[0], 10),
+            countryRank: profileData.countryRank,
+            globalRank: profileData.globalRank,
+            countryName: profileData.countryName,
+            currentRating: profileData.currentRating,
+            highestRating: profileData.highestRating,
+            stars: profileData.stars,
+            contests: simplifiedRatingData.length > 0 ? simplifiedRatingData : undefined,
+            ActivityCalender2022: year2022.length > 0 ? year2022 : undefined,
+            ActivityCalender2023: year2023.length > 0 ? year2023 : undefined,
+            ActivityCalender2024: year2024.length > 0 ? year2024 : undefined,
+            ActivityCalender2025: year2025.length > 0 ? year2025 : undefined,
+        });
+
+        await newCodeChef.save();
+
+        findUser.CodeChef = newCodeChef._id;
+        await User.findByIdAndUpdate(findUser._id, { CodeChef: newCodeChef._id });
+
+        return res.status(201).json({ message: "User data stored successfully", data: newCodeChef });
+
+    } catch (error) {
+        console.error("Error storing CodeChef user data:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+export const fetchCodeChefAccount = async (req, res) => {
+    try {
+        const { username } = req.params;
+
+        if (!username) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+
+        const findUser = await User.findOne({ username }).exec();
+
+        if (!findUser) {
+            console.log("User not found in the database.");
+            return res.status(400).json({ message: "User not exists in database" });
+        }
+
+        if (!findUser.CodeChef) {
+            return res.status(400).json({ message: "CodeChef account not linked with this user" });
+        }
+
+        // Find the existing CodeChef user document
+        const existingCodeChefUser = await CodeChefUser.findById(findUser.CodeChef);
+        if (!existingCodeChefUser) {
+            return res.status(400).json({ message: "CodeChef user data not found" });
+        }
+
+        const url = `https://www.codechef.com/users/${existingCodeChefUser.username}`;
+
+        const browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+
+        await page.goto(url, { waitUntil: "domcontentloaded" });
+
+        // Extract number of problems solved
+        const problemsSolved = await page.evaluate(() => {
+            const h3Elements = document.querySelectorAll(".rating-data-section.problems-solved h3");
+            return h3Elements.length > 0 ? h3Elements[3].innerText.trim() : "Not found";
+        });
+
+        console.log(`Problems Solved: ${problemsSolved}`);
+        await browser.close();
+
+        // Fetch CodeChef profile data
+        const profilePromise = axios.get(`${process.env.codechef_api_user}/${existingCodeChefUser.username}`).catch(() => null);
+        const [profileRes] = await Promise.all([profilePromise]);
+
+        const profileData = profileRes?.data || null;
+
+        if (!profileData) {
+            return res.status(400).json({ message: "Failed to fetch user data from CodeChef APIs" });
+        }
+
+        const simplifiedRatingData = profileData.ratingData.map(entry => ({
+            name: entry.name,
+            end_date: entry.end_date,
+            rating: entry.rating,
+            rank: entry.rank
+        }));
+
+        // Categorizing heat map activity by year
+        let year2022 = [], year2023 = [], year2024 = [], year2025 = [];
+
+        profileData.heatMap.forEach(item => {
+            const year = item.date.split("-")[0]; // Extract year from date
+            if (year === "2022") year2022.push(item);
+            else if (year === "2023") year2023.push(item);
+            else if (year === "2024") year2024.push(item);
+            else if (year === "2025") year2025.push(item);
+        });
+
+        // Update existing CodeChefUser document
+        existingCodeChefUser.username = existingCodeChefUser.username;
+        existingCodeChefUser.problemSolved = parseInt(problemsSolved.match(/\d+/)[0], 10);
+        existingCodeChefUser.countryRank = profileData.countryRank;
+        existingCodeChefUser.globalRank = profileData.globalRank;
+        existingCodeChefUser.countryName = profileData.countryName;
+        existingCodeChefUser.currentRating = profileData.currentRating;
+        existingCodeChefUser.highestRating = profileData.highestRating;
+        existingCodeChefUser.stars = profileData.stars;
+        existingCodeChefUser.contests = simplifiedRatingData.length > 0 ? simplifiedRatingData : undefined;
+        existingCodeChefUser.ActivityCalender2022 = year2022.length > 0 ? year2022 : undefined;
+        existingCodeChefUser.ActivityCalender2023 = year2023.length > 0 ? year2023 : undefined;
+        existingCodeChefUser.ActivityCalender2024 = year2024.length > 0 ? year2024 : undefined;
+        existingCodeChefUser.ActivityCalender2025 = year2025.length > 0 ? year2025 : undefined;
+
+        await existingCodeChefUser.save();
+
+        return res.status(200).json({ message: "User data updated successfully", data: existingCodeChefUser });
+
+    } catch (error) {
+        console.error("Error updating CodeChef user data:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+export const fetchCodeChefFromDB = async (req, res) => {
+    try {
+        const { codechefid } = req.params;
+        let existingUser = await CodeChefUser.findById(codechefid).exec();
+
+        if (!existingUser) {
+            console.log("CodeChef user not found, creating a new one.");
+            return res.status(400).json({
+                success: false,
+                message: "CodeChef user not found"
+            });
+        } else {
+            return res.status(200).json({
+                data: existingUser,
+                success: true,
+                message: "CodeChef user  found"
+            });
+        }
+    } catch (error) {
+        console.error("Error storing LeetCode user data:", error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }

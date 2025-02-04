@@ -140,3 +140,28 @@ export const checkUsername = async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+export const getUser=async(req,res)=>{
+    try {
+        const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json({ error: 'Username parameter is required' });
+        }
+
+        const user = await User.findById(id);
+
+        if (user) {
+            return res.status(200).json({ 
+                data:user
+             });
+        }
+
+        return res.status(200).json({ 
+            data:null
+         });
+    } catch (error) {
+        console.error('Error checking username availability:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../App';
 import Loader from '../components/Loader';
-import { Code, PlusCircle, X, ExternalLink, Award, Target, Brain, DeleteIcon, CheckCircle2, RefreshCwIcon, Timer, Trophy } from 'lucide-react';
+import { Code, PlusCircle, X, ExternalLink, Award, Target, Brain, DeleteIcon, CheckCircle2, RefreshCwIcon, Timer, Trophy, TrendingUp } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import RatingGraph from '../components/RatingGraph';
 import CircularCards from '../components/CircularCards';
@@ -17,12 +17,12 @@ import { useParams } from 'react-router-dom';
 
 const LeetCode = () => {
   const { username } = useParams();
-  const { currentUser } = useAuth();
+  const { currentUser, updateProfile } = useAuth();
   // const [toast, setToast] = useState({ show: false, message: "" });
   const { isDarkMode } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
   // const [username, setUsername] = useState('');
-  const [hasAccount, setHasAccount] = useState(false); // Dummy state for demo
+  const [hasAccount, setHasAccount] = useState(true);
   const [profile, setProfile] = useState({});
   const [recentProblem, setRecentProblem] = useState([]);
   const [streak, setStreak] = useState(0);
@@ -37,6 +37,8 @@ const LeetCode = () => {
   const [loading, setloading] = useState(false);
   const [ShowRefresh, setShowRefresh] = useState(false);
   const [ShowDelete, setShowDelete] = useState(false);
+  const [leetusername, setUsernameLeet] = useState("");
+  const [hasFetchedUser, setHasFetchedUser] = useState(false);
   const setToast = (message) => {
     console.log(message);
     toast.success(message);
@@ -68,16 +70,25 @@ const LeetCode = () => {
           if (currentUser?.LeetCode) {
             setShowRefresh(true);
             setShowDelete(true);
+            //this is self account and logged in
             response = await axios.get(`http://localhost:4000/server/leetcode/fetch/${username}`);
           } else {
+            //account not added and and logged in
+            console.log(hasAccount)
             setHasAccount(false);
             return;
           }
         } else {
+          //not self account and logged in
           response = await axios.get(`http://localhost:4000/server/leetcode/fetch/${username}`);
+          setShowRefresh(false);
+          setShowDelete(false);
         }
       } else {
+        //not self account and not logged in
         response = await axios.get(`http://localhost:4000/server/leetcode/fetch/${username}`);
+        setShowRefresh(false);
+        setShowDelete(false);
       }
 
       if (!response || !response.data) {
@@ -88,6 +99,94 @@ const LeetCode = () => {
       const data = response.data.data;
       console.log("LeetCode Data:", data);
 
+      setUsernameLeet(data.username)
+      setProfile(data.profile);
+      setRecentProblem(data.profile?.recentSubmissions || []);
+      setcontestAttend(data.contests?.contestAttend || 0);
+      setcontestRating(data.contests?.contestRating || 0);
+      setcontestParticipation(data.contests?.contestParticipation || []);
+      setactiveYears(data.submissions_2025?.activeYears || []);
+      settotalActiveDays(data.submissions_2025?.totalActiveDays || 0);
+      setStreak(data.submissions_2025?.streak || 0);
+
+      // Update circular chart data
+      if (data.profile) {
+        const updatedCircularData = circularData.map((item) => {
+          let solvedCount = 0;
+          if (item.label === "Easy") solvedCount = data.profile.easySolved || 0;
+          if (item.label === "Medium") solvedCount = data.profile.mediumSolved || 0;
+          if (item.label === "Hard") solvedCount = data.profile.hardSolved || 0;
+
+          return {
+            ...item,
+            count: solvedCount,
+            percentage: item.total > 0 ? ((solvedCount / item.total) * 100).toFixed(2) : 0,
+          };
+        });
+
+        setcircularData(updatedCircularData);
+      }
+
+      // Parse submission calendars
+      const parseSubmissions = (submissions) => {
+        return (submissions || []).map((datao) => ({
+          date: new Date((datao.date) * 1000).toISOString().split('T')[0],
+          submissions: datao.submissions,
+        }));
+      };
+
+      setsubmissionCalendar2025(parseSubmissions(data.submissions_2025?.submissionCalendar));
+      setsubmissionCalendar2024(parseSubmissions(data.submissions_2024?.submissionCalendar));
+      console.log("Submission Calendar 2024:", data.submissions_2024?.submissionCalendar);
+      console.log("Submission Calendar 2025:", data.submissions_2025?.submissionCalendar);
+
+      setHasAccount(true);
+    } catch (error) {
+      console.error("Error fetching LeetCode data:", error);
+    } finally {
+      setloading(false);
+    }
+  };
+
+  const fetchLeetCodeDataFromDB = async () => {
+    setloading(true);
+    try {
+      let response = null;
+
+      console.log(currentUser)
+      if (currentUser) {
+        if (currentUser?.username === username) {
+          if (currentUser?.LeetCode) {
+            setShowRefresh(true);
+            setShowDelete(true);
+            const leetid = currentUser?.LeetCode;
+            response = await axios.get(`http://localhost:4000/server/leetcode/fetch-from-db/${leetid}`);
+          } else {
+            console.log(hasAccount)
+            setHasAccount(false);
+            return;
+          }
+        } else {
+          response = await axios.get(`http://localhost:4000/server/leetcode/fetch/${username}`);
+          setShowRefresh(false);
+          setShowDelete(false);
+        }
+      } else {
+        response = await axios.get(`http://localhost:4000/server/leetcode/fetch/${username}`);
+        setShowRefresh(false);
+        setShowDelete(false);
+      }
+
+      console.log(response)
+      if (!response || !response.data) {
+        setloading(false);
+        return;
+      }
+
+      const data = response.data.data;
+      console.log("LeetCode Data:", data);
+
+      setUsernameLeet(data.username)
       setProfile(data.profile);
       setRecentProblem(data.profile?.recentSubmissions || []);
       setcontestAttend(data.contests?.contestAttend || 0);
@@ -147,17 +246,43 @@ const LeetCode = () => {
     }
   }
 
+  const fetchUpdatedUser = async () => {
+    setloading(true);
+    try {
+      if (!currentUser?._id) {
+        console.log("No valid user ID found");
+        return;
+      }
+  
+      const response = await axios.get(`http://localhost:4000/server/user/get-user/${currentUser._id}`);
+      console.log("111",response.data?.data)
+      if (response.status === 200 && response.data?.data) {
+        await updateProfile(response.data.data);
+      } else {
+        console.log("Invalid response received");
+      }
+    } catch (error) {
+      console.error("Unable to fetch user", error);
+    } finally {
+      setloading(false); // Always reset loading state
+    }
+  };
+  
 
   useEffect(() => {
-    fetchLeetCodeData();
+    if (!hasFetchedUser && currentUser) {
+      setHasFetchedUser(true);
+      fetchUpdatedUser();
+    }
+    fetchLeetCodeDataFromDB();
   }, [currentUser]);
 
   if (loading) {
     return (
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1 -translate-y-1/2">
         <Loader />
+        <p className='relative right-1/2'>Wait upto minute, it needs some time...!</p>
       </div>
-
     );
   }
 
@@ -228,19 +353,22 @@ const LeetCode = () => {
             <section className={`py-12 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
               <div className="container mx-auto px-4">
                 <h2 className={`text-3xl text-center font-bold mb-8 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  LeetCode UserId : {username}
+                  LeetCode UserId : {leetusername}
                 </h2>
 
-                <motion.button
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  onClick={fetchLeetCodeData}
-                  className="flex justify-center items-center space-x-2 px-6 py-3 bg-white text-blue-600 rounded-full font-semibold hover:bg-blue-50 transition-colors mx-auto w-fit"
-                >
-                  <RefreshCwIcon className="h-5 w-5" />
-                  <span>Refresh</span>
-                </motion.button>
+                {ShowRefresh && (
+                  <motion.button
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    onClick={fetchLeetCodeData}
+                    className="flex justify-center items-center space-x-2 px-6 py-3 bg-white text-blue-600 rounded-full font-semibold hover:bg-blue-50 transition-colors mx-auto w-fit"
+                  >
+                    <RefreshCwIcon className="h-5 w-5" />
+                    <span>Refresh</span>
+                  </motion.button>
+                )
+                }
 
               </div>
             </section>
@@ -395,16 +523,20 @@ const LeetCode = () => {
                   </table>
                 </div>
               </div>
-              <motion.button
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                onClick={deleteLeetCodeAccount}
-                className="flex justify-center items-center space-x-2 mt-10 px-6 py-3 bg-white text-red-600 rounded-full font-semibold hover:bg-blue-50 transition-colors mx-auto w-fit"
-              >
-                <DeleteIcon className="h-5 w-5" />
-                <span>Remove LeetCode Account</span>
-              </motion.button>
+              {
+                ShowDelete && (
+                  <motion.button
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    onClick={deleteLeetCodeAccount}
+                    className="flex justify-center items-center space-x-2 mt-10 px-6 py-3 bg-white text-red-600 rounded-full font-semibold hover:bg-blue-50 transition-colors mx-auto w-fit"
+                  >
+                    <DeleteIcon className="h-5 w-5" />
+                    <span>Remove LeetCode Account</span>
+                  </motion.button>
+                )
+              }
             </section>
           </>
         ) : (

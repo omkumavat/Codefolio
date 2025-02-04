@@ -7,7 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../Context/AuthProvider";
 
-const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
+const CodeChefModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     const { currentUser } = useAuth();
     const { isDarkMode } = useTheme();
     const [username, setUsername] = useState("");
@@ -18,8 +18,7 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     const [verificationStep2, setVerificationStep2] = useState("");
     const [verificationStep3, setVerificationStep3] = useState("");
     const [showRefresh, setShowRefresh] = useState(false);
-    const [total1, setTotal1] = useState(-1);
-    const [total2, setTotal2] = useState(-1);
+    const [Problem, setProblem] = useState("");
     const [Account, setAccount] = useState("");
     const [iShow, setIsShow] = useState(false);
     const [iShow2, setIsShow2] = useState(false);
@@ -47,23 +46,23 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     const handleVerify = async () => {
         setIsShow(true);
         if (username.trim() === "") {
-            setVerificationStep2("Please enter a valid username.");
+            setNotValid("Please enter a valid username.");
+            setIsShow(false);
             return;
         }
 
-        const response = await axios.get(`http://localhost:4000/server/leetcode/check-username/${username}`);
+        const response = await axios.get(`http://localhost:4000/server/codechef/check-user/${username}`);
         // const data = response.data;
         console.log(response)
         if (response.data.success) {
-            setTotal1(response.data.total1);
-            setTotal2(response.data.total2);
+            setProblem(response.data.problemsolved)
             setIsVerifying(true);
             setAccount("");
-            setVerificationStep1(`1) Visit the LeetCode for problem number 2667.`);
+            setVerificationStep1(`1) Visit the CodeChef for problem name "Happy New Year!".`);
             setVerificationStep2("2) Click on the submit (make compile time error).");
             setVerificationStep3("3) Do this within time and click on refresh after time ends !");
         } else {
-            setAccount('LeetCode Account does not exist !');
+            setAccount('CodeChef Account does not exist !');
         }
         setIsShow(false);
     };
@@ -74,17 +73,16 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
         setVerificationStep1("");
         setVerificationStep2("");
         setVerificationStep3("");
-        const response = await axios.get(`http://localhost:4000/server/leetcode/check-username/${username}`);
+        const response = await axios.get(`http://localhost:4000/server/codechef/check-user/${username}`);
         if (response.data.success) {
-            if (response.data.total1 === (total1 ) && response.data.total2 === (total2 )) {
+            if (response.data.problemsolved !== Problem) {
                 setVerificationStep1("Problem submitted successfully! 🎉");
-                setToast("Submmission found ..!");
-                const response = await axios.post(`http://localhost:4000/server/leetcode/add-leetcode`, {
+                const response = await axios.post(`http://localhost:4000/server/codechef/add-codechef`, {
                     username: username,
                     email: currentUser?.email
                 })
                 console.log(response.data.data);
-
+                setToast("Submmission found ..!");
             } else {
                 setVerificationStep1("No submission found. Try again.");
                 setToast("Submmission not found ..!");
@@ -127,7 +125,7 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
                                 <X className={`h-5 w-5 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`} />
                             </button>
                             <h3 className={`text-2xl font-bold mb-6 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-                                Add LeetCode Account
+                                Add CodeChef Account
                             </h3>
                             <div className="space-y-4">
                                 <div>
@@ -135,7 +133,7 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
                                         className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
                                             }`}
                                     >
-                                        LeetCode Username
+                                        CodeChef Username
                                     </label>
                                     <div className="flex items-center space-x-2">
                                         <input
@@ -186,13 +184,13 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
 
                                     </div>
                                     <p className="text-sm mt-2 text-red-500">{Account}</p>
-                                    <p className="text-sm mt-2 text-gray-500">{notValid}</p>
+                                    <p className="text-sm mt-2 text-red-500">{notValid}</p>
                                     <p className="text-sm mt-2 text-gray-500">
                                         {verificationStep1}
                                         {
                                             verificationStep1 !== "" && (
                                                 <a
-                                                    href="https://leetcode.com/problems/create-hello-world-function/description/"
+                                                    href="https://www.codechef.com/problems/NEWYEAR"
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="text-blue-600 hover:underline"
@@ -253,4 +251,4 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     );
 };
 
-export default LeetCodeModal;
+export default CodeChefModal;
