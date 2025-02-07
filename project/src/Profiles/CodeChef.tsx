@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChefHat, Plus, Trophy, Globe, Flag, Star, Award, PlusCircle, RefreshCwIcon, DeleteIcon } from 'lucide-react';
+import { ChefHat, Plus, Trophy, Globe, Flag, Star, Award, PlusCircle, RefreshCwIcon, DeleteIcon, Brain, Target } from 'lucide-react';
 import RatingGraph from '../components/RatingGraph';
 import { useTheme } from '../App';
 import Navbar from '../components/Navbar';
@@ -28,7 +28,7 @@ const CodeChef = () => {
     const [stars, setStars] = useState("");
     const [contestRating, setcontestRating] = useState(0);
     const [highestcontestRating, sethighestcontestRating] = useState(0);
-    const [contestParticipation, setcontestParticipation] = useState({});
+    const [contestParticipation, setcontestParticipation] = useState([]);
     const [submissionCalendar2025, setsubmissionCalendar2025] = useState([]);
     const [submissionCalendar2024, setsubmissionCalendar2024] = useState([]);
     const [submissionCalendar2023, setsubmissionCalendar2023] = useState([]);

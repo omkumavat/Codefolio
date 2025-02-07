@@ -1,4 +1,4 @@
-import  { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -9,6 +9,8 @@ import About from './pages/About';
 import ContestSection from './pages/ContestSection'
 import LeetCode from './Profiles/LeetCode';
 import CodeChef from './Profiles/CodeChef';
+import NotFound from './components/NotFound';
+import ProtectedRoute from './Context/ProtectedRoute';
 
 // Create theme context
 export const ThemeContext = createContext({
@@ -19,6 +21,7 @@ export const ThemeContext = createContext({
 export const useTheme = () => useContext(ThemeContext);
 
 function App() {
+
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {
@@ -28,21 +31,28 @@ function App() {
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-        <div className={`flex flex-col min-h-screen ${isDarkMode ? 'dark' : ''}`}>
-          <main className="flex-grow pt-0">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/user/:username/leetcode" element={<LeetCode />} />
-              <Route path="/user/:username/codechef" element={<CodeChef />} />
-            </Routes>
-          </main>
-        </div>
+      <div className={`flex flex-col min-h-screen ${isDarkMode ? 'dark' : ''}`}>
+        <main className="flex-grow pt-0">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/about" element={<About />} />
+            <Route
+              path="/user/:username/leetcode"
+              element={<ProtectedRoute><LeetCode /></ProtectedRoute>}
+            />
+            <Route
+              path="/user/:username/codechef"
+              element={<ProtectedRoute><CodeChef /></ProtectedRoute>}
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+      </div>
     </ThemeContext.Provider>
-    
-
+    // <ContestSection/>
+   
   );
 }
           {/* // <Loader/>

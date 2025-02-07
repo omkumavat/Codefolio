@@ -4,6 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { Code, Award, Users, Zap, Star, Trophy, Target } from 'lucide-react';
 import { useTheme } from '../App';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 const About = () => {
   const [ref, inView] = useInView({
@@ -181,6 +182,7 @@ const About = () => {
         </div>
       </section>
     </div>
+    <Footer/>
     </>
   );
 };

@@ -5,6 +5,7 @@ import { Code, Users, Target, Rocket, Award, Star, TrendingUp, Brain, Zap, Troph
 import { useTheme } from '../App';
 import ContestSection from './ContestSection';import Navbar from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
+import Footer from '../components/Footer';
 
 const Home = () => {
   const navigate=useNavigate();
@@ -213,6 +214,7 @@ const Home = () => {
         </div>
       </section>
     </div>
+    <Footer/>
     </>
   );
 };
