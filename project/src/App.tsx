@@ -11,6 +11,7 @@ import LeetCode from './Profiles/LeetCode';
 import CodeChef from './Profiles/CodeChef';
 import NotFound from './components/NotFound';
 import ProtectedRoute from './Context/ProtectedRoute';
+import Codeforces from './Profiles/codeforces';
 
 // Create theme context
 export const ThemeContext = createContext({
@@ -45,6 +46,10 @@ function App() {
             <Route
               path="/user/:username/codechef"
               element={<ProtectedRoute><CodeChef /></ProtectedRoute>}
+            />
+             <Route
+              path="/user/:username/codeforces"
+              element={<ProtectedRoute><Codeforces /></ProtectedRoute>}
             />
             <Route path="*" element={<NotFound />} />
           </Routes>

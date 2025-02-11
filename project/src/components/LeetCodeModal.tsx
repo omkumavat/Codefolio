@@ -67,7 +67,6 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
         }
         setIsShow(false);
     };
-
     const handleRefresh = async () => {
         setIsShow2(true);
         setIsVerifying(true);

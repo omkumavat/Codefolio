@@ -253,6 +253,7 @@ const Codeforces = () => {
                         </div>
                     </div>
                 </motion.section>
+                {/* change */}
                 {!hasAccount ? (
                     <>
                         <section className={`py-12 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
