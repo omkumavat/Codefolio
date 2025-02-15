@@ -4,6 +4,14 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      // animation: {
+      //   fill: 'fill 1s ease-in infinite alternate',
+      // },
+      // keyframes: {
+      //   fill: {
+      //     '0%': { 'box-shadow': '0 0 0 2px inset' },
+      //     '100%': { 'box-shadow': '0 0 0 10px inset' },
+      //   },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -46,5 +54,6 @@ export default {
       },
     },
   },
+
   plugins: [],
 };

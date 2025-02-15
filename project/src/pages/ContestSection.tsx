@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import axios from "axios";
 
 const ContestCard = ({ contest }: { contest: any }) => {
   return (
-    <div className="bg-black text-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 relative border border-gray-700">
+    <div className=" p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 relative border border-gray-700">
       <p className="text-center mb-4">
         <span className="font-bold">{contest.contest_name || contest.name}</span>
       </p>
@@ -22,11 +22,11 @@ const ContestCard = ({ contest }: { contest: any }) => {
             } minutes`}
       </p>
       <div className="text-center">
-        <button className="px-4 py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all">
-          Enter Contest
-        </button>
+      <button className="px-4 py-2 dark:bg-gray-800 rounded-2xl border border-black hover:bg-gray-700 transition-all">
+    Enter Contest
+  </button>
       </div>
-      <div className="absolute inset-0 rounded-xl blur-lg opacity-50 bg-gradient-to-r from-purple-500 to-blue-500 z-[-1]"></div>
+      <div className="absolute inset-0 rounded-xl blur-lg opacity-50 dark:bg-gradient-to-r from-purple-500 to-blue-500 z-[-1]"></div>
     </div>
   );
 };
@@ -65,18 +65,18 @@ const ContestSection = () => {
   }, []);
 
   if (loading) {
-    return <div className="text-center text-white">Loading contests...</div>;
+    return <div className="text-center font-extrabold text-4xl"> Loading ...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-gray-900 via-black to-gray-900 py-10">
-      <h2 className="text-3xl font-bold text-center text-white mb-8">
+    <div className="min-h-screen  from-gray-900 via-black to-gray-900 py-10">
+      <h2 className="text-3xl font-bold text-center  mb-8">
         Upcoming Contests
       </h2>
 
       {/* Codeforces Section */}
       <div className="mb-10">
-        <h3 className="text-2xl font-bold text-white text-center mb-6">
+        <h3 className="text-2xl font-bold  text-center mb-6">
           Codeforces Contests
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 max-w-7xl mx-auto">
@@ -88,7 +88,7 @@ const ContestSection = () => {
 
       {/* CodeChef Section */}
       <div>
-        <h3 className="text-2xl font-bold text-white text-center mb-6">
+        <h3 className="text-2xl font-bold text-center mb-6">
           CodeChef Contests
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 max-w-7xl mx-auto">

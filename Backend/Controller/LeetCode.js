@@ -115,6 +115,8 @@ export const fetchLeetCode = async (req, res) => {
             }
             : existingUser.submissions_2025;
 
+        
+
         await existingUser.save();
         await User.findByIdAndUpdate(findUser._id, { LeetCode: existingUser._id });
 
@@ -244,6 +246,7 @@ export const AddLeetCodeAccount = async (req, res) => {
         const submissionsPromise2025 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${username}&year=2025`).catch(() => null);
         const submissionsPromise2024 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${username}&year=2024`).catch(() => null);
         const rankPromise = axios.get(`${process.env.leetcode_api}/${username}`).catch(() => null);
+console.log(profilePromise);
 
         // Await all API responses
         const [profileRes, contestRes, submissionsRes2024, submissionsRes2025, rankRes] = await Promise.all([
@@ -324,6 +327,7 @@ export const AddLeetCodeAccount = async (req, res) => {
                 : undefined,
         });
 
+        console.log(newLeetCode);
         await newLeetCode.save();
         findUser.LeetCode = newLeetCode._id;
         await User.findByIdAndUpdate(findUser._id, { LeetCode: newLeetCode._id });

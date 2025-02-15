@@ -7,19 +7,18 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../Context/AuthProvider";
 
-const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
+const CodeforcesModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     const { currentUser } = useAuth();
     const { isDarkMode } = useTheme();
     const [username, setUsername] = useState("");
     const [isVerifying, setIsVerifying] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(60);
+    const [timeLeft, setTimeLeft] = useState(10);
     const [notValid, setNotValid] = useState("");
     const [verificationStep1, setVerificationStep1] = useState("");
     const [verificationStep2, setVerificationStep2] = useState("");
     const [verificationStep3, setVerificationStep3] = useState("");
     const [showRefresh, setShowRefresh] = useState(false);
-    const [total1, setTotal1] = useState(-1);
-    const [total2, setTotal2] = useState(-1);
+    const [Problem, setProblem] = useState("");
     const [Account, setAccount] = useState("");
     const [iShow, setIsShow] = useState(false);
     const [iShow2, setIsShow2] = useState(false);
@@ -36,64 +35,61 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
         }
     }, [isVerifying, timeLeft]);
 
-    // Convert timeLeft (in seconds) to minutes and seconds
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
         return `${minutes}m ${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}s`;
     };
 
-
     const handleVerify = async () => {
         setIsShow(true);
         if (username.trim() === "") {
-            setVerificationStep2("Please enter a valid username.");
+            setNotValid("Please enter a valid username.");
+            setIsShow(false);
             return;
         }
 
-        const response = await axios.get(`http://localhost:4000/server/leetcode/check-username/${username}`);
-        // const data = response.data;
-        console.log(response)
+        const response = await axios.get(`http://localhost:4000/server/codeforces/fetch-codeforces/${username}`);
+        console.log(response);
         if (response.data.success) {
-            setTotal1(response.data.total1);
-            setTotal2(response.data.total2);
+            setProblem(response.data.data.problemsolved);
             setIsVerifying(true);
             setAccount("");
-            setVerificationStep1(`1) Visit the LeetCode for problem number 2667.`);
-            setVerificationStep2("2) Click on the submit (make compile time error).");
-            setVerificationStep3("3) Do this within time and click on refresh after time ends !");
+            setVerificationStep1(`1) Visit Codeforces and solve any problem.`);
+            setVerificationStep2("2) Submit your solution to any problem.");
+            setVerificationStep3("3) After submitting, click refresh when time ends!");
         } else {
-            setAccount('LeetCode Account does not exist !');
+            setAccount('Codeforces Account does not exist!');
         }
         setIsShow(false);
     };
+
     const handleRefresh = async () => {
         setIsShow2(true);
         setIsVerifying(true);
         setVerificationStep1("");
         setVerificationStep2("");
         setVerificationStep3("");
-        const response = await axios.get(`http://localhost:4000/server/leetcode/check-username/${username}`);
+        const response = await axios.get(`http://localhost:4000/server/codeforces/fetch-codeforces/${username}`);
         if (response.data.success) {
-            if (response.data.total1 === (total1 ) && response.data.total2 === (total2 )) {
+            if (response.data.data.problemsolved===Problem) {
                 setVerificationStep1("Problem submitted successfully! 🎉");
-                setToast("Submmission found ..!");
-                const response = await axios.post(`http://localhost:4000/server/leetcode/add-leetcode`, {
+                const response = await axios.post(`http://localhost:4000/server/codeforces/add-codeforces`, {
                     username: username,
                     email: currentUser?.email
-                })
+                });
                 console.log(response.data.data);
-
+                setToast("Submission found!");
             } else {
                 setVerificationStep1("No submission found. Try again.");
-                setToast("Submmission not found ..!");
+                setToast("Submission not found!");
             }
         }
         setIsVerifying(false);
         setShowRefresh(false);
         setIsShow2(false);
         setIsModalOpen(false);
-        window.location.reload()
+        window.location.reload();
     };
 
     return (
@@ -126,7 +122,7 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
                                 <X className={`h-5 w-5 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`} />
                             </button>
                             <h3 className={`text-2xl font-bold mb-6 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-                                Add LeetCode Account
+                                Add Codeforces Account
                             </h3>
                             <div className="space-y-4">
                                 <div>
@@ -134,7 +130,7 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
                                         className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
                                             }`}
                                     >
-                                        LeetCode Username
+                                        Codeforces Username
                                     </label>
                                     <div className="flex items-center space-x-2">
                                         <input
@@ -148,66 +144,6 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
                                         />
                                         {
                                             iShow ? (
-                                                <>
-                                                    <svg
-                                                        className="animate-spin h-5 w-5 text-gray-500"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                    >
-                                                        <circle
-                                                            className="opacity-25"
-                                                            cx="12"
-                                                            cy="12"
-                                                            r="10"
-                                                            stroke="currentColor"
-                                                            strokeWidth="4"
-                                                        ></circle>
-                                                        <path
-                                                            className="opacity-75"
-                                                            fill="currentColor"
-                                                            d="M4 12a8 8 0 018-8v8H4z"
-                                                        ></path>
-                                                    </svg>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <button
-                                                        onClick={handleVerify}
-                                                        className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                                        disabled={isVerifying}
-                                                    >
-                                                        {isVerifying ? "Verifying..." : "Verify"}
-                                                    </button>
-                                                </>
-                                            )
-                                        }
-
-                                    </div>
-                                    <p className="text-sm mt-2 text-red-500">{Account}</p>
-                                    <p className="text-sm mt-2 text-gray-500">{notValid}</p>
-                                    <p className="text-sm mt-2 text-gray-500">
-                                        {verificationStep1}
-                                        {
-                                            verificationStep1 !== "" && (
-                                                <a
-                                                    href="https://leetcode.com/problems/create-hello-world-function/description/"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-600 hover:underline"
-                                                >
-                                                    Click here
-                                                </a>
-                                            )
-                                        }
-                                    </p>
-
-                                    <p className="text-sm mt-2 text-gray-500">{verificationStep2}</p>
-                                    <p className="text-sm mt-2 text-gray-500">{verificationStep3}</p>
-                                    {isVerifying && <p className="text-red-500">Time left: {formatTime(timeLeft)}</p>}
-                                    {
-                                        iShow2 ? (
-                                            <>
                                                 <svg
                                                     className="animate-spin h-5 w-5 text-gray-500"
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -228,16 +164,53 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
                                                         d="M4 12a8 8 0 018-8v8H4z"
                                                     ></path>
                                                 </svg>
-                                            </>
-                                        ) : showRefresh === true ? (
-                                            <>
+                                            ) : (
                                                 <button
-                                                    onClick={handleRefresh}
-                                                    className="mt-2 px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                                    onClick={handleVerify}
+                                                    disabled={isVerifying}
                                                 >
-                                                    Refresh
+                                                    {isVerifying ? "Verifying..." : "Verify"}
                                                 </button>
-                                            </>
+                                            )
+                                        }
+                                    </div>
+                                    <p className="text-sm mt-2 text-red-500">{Account}</p>
+                                    <p className="text-sm mt-2 text-red-500">{notValid}</p>
+                                    <p className="text-sm mt-2 text-gray-500">
+                                        {verificationStep1}
+                                    </p>
+                                    <p className="text-sm mt-2 text-gray-500">{verificationStep2}</p>
+                                    <p className="text-sm mt-2 text-gray-500">{verificationStep3}</p>
+                                    {isVerifying && <p className="text-red-500">Time left: {formatTime(timeLeft)}</p>}
+                                    {
+                                        iShow2 ? (
+                                            <svg
+                                                className="animate-spin h-5 w-5 text-gray-500"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <circle
+                                                    className="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    strokeWidth="4"
+                                                ></circle>
+                                                <path
+                                                    className="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8v8H4z"
+                                                ></path>
+                                            </svg>
+                                        ) : showRefresh === true ? (
+                                            <button
+                                                onClick={handleRefresh}
+                                                className="mt-2 px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                            >
+                                                Refresh
+                                            </button>
                                         ) : (
                                             <></>
                                         )
@@ -252,4 +225,4 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     );
 };
 
-export default LeetCodeModal;
+export default CodeforcesModal;

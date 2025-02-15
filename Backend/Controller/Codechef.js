@@ -7,9 +7,9 @@ import CodeChef from '../Models/CodeChef.js';
 import User from '../Models/User.js';
 dotenv.config();
 
-export const getfuturecontest = async (requestAnimationFrame, res) => {
-    try {
-        const response = await axios.get(`${process.env.codechef_api}`)
+export const getfuturecontest=async(requestAnimationFrame,res)=>{
+    try{
+        const response=await axios.get(`${process.env.codechef_api}`)
         console.log(response)
 
         if (response.data.status === 'success') {

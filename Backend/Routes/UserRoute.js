@@ -18,5 +18,9 @@ router.post('/user/email/email-otp',sendOTPEmail)
 
 // import { fetchGFG } from '../Controller/GeeksForGeeks.js';
 // router.post('/fetch/gfg',fetchGFG)
+import {updateUserProfile } from '../Controller/useredit.js'
+import { authMiddleware } from '../Middleware/authMiddleware.js';
+router.put('/user/edit-profile',updateUserProfile);
+// router.get('./user/getdata',getUserProfile )
 
 export default router;

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -11,10 +11,6 @@ import LeetCode from './Profiles/LeetCode';
 import CodeChef from './Profiles/CodeChef';
 import NotFound from './components/NotFound';
 import ProtectedRoute from './Context/ProtectedRoute';
-import GeeksforGeeks from './Profiles/GeeksforGeeks';
-import GitHub from './Profiles/GitHub';
-import Profile from './pages/Profile';
-import EditProfile from './pages/EditProfile';
 
 // Create theme context
 export const ThemeContext = createContext({
@@ -50,30 +46,18 @@ function App() {
               path="/user/:username/codechef"
               element={<ProtectedRoute><CodeChef /></ProtectedRoute>}
             />
-             <Route
-              path="/user/:username/geeksforgeeks"
-              element={<ProtectedRoute><GeeksforGeeks /></ProtectedRoute>}
-            />
-             <Route
-              path="/user/:username/github"
-              element={<ProtectedRoute><GitHub /></ProtectedRoute>}
-            />
-             <Route
-              path="/user/:username"
-              element={<ProtectedRoute><Profile /></ProtectedRoute>}
-            />
-            <Route
-              path="/user/:username/edit"
-              element={<ProtectedRoute><EditProfile /></ProtectedRoute>}
-            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
       </div>
     </ThemeContext.Provider>
     // <ContestSection/>
-
+   
   );
 }
+          {/* // <Loader/>
+    // <ContestSection/> */}
 
-export default App;
+   
+
+          export default App;
