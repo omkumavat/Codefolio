@@ -17,6 +17,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 // import { useToast } from "@/components/ui/use-toast";
 
 const Signup = () => {
@@ -450,6 +451,7 @@ const Signup = () => {
         </motion.div>
 
       </div>
+      <Footer/>
     </>
   );
 };

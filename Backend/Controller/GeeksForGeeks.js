@@ -1,93 +1,266 @@
 import axios from 'axios';
 import { JSDOM } from 'jsdom';
+import GeeksforGeeksUser from '../Models/GeeksforGeeks.js'; // adjust the path as needed
+import User from '../Models/User.js';
 
-export const fetchGFG = async (req, res) => {
-
+export const addGFG = async (req, res) => {
   try {
-    console.log(req.body)
-  const { username } = req.body;  // Get the username from the request body
-  console.log(username);
+    const { username, email } = req.body;
 
-  if (!username) {
-    return res.status(400).json({ error: 'Username is required in the request body.' });
-}
+    if (!username) {
+      return res.status(400).json({ success: false, message: 'Username is required.' });
+    }
 
-    // Fetch HTML of the GeeksForGeeks user profile page
-    const { data } = await axios.get(`https://www.geeksforgeeks.org/user/${username}`);
+    const findUser = await User.findOne({ email }).exec();
 
+    if (!findUser) {
+      console.log("User not found in the database.");
+      return res.status(400).json({ success: false, message: "User not exists in database" });
+    }
+
+    let existingProfile = await GeeksforGeeksUser.findOne({ username });
+
+    if (existingProfile) {
+      return res.status(400).json({ success: false, message: 'User already exists in database', data: existingProfile });
+    }
+
+    // Fetch HTML from GeeksForGeeks
+    const response = await axios.get(`https://www.geeksforgeeks.org/user/${username}`);
+    if (response.status !== 200) {
+      return res.status(404).json({ success: false, message: 'GFG user not found.' });
+    }
+
+    const { data } = response;
     const dom = new JSDOM(data);
     const document = dom.window.document;
 
-    const userHandle = document.querySelector('.profilePicSection_head_userHandle__oOfFy')?.textContent;
-    const stars = document.querySelectorAll('.profilePicSection_head_stars__JrrGz i').length;
-    const education = document.querySelector('.educationDetails_head_left--text__tgi9I')?.textContent;
-    const rank = document.querySelector('.educationDetails_head_left_userRankContainer--text__wt81s b')?.textContent.trim();
-    const skills = document.querySelector('.educationDetails_head_right--text__lLOHI')?.textContent.trim();
-    const contestAttended = document.querySelector('.contestDetailsCard_head_detail--text__NG_ae')?.textContent.trim();
-//     const contestDetails = Array.from(document.querySelectorAll('.contest_head_UXeV_ .contestDetailsCard_head_detail--text__NG_ae'))
-//   .map(element => element.textContent.trim());
-// const contestDetails = Array.from(document.querySelectorAll('.contestDetailsCard_head__0MvGa .contestDetailsCard_head_detail__8P4Vo'))
-//   .map(element => {
-//     // Extracting the title text (e.g., "Contest Rating", "Level")
-//     const title = element.querySelector('p.contestDetailsCard_head_detail--title__ngWg9').textContent.trim();
+    // Function to safely extract values
+    const getText = (selector) => document.querySelector(selector)?.textContent.trim() || null;
 
-//     // Extracting the value (e.g., "1588", "2")
-//     const value = element.querySelector('span.contestDetailsCard_head_detail--text__NG_ae').textContent.trim();
+    const getStars = () => document.querySelectorAll('.profilePicSection_head_stars__JrrGz i').length || 0;
 
-//     // Only return if both title and value are available
-//     if (title && value) {
-//       return { title, value };
-//     }
-//   })
-//   .filter(item => item !== undefined);
-const contestDetails = Array.from(document.querySelectorAll('p.contestDetailsCard_head_detail--title__ngWg9')).map(el => el.textContent.trim());
+    const getContestDetails = () => {
+      return Array.from(document.querySelectorAll(".contestDetailsCard_head_detail--title__ngWg9"))
+        .map(el => el.textContent.trim());
+    };
+
+    const getGlobalRank = () => {
+      const elements = document.querySelectorAll(".contestDetailsCard_head_detail--title__ngWg9");
+      for (const el of elements) {
+        if (el.textContent.trim() === "Global Rank") {
+          return el.parentElement?.querySelector(".contestDetailsCard_head_detail--text__NG_ae")?.textContent.trim() || 'Not Available';
+        }
+      }
+      return 'Not Available';
+    };
+
+    const getDifficultyLevels = () => {
+      return Array.from(document.querySelectorAll('.problemNavbar_head__cKSRi .problemNavbar_head_nav__a4K6P'))
+        .map(navItem => {
+          const textElement = navItem.querySelector('.problemNavbar_head_nav--text__UaGCx');
+          const textContent = textElement ? textElement.textContent.trim() : null;
+          const matches = textContent ? textContent.match(/([A-Za-z]+)\s\((\d+)\)/) : null;
+          return matches ? { difficulty: matches[1], solved: parseInt(matches[2], 10) } : null;
+        })
+        .filter(item => item !== null);
+    };
+
+    // Extract Data
+    const userHandle = getText('.profilePicSection_head_userHandle__oOfFy');
+    const stars = getStars();
+    const education = getText('.educationDetails_head_left--text__tgi9I');
+    const rank = getText('.educationDetails_head_left_userRankContainer--text__wt81s b');
+    const skills = getText('.educationDetails_head_right--text__lLOHI');
+    const contestAttended = getText('.contestDetailsCard_head_detail--text__NG_ae');
+    const contestDetails = getContestDetails();
+    const globalRank = getGlobalRank();
+    const contestRating = Array.from(document.querySelectorAll('.scoreCard_head_left--score__oSi_x'))
+      .map(el => el.textContent.trim());
+    const streak = getText('.circularProgressBar_head_mid_streakCnt__MFOF1');
+    const percentageInfo = getText('.contestDetailsCard_head_card__2xPdL p');
+
+    const problemNames = Array.from(document.querySelectorAll('.problemList_head__FfRAd ul li'))
+      .map(li => li.querySelector('a')?.textContent.trim())
+      .filter(name => name !== null)
+      .slice(0, 15); // Get only the top 15 problems
 
 
-console.log(contestDetails);
 
+    const difficultyLevels = getDifficultyLevels();
 
-    const contestrating = Array.from(document.querySelectorAll('.scoreCard_head_left--score__oSi_x')).map(el => el.textContent.trim());
-    const streak = document.querySelector('.circularProgressBar_head_mid_streakCnt__MFOF1')?.textContent.trim();
-    const percentageInfo = document.querySelector('.contestDetailsCard_head_card__2xPdL p')?.textContent.trim();
-
-    const problemNames = Array.from(document.querySelectorAll('.problemList_head__FfRAd ul li')).map(li => {
-      const anchor = li.querySelector('a');
-      return anchor ? anchor.textContent.trim() : null;
-    }).filter(name => name !== null);
-
-    const difficultyLevels = Array.from(document.querySelectorAll('.problemNavbar_head__cKSRi .problemNavbar_head_nav__a4K6P'))
-      .map(navItem => {
-        const textElement = navItem.querySelector('.problemNavbar_head_nav--text__UaGCx');
-        const textContent = textElement ? textElement.textContent.trim() : null;
-        const matches = textContent ? textContent.match(/([A-Za-z]+)\s\((\d+)\)/) : null;
-        return matches ? { difficulty: matches[1], solved: parseInt(matches[2], 10) } : null;
-      })
-      .filter(item => item !== null);
-
-    // Send all the extracted data as the response
-    return res.status(200).json({
-      success: true,
-      data: { 
-        username: userHandle,
-        stars: stars,
-        education: education,
-        rank: rank,
-        skills: skills,
-        contestRating: contestrating,
-        streak: streak,
-        contestAttended: contestAttended,
-        // globalRank: globalRank,
-        percentageInfo: percentageInfo,
-        problemNames: problemNames,
-        difficultyLevels: difficultyLevels,
-        contestt:contestDetails
-      },
+    // Store Data in MongoDB
+    const GeeksforGeeks = new GeeksforGeeksUser({
+      username: userHandle || username,
+      stars,
+      education: education || 'Not Available',
+      rank: rank || 'Not Available',
+      skills: skills || 'Not Available',
+      contestRating,
+      streak: streak || '0',
+      contestAttended: contestAttended || '0',
+      globalRank,
+      percentageInfo: percentageInfo || 'Not Available',
+      problemNames,
+      difficultyLevels,
+      contestDetails
     });
+
+    await GeeksforGeeks.save();
+    findUser.GeeksforGeeks = GeeksforGeeks._id;
+    await User.findByIdAndUpdate(findUser._id, { GeeksforGeeks: GeeksforGeeks._id });
+
+    return res.status(201).json({
+      success: true,
+      message: "User data successfully fetched and stored",
+      data: GeeksforGeeks
+    });
+
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching user data:", error);
     return res.status(500).json({
       success: false,
       message: "An error occurred while fetching user data",
+    });
+  }
+};
+
+export const fetchGFGfromDB = async (req, res) => {
+  try {
+    const { gfgid } = req.params;
+    let existingUser = await GeeksforGeeksUser.findById(gfgid).exec();
+
+    if (!existingUser) {
+      console.log("GeeksforGeeks user not found, creating a new one.");
+      return res.status(400).json({
+        success: false,
+        message: "LeetCode user not found"
+      });
+    } else {
+      return res.status(200).json({
+        data: existingUser,
+        success: true,
+        message: "GeeksforGeeks user  found"
+      });
+    }
+  } catch (error) {
+    console.error("Error storing LeetCode user data:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export const fetchGFG = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    if (!username) {
+      return res.status(400).json({ success: false, message: 'Username is required.' });
+    }
+
+    // Find the user in the database using the email.
+    const findUser = await User.findOne({ username }).exec();
+    if (!findUser) {
+      console.log("User not found in the database.");
+      return res.status(400).json({ success: false, message: "User does not exist in the database" });
+    }
+
+    // Determine whether to update an existing GFG profile or create a new one.
+    let gfgProfile;
+    if (findUser.GeeksforGeeks) {
+      // User already has a linked GFG profile; update it.  
+      gfgProfile = await GeeksforGeeksUser.findById(findUser.GeeksforGeeks);
+    } else {
+      return res.status(400).json({ success: false, message: "GFG does not exist in the database" });
+    }
+
+    const response = await axios.get(`https://www.geeksforgeeks.org/user/${gfgProfile.username}`);
+    if (response.status !== 200) {
+      return res.status(404).json({ success: false, message: 'GFG user not found.' });
+    }
+
+    const { data } = response;
+    const dom = new JSDOM(data);
+    const document = dom.window.document;
+
+    // Helper functions for safe extraction:
+    const getText = (selector) =>
+      document.querySelector(selector)?.textContent.trim() || null;
+
+    const getStars = () =>
+      document.querySelectorAll('.profilePicSection_head_stars__JrrGz i').length || 0;
+
+    const getContestDetails = () => {
+      return Array.from(document.querySelectorAll(".contestDetailsCard_head_detail--title__ngWg9"))
+        .map(el => el.textContent.trim());
+    };
+
+    const getGlobalRank = () => {
+      const elements = document.querySelectorAll(".contestDetailsCard_head_detail--title__ngWg9");
+      for (const el of elements) {
+        if (el.textContent.trim() === "Global Rank") {
+          return el.parentElement?.querySelector(".contestDetailsCard_head_detail--text__NG_ae")?.textContent.trim() || 'Not Available';
+        }
+      }
+      return 'Not Available';
+    };
+
+    const getDifficultyLevels = () => {
+      return Array.from(document.querySelectorAll('.problemNavbar_head__cKSRi .problemNavbar_head_nav__a4K6P'))
+        .map(navItem => {
+          const textElement = navItem.querySelector('.problemNavbar_head_nav--text__UaGCx');
+          const textContent = textElement ? textElement.textContent.trim() : null;
+          const matches = textContent ? textContent.match(/([A-Za-z]+)\s\((\d+)\)/) : null;
+          return matches ? { difficulty: matches[1], solved: parseInt(matches[2], 10) } : null;
+        })
+        .filter(item => item !== null);
+    };
+
+    // Extract data from the document.
+    const userHandle = getText('.profilePicSection_head_userHandle__oOfFy');
+    const stars = getStars();
+    const education = getText('.educationDetails_head_left--text__tgi9I');
+    const rank = getText('.educationDetails_head_left_userRankContainer--text__wt81s b');
+    const skills = getText('.educationDetails_head_right--text__lLOHI');
+    const contestAttended = getText('.contestDetailsCard_head_detail--text__NG_ae');
+    const contestDetails = getContestDetails();
+    const globalRank = getGlobalRank();
+    const contestRating = Array.from(document.querySelectorAll('.scoreCard_head_left--score__oSi_x'))
+      .map(el => el.textContent.trim());
+    const streak = getText('.circularProgressBar_head_mid_streakCnt__MFOF1');
+    const percentageInfo = getText('.contestDetailsCard_head_card__2xPdL p');
+    const problemNames = Array.from(document.querySelectorAll('.problemList_head__FfRAd ul li'))
+      .map(li => li.querySelector('a')?.textContent.trim())
+      .filter(name => name !== null)
+      .slice(0, 15); // Get only the top 15 problems
+    const difficultyLevels = getDifficultyLevels();
+
+    // Update each field of the GFG profile document.
+    gfgProfile.username = userHandle || username;
+    gfgProfile.stars = stars;
+    gfgProfile.education = education || 'Not Available';
+    gfgProfile.rank = rank || 'Not Available';
+    gfgProfile.skills = skills || 'Not Available';
+    gfgProfile.contestRating = contestRating;
+    gfgProfile.streak = streak || '0';
+    gfgProfile.contestAttended = contestAttended || '0';
+    gfgProfile.globalRank = globalRank;
+    gfgProfile.percentageInfo = percentageInfo || 'Not Available';
+    gfgProfile.problemNames = problemNames;
+    gfgProfile.difficultyLevels = difficultyLevels;
+    gfgProfile.contestDetails = contestDetails;
+
+    // Save the updated or newly created GFG profile.
+    await gfgProfile.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "User data successfully updated",
+      data: gfgProfile
+    });
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching user data"
     });
   }
 };

@@ -3,23 +3,6 @@ import dotenv from 'dotenv';
 import LeetCodeUser from '../Models/LeetCode.js';
 import User from '../Models/User.js';
 dotenv.config();
-// const leetcode_profile = await axios.get(`${process.env.leetcode_api}/${username}`);
-// const leetcode_badges = await axios.get(`${process.env.leetcode_api}/${username}/badges`);
-// const leetcode_solved = await axios.get(`${process.env.leetcode_api}/${username}/solved`);
-// const leetcode_contest = await axios.get(`${process.env.leetcode_api}/${username}/contest`);
-// const leetcode_last_20 = await axios.get(`${process.env.leetcode_api}/${username}/acSubmission`);
-// const leetcode_active_2024 = await axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${username}&year=2024`);
-// const leetcode_active_2025 = await axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${username}&year=2025`);
-
-// const response = {
-//     profile: leetcode_profile.data,
-//     badges: leetcode_badges.dataconst,
-//     solved: leetcode_solved.data,
-//     contest: leetcode_contest.data,
-//     last_20: leetcode_last_20.data,
-//     active_2024: leetcode_active_2024.data,
-//     active_2025: leetcode_active_2025.data,
-// };
 
 export const fetchLeetCode = async (req, res) => {
     try {

@@ -1,7 +1,9 @@
 import express from 'express';
 const router = express.Router();
 
-import { fetchGFG } from '../Controller/GeeksForGeeks.js';
-router.post('/fetch',fetchGFG)
+import { addGFG,fetchGFG ,fetchGFGfromDB} from '../Controller/GeeksForGeeks.js';
+router.post('/add-gfg',addGFG)
+router.get('/fetch-gfg/:username',fetchGFG)
+router.get('/fetch-gfg-db/:gfgid',fetchGFGfromDB)
 
 export default router;

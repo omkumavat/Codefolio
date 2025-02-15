@@ -91,8 +91,8 @@ const LeetCode = () => {
         setShowDelete(false);
       }
 
-      if (!response || !response.data) {
-        setloading(false);
+      if (!response || !response.data || response.status !== 200) {
+        window.location.href = "/notfound";  
         return;
       }
 
@@ -142,6 +142,7 @@ const LeetCode = () => {
 
       setHasAccount(true);
     } catch (error) {
+      window.location.href = "/notfound";
       console.error("Error fetching LeetCode data:", error);
     } finally {
       setloading(false);
@@ -152,8 +153,8 @@ const LeetCode = () => {
     setloading(true);
     try {
       let response = null;
-
-      console.log(currentUser)
+  
+      console.log(currentUser);
       if (currentUser) {
         if (currentUser?.username === username) {
           if (currentUser?.LeetCode) {
@@ -162,7 +163,7 @@ const LeetCode = () => {
             const leetid = currentUser?.LeetCode;
             response = await axios.get(`http://localhost:4000/server/leetcode/fetch-from-db/${leetid}`);
           } else {
-            console.log(hasAccount)
+            console.log(hasAccount);
             setHasAccount(false);
             return;
           }
@@ -176,17 +177,19 @@ const LeetCode = () => {
         setShowRefresh(false);
         setShowDelete(false);
       }
-
-      console.log(response)
-      if (!response || !response.data) {
-        setloading(false);
-        return;
-      }
-
+  
+      // const data = response.data.data;
+      // console.log("LeetCode Data:", data);
+      // // **Check if response is invalid**
+      // if (!response || !response.data) {
+      //   window.location.href = "/notfound";  
+      //   return;
+      // }
+  
       const data = response.data.data;
       console.log("LeetCode Data:", data);
-
-      setUsernameLeet(data.username)
+  
+      setUsernameLeet(data.username);
       setProfile(data.profile);
       setRecentProblem(data.profile?.recentSubmissions || []);
       setcontestAttend(data.contests?.contestAttend || 0);
@@ -195,45 +198,48 @@ const LeetCode = () => {
       setactiveYears(data.submissions_2025?.activeYears || []);
       settotalActiveDays(data.submissions_2025?.totalActiveDays || 0);
       setStreak(data.submissions_2025?.streak || 0);
-
-      // Update circular chart data
+  
+      // **Update circular chart data**
       if (data.profile) {
         const updatedCircularData = circularData.map((item) => {
           let solvedCount = 0;
           if (item.label === "Easy") solvedCount = data.profile.easySolved || 0;
           if (item.label === "Medium") solvedCount = data.profile.mediumSolved || 0;
           if (item.label === "Hard") solvedCount = data.profile.hardSolved || 0;
-
+  
           return {
             ...item,
             count: solvedCount,
             percentage: item.total > 0 ? ((solvedCount / item.total) * 100).toFixed(2) : 0,
           };
         });
-
+  
         setcircularData(updatedCircularData);
       }
-
-      // Parse submission calendars
+  
+      // **Parse submission calendars**
       const parseSubmissions = (submissions) => {
         return (submissions || []).map((datao) => ({
-          date: new Date((datao.date) * 1000).toISOString().split('T')[0],
+          date: new Date(datao.date * 1000).toISOString().split("T")[0],
           submissions: datao.submissions,
         }));
       };
-
+  
       setsubmissionCalendar2025(parseSubmissions(data.submissions_2025?.submissionCalendar));
       setsubmissionCalendar2024(parseSubmissions(data.submissions_2024?.submissionCalendar));
+  
       console.log("Submission Calendar 2024:", data.submissions_2024?.submissionCalendar);
       console.log("Submission Calendar 2025:", data.submissions_2025?.submissionCalendar);
-
+  
       setHasAccount(true);
     } catch (error) {
       console.error("Error fetching LeetCode data:", error);
+      // window.location.href = "/notfound"; 
     } finally {
       setloading(false);
     }
   };
+  
 
   const deleteLeetCodeAccount = async () => {
     try {

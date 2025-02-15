@@ -12,7 +12,7 @@ const CodeChefModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     const { isDarkMode } = useTheme();
     const [username, setUsername] = useState("");
     const [isVerifying, setIsVerifying] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(10);
+    const [timeLeft, setTimeLeft] = useState(60);
     const [notValid, setNotValid] = useState("");
     const [verificationStep1, setVerificationStep1] = useState("");
     const [verificationStep2, setVerificationStep2] = useState("");
@@ -75,7 +75,7 @@ const CodeChefModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
         setVerificationStep3("");
         const response = await axios.get(`http://localhost:4000/server/codechef/check-user/${username}`);
         if (response.data.success) {
-            if (response.data.problemsolved !== Problem) {
+            if (response.data.problemsolved === Problem) {
                 setVerificationStep1("Problem submitted successfully! 🎉");
                 const response = await axios.post(`http://localhost:4000/server/codechef/add-codechef`, {
                     username: username,

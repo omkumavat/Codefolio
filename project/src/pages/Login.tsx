@@ -8,6 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from '../Context/AuthProvider';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer'
 
 const Login = () => {
   const {login}=useAuth();
@@ -164,6 +165,7 @@ const Login = () => {
         </div>
       </motion.div>
     </div>
+    <Footer/>
     </>
   );
 };

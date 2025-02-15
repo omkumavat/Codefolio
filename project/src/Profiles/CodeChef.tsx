@@ -94,11 +94,10 @@ const CodeChef = () => {
                 setShowDelete(false);
             }
 
-            if (!response || !response.data) {
-                setloading(false);
+            if (!response || !response.data || response.status !== 200) {
+                window.location.href = "/notfound";  
                 return;
-            }
-
+              }
             const data = response.data.data;
             console.log("LeetCode Data:", data);
 
@@ -144,6 +143,7 @@ const CodeChef = () => {
 
             setHasAccount(true);
         } catch (error) {
+            window.location.href = "/notfound"; 
             console.error("Error fetching LeetCode data:", error);
         } finally {
             setloading(false);
@@ -180,10 +180,10 @@ const CodeChef = () => {
             }
 
             console.log(response)
-            if (!response || !response.data) {
-                setloading(false);
+            if (!response || !response.data || response.status !== 200) {
+                window.location.href = "/notfound";  
                 return;
-            }
+              }
 
             const data = response.data.data;
             console.log("LeetCode Data:", data);
@@ -231,6 +231,7 @@ const CodeChef = () => {
 
             setHasAccount(true);
         } catch (error) {
+            window.location.href = "/notfound";
             console.error("Error fetching LeetCode data:", error);
         } finally {
             setloading(false);
@@ -488,12 +489,6 @@ const CodeChef = () => {
                 ) : (
 
                     <>
-                        {/* <div className="relative py-20 px-4">
-                        <div className="container mx-auto relative z-10 mt-1">
-                            <div className="flex flex-col items-center">
-                            </div>
-                        </div>
-                    </div> */}
                         <section className={`py-20 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                             <div className="container mx-auto px-4">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -537,8 +532,6 @@ const CodeChef = () => {
                     </>
                 )
                 }
-
-
                 {
                     isModalOpen && (
                         <CodeChefModal isModalOpen={isModalOpen} setToast={setToast} setIsModalOpen={setIsModalOpen} />

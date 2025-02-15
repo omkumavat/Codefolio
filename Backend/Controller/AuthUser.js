@@ -2,6 +2,7 @@ import User from "../Models/User.js";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import dotenv from "dotenv";
+import cloudinary from 'cloudinary'
 dotenv.config();
 
 export const Signup = async (req, res) => {
@@ -190,3 +191,137 @@ export const checkUser=async(req,res)=>{
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+export const getUserbyId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    // Send user data (or filter fields as needed)
+    return res.json({
+        success:true,
+
+    });
+  } catch (error) {
+    console.error('Error in getUser:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+export const editUserbyId = async (req, res) => {
+  const { id } = req.params;
+  // Destructure expected fields from request body
+  const {
+    username,
+    name,
+    email,
+    mobileno,
+    profilePicture,
+    bio,
+    city,
+    country,
+    state,
+    college,
+    branch,
+    degree,
+    gryear,
+    website,
+    skills,
+    position,
+    avgScore,
+    userProfile,
+    gender,
+    birthdate,
+    role,
+    imageData,
+    linkedin,
+    geeksforgeeks,
+    github,
+    leetcode,
+    codeforces,
+    codechef,
+    twitter
+  } = req.body;
+
+  try {
+    // Find user by ID
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    let newImageUrl=user.profilePicture;
+    if (imageData && imageData.startsWith("data:image")) {
+        const base64Image = imageData.split(";base64,").pop();
+        const uploadResponse = await cloudinary.uploader.upload(
+            `data:image/png;base64,${base64Image}`,
+            {
+                folder: "CodeFolio",
+                use_filename: true,
+                unique_filename: true,
+                quality: "auto:best",
+                format: "auto",
+                width: 374,
+                height: 305,
+                crop: "fit",
+            }
+        );
+        newImageUrl = uploadResponse.secure_url;
+    }
+
+    if(imageData!==undefined) user.profilePicture = newImageUrl;    
+    if (username !== undefined) user.username = username;
+    if (name !== undefined) user.name = name;
+    if (email !== undefined) user.email = email;
+    if (mobileno !== undefined) user.mobileno = parseInt(mobileno)
+    if (profilePicture !== undefined) user.profilePicture = profilePicture;
+    if (bio !== undefined) user.bio = bio;
+    if (skills !== undefined) user.skills = skills;
+    if (position !== undefined) user.position = position;
+    if (website !== undefined) user.website = website;
+    if (gender !== undefined) user.gender = gender;
+    if (birthdate !== undefined) user.birthdate = birthdate;
+    if (role !== undefined) user.role = role;
+    if(city!==undefined) user.location.city=city;
+    if(country!==undefined) user.location.country=country;
+    if(state!==undefined) user.location.state=state;
+    if(college!==undefined) user.education.college=college;
+    if(branch!==undefined) user.education.branch=branch;
+    if(degree!==undefined) user.education.degree=degree;
+    if(gryear!==undefined) user.education.gryear=gryear;
+    if(linkedin!==undefined) user.userProfile.linkedin=linkedin;
+    if(geeksforgeeks!==undefined) user.userProfile.geeksforgeeks=geeksforgeeks;
+    if(leetcode!==undefined) user.userProfile.leetcode=leetcode;
+    if(codechef!==undefined) user.userProfile.codechef=codechef;
+    if(codeforces!==undefined) user.userProfile.codeforces=codeforces;
+    if(twitter!==undefined) user.userProfile.twitter=twitter;
+    if(github!==undefined) user.userProfile.github=github;
+
+
+    // Update avgScore object (if provided)
+    if (avgScore) {
+      user.avgScore = {
+        rank: avgScore.rank !== undefined ? avgScore.rank : user.avgScore.rank,
+        score: avgScore.score !== undefined ? avgScore.score : user.avgScore.score,
+        totalActiveDays: avgScore.totalActiveDays !== undefined ? avgScore.totalActiveDays : user.avgScore.totalActiveDays,
+        stars: avgScore.stars !== undefined ? avgScore.stars : user.avgScore.stars,
+        graph: avgScore.graph && avgScore.graph.activedates 
+          ? { activedates: avgScore.graph.activedates }
+          : user.avgScore.graph
+      };
+    }
+
+    const updatedUser = await user.save();
+    return res.json({
+        success:true,
+        updatedUser
+    });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
+

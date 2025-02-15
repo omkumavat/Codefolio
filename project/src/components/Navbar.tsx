@@ -169,6 +169,9 @@ const Navbar = () => {
                   Profile
                 </button>
               )}
+               {!isLoggedIn && (
+                 <MobileNavLink to="/login" text="Login" isDarkMode={isDarkMode} />
+              )}
             </div>
           </motion.div>
         )}
@@ -224,13 +227,13 @@ const Navbar = () => {
 
                 <div className="space-y-2">
                   {[
-                    { icon: <Award />, text: 'My Profile', link: '/profiles/leetcode' },
+                    { icon: <Award />, text: 'My Profile', link: `/user/${currentUser.username}` },
                     { icon: <Award />, text: 'LeetCode', link: `/user/${currentUser.username}/leetcode` },
                     { icon: <Award />, text: 'CodeForces', link: '/profiles/codeforces' },
                     { icon: <Award />, text: 'CodeChef', link: `/user/${currentUser.username}/codechef` },
-                    { icon: <Github />, text: 'GitHub', link: '/profiles/github' },
-                    { icon: <Award />, text: 'GeeksforGeeks', link: '/profiles/gfg' },
-                    { icon: <Edit3 />, text: 'Edit Profile', link: '/profile/edit' },
+                    { icon: <Github />, text: 'GitHub', link: `/user/${currentUser.username}/github` },
+                    { icon: <Award />, text: 'GeeksforGeeks', link: `/user/${currentUser.username}/geeksforgeeks` },
+                    { icon: <Edit3 />, text: 'Edit Profile', link: `/user/${currentUser.username}/edit` },
                     { icon: <Settings />, text: 'Settings', link: '/settings' },
                     // { icon: <LogOut />, text: 'LogOut', link: '/settings' },
                   ].map((item, index) => (

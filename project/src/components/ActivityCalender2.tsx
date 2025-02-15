@@ -3,18 +3,19 @@ import { motion } from "framer-motion";
 
 interface ActivityDay {
   date: string;
-  count: number;
+  submissions: number;
 }
 
 interface ActivityCalendarProps {
   data: ActivityDay[];
   isDarkMode: boolean;
+  selectedYear: number;
 }
 
-const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ data, isDarkMode,selectedYear }) => {
-  console.log(data)
+const ActivityCalender2: React.FC<ActivityCalendarProps> = ({ data, isDarkMode, selectedYear }) => {
+  console.log(data);
+
   const getIntensityColor = (count: number) => {
-    // console.log(count);
     if (count === 0) return isDarkMode ? "bg-gray-800" : "bg-gray-200";
     if (count <= 2) return "bg-green-200";
     if (count <= 5) return "bg-green-300";
@@ -25,21 +26,20 @@ const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ data, isDarkMode,se
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   const generateFullYearData = () => {
-    const fullYearData: Record<number, ActivityDay[]> = {};
-    const currentYear = new Date().getFullYear();
+    const fullYearData: Record<number, { date: string; count: number }[]> = {};
 
     for (let month = 0; month < 12; month++) {
       fullYearData[month] = [];
       const daysInMonth = new Date(selectedYear, month + 1, 0).getDate();
 
       for (let day = 1; day <= daysInMonth; day++) {
-        const dateString = `${selectedYear}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        // Create a date string in the "YY-MM-DD" format, e.g. "24-03-16"
+        const twoDigitYear = String(selectedYear).slice(-2);
+        const dateString = `${twoDigitYear}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+        // Find the matching day in the data array using the new date format
         const existingDay = data.find((d) => d.date === dateString);
-        fullYearData[month].push({
-          date: dateString,
-          count: existingDay ? (existingDay.value ?? existingDay.submissions ?? 0) : 0
-        });        
-        
+        fullYearData[month].push({ date: dateString, count: existingDay ? existingDay.submissions : 0 });
       }
     }
     return fullYearData;
@@ -48,7 +48,7 @@ const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ data, isDarkMode,se
   const groupedData = generateFullYearData();
 
   return (
-    <div className="w-full max-w-[1000px] mx-auto"> {/* Reduced width for better fit on 14-inch screens */}
+    <div className="w-full max-w-[1000px] mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         {months.map((month, monthIndex) => (
           <div key={monthIndex} className="flex flex-col items-center">
@@ -80,4 +80,4 @@ const ActivityCalendar: React.FC<ActivityCalendarProps> = ({ data, isDarkMode,se
   );
 };
 
-export default ActivityCalendar;
+export default ActivityCalender2;
