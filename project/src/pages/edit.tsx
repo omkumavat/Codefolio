@@ -1,195 +1,111 @@
-import  { useState, useEffect } from 'react';
-import { TextField, Button, Grid, Box, InputAdornment, IconButton, Typography } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import axios from 'axios';
-import { useAuth } from '../Context/AuthProvider';
+import React, { useState, useEffect } from "react";
+import Button from "../components/Button.js";
+import TextBox from "../components/TextBox.js";
+import { EnvelopeIcon, LockClosedIcon, UserIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
 
-const Edit = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    name: '',
-    email: '',
-    password: '',
-    profilePicture: '',
-    skills: [],
-    education: [],
-  });
-
-  const {currentUser} = useAuth(); // Assuming this hook provides the current user's info
-  const userId = currentUser?.id || ''; // Adjust this based on your auth implementation
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+const EditProfile = () => {
+  const [id, setId] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   useEffect(() => {
-    if (currentUser) {
-  
-      setFormData({
-        username: currentUser.username || '',
-        name: currentUser.name || '',
-        email: currentUser.email || '',
-        // profilePicture: currentUser.profilePicture || '',
-        skills: currentUser.skills || [],
-        education: currentUser.education || [],
-      });0
-    }
-  }, [currentUser]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleSkillsChange = (e) => {
-    const value = e.target.value.split(',').map((skill) => skill.trim());
-    setFormData({ ...formData, skills: value });
-  };
-
-  const handleEducationChange = (e) => {
-    const updatedEducation = e.target.value
-      .split(',')
-      .map((edu) => {
-        const [degree, branch, college] = edu.split(';');
-        if (!degree || !branch || !college) {
-          alert('Please enter education in the format: degree;branch;college');
-          return null;
+    const fetchUserData = async () => {
+      try {
+        const storedEmail = localStorage.getItem("email");
+        if (!storedEmail) {
+          alert("Email is required");
+          return;
         }
-        return { degree, branch, college };
-      })
-      .filter(Boolean); // Removes null values
-    setFormData({ ...formData, education: updatedEducation });
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+        const response = await axios.get(`http://localhost:5000/user/getuserbyemail`, {
+          params: { email: storedEmail },
+        });
+
+        setId(response.data.user._id);
+        setName(response.data.user.name);
+        setEmail(response.data.user.email);
+        setPassword(response.data.user.password);
+        setConfirmPassword(response.data.user.password);
+      } catch (error) {
+        alert(error?.response?.data?.message);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handleUpdate = async (event) => {
+    event.preventDefault();
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    const userData = {
+      name,
+      email,
+      password,
+    };
 
     try {
-      const { username, name, email, password, profilePicture, skills, education } = formData;
-
-      if (!username || !email) {
-        alert('Please fill in all required fields.');
-        setLoading(false);
-        return;
-      }
-
-      const response = await axios.put('http://localhost:4000/server/user/edit-profile', {
-        userId:currentUser._id,
-        username,
-        name,
-        email,
-        password,
-        profilePicture,
-        skills,
-        education,
-      });
-
-      alert(response.data.message);
+      const response = await axios.put(`http://localhost:5000/user/update/${id}`, userData);
+      alert(response?.data?.message);
     } catch (error) {
-      console.error('Error updating profile:', error);
-      alert(error.response?.data?.message || 'There was an error updating your profile.');
-    } finally {
-      setLoading(false);
+      alert(error?.response?.data?.message);
     }
   };
 
-  const handleClickShowPassword = () => setShowPassword(!showPassword);
-
   return (
-    <Box sx={{ padding: 2 }}>
-      <Typography variant="h5" gutterBottom>
-        Edit Profile
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Profile Picture URL"
-              name="profilePicture"
-              value={formData.profilePicture}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Skills (comma separated)"
-              name="skills"
-              value={formData.skills.join(', ')}
-              onChange={handleSkillsChange}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Education (degree;branch;college, comma separated)"
-              name="education"
-              value={formData.education
-                .map((edu) => `${edu.degree};${edu.branch};${edu.college}`)
-                .join(', ')}
-              onChange={handleEducationChange}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Password"
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              value={formData.password}
-              onChange={handleChange}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={handleClickShowPassword} edge="end" aria-label="toggle password visibility">
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-        </Grid>
-        <Box sx={{ marginTop: 2 }}>
-          <Button variant="contained" color="primary" type="submit" disabled={loading} fullWidth>
-            {loading ? 'Updating...' : 'Update Profile'}
-          </Button>
-        </Box>
-      </form>
-    </Box>
-  );
-};
+    <div className="px-80 mt-10">
+      {/* <div className="flex flex-row justify-center items-center">
+        <h2>Change Profile Picture:</h2>
+        <div className="w-20 mt-4 ml-5">
+          <Button name="Update" />
+        </div>
+      </div> */}
 
-export default Edit;
+      <div className="flex flex-col justify-center items-center mt-10">
+        <p className="font-sans text-gray-400 text-lg text-center font-semibold tracking-widest mb-10">
+          Update Your Information
+        </p>
+        <form className="flex flex-col gap-4 mr-10 ml-4" onSubmit={handleUpdate}>
+          <TextBox label="Name" type="text" Icon={UserIcon} value={name} setValue={setName} required={true} />
+
+          <TextBox
+            label="Email"
+            type="text"
+            Icon={EnvelopeIcon}
+            value={email}
+            setValue={setEmail}
+            required={true}
+          />
+
+          <TextBox
+            label="Password"
+            type="password"
+            Icon={LockClosedIcon}
+            value={password}
+            setValue={setPassword}
+            required={true}
+          />
+
+          <TextBox
+            label="Confirm Password"
+            type="password"
+            Icon={LockClosedIcon}
+            value={confirmPassword}
+            setValue={setConfirmPassword}
+            required={true}
+          />
+
+          <Button type="submit" name="Update" onClick={undefined} />
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default EditProfile;

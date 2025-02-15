@@ -13,6 +13,7 @@ import Loader from '../components/Loader';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import ActivityCalendar from '../components/ActivityCalender';
+import SubmissionCalendar from '../components/ac';
 const Codeforces = () => {
     const { username } = useParams();
     const { currentUser, updateProfile } = useAuth();
@@ -131,11 +132,11 @@ const Codeforces = () => {
                 }));
             };
     
-            // setSubmissionCalendar2025(parseSubmissions(data.ActivityCalendar2025));
-            // setSubmissionCalendar2024(parseSubmissions(data.ActivityCalendar2024));
-            // setSubmissionCalendar2023(parseSubmissions(data.ActivityCalendar2023));
-            // setSubmissionCalendar2022(parseSubmissions(data.ActivityCalendar2022));
-            // setContestParticipation(parseContests(data.contests) || []);
+            setSubmissionCalendar2025(parseSubmissions(data.ActivityCalendar2025));
+            setSubmissionCalendar2024(parseSubmissions(data.ActivityCalendar2024));
+            setSubmissionCalendar2023(parseSubmissions(data.ActivityCalendar2023));
+            setSubmissionCalendar2022(parseSubmissions(data.ActivityCalendar2022));
+            setContestParticipation(parseContests(data.contests) || []);
     
             setHasAccount(true);
         } catch (error) {
@@ -327,6 +328,12 @@ const Codeforces = () => {
                                     <CodeforcesGraph isDarkMode={isDarkMode} handle="balajisaw07" />
                                 </div>
                             </div>
+
+
+  <div>
+    <SubmissionCalendar handle={cfUsername} isDarkMode={isDarkMode} selectedYear={selectedYear} />
+  </div>
+
 
                             {ShowDelete && (
                                 <motion.button
