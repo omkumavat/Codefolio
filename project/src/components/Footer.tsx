@@ -9,7 +9,7 @@ const FooterLink = ({ href, text }) => (
       target={href.startsWith("http") ? "_blank" : "_self"} // Open external links in a new tab
       rel={href.startsWith("http") ? "noopener noreferrer" : ""} // Security for external links
       whileHover={{ x: 5 }}
-      className="text-gray-400 hover:text-purple-400 transition-colors text-sm block"
+      className="text-gray-400 hover:text-blue-400 transition-colors text-sm block"
     >
       {text}
     </motion.a>
@@ -35,8 +35,8 @@ const Footer = () => {
             className="space-y-4"
           >
             <div className="flex items-center space-x-2">
-              <Code className="h-6 w-6 text-purple-400" />
-              <h3 className="text-xl font-bold">DevProfiles</h3>
+              <Code className="h-6 w-6 text-blue-400" />
+              <h3 className="text-xl font-bold">CodeFolio</h3>
             </div>
             <p className="text-gray-400 text-sm">
               Your one-stop platform for managing and showcasing your coding profiles.
@@ -94,9 +94,9 @@ const Footer = () => {
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="bg-gray-800 text-white px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none flex-grow"
+                className="bg-gray-800 text-white px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none flex-grow"
               />
-              <button className="bg-purple-600 text-white px-2 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+              <button className="bg-blue-600 text-white px-2 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                 Subscribe
               </button>
             </div>
@@ -110,7 +110,7 @@ const Footer = () => {
           className="mt-8 pt-8 border-t border-gray-800 text-center"
         >
           <p className="text-gray-400 text-sm">
-            &copy; {new Date().getFullYear()} DevProfiles. All rights reserved.
+            &copy; {new Date().getFullYear()} CodeFolio. All rights reserved.
           </p>
         </motion.div>
       </div>
@@ -123,7 +123,7 @@ const SocialIcon = ({ href, icon }: { href: string; icon: React.ReactNode }) => 
     href={href}
     whileHover={{ scale: 1.1 }}
     whileTap={{ scale: 0.95 }}
-    className="text-gray-400 hover:text-purple-400 transition-colors"
+    className="text-gray-400 hover:text-blue-400 transition-colors"
   >
     {icon}
   </motion.a>

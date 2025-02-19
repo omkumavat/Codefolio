@@ -13,10 +13,10 @@ interface ActivityCalendarProps {
 }
 
 const ActivityCalender2: React.FC<ActivityCalendarProps> = ({ data, isDarkMode, selectedYear }) => {
-  console.log(data);
+  console.log(isDarkMode);
 
   const getIntensityColor = (count: number) => {
-    if (count === 0) return isDarkMode ? "bg-gray-800" : "bg-gray-200";
+    if (count === 0) return isDarkMode ? "bg-gray-800 border-gray-700" : "bg-gray-200 border-gray-300";
     if (count <= 2) return "bg-green-200";
     if (count <= 5) return "bg-green-300";
     if (count <= 9) return "bg-green-400";

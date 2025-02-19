@@ -1,14 +1,15 @@
 import mongoose from "mongoose";
 import User from '../Models/User.js'
 // Schema for each contest participation
-const ContestSchema = new mongoose.Schema({
-  title: String,
-  rating: Number,
-  ranking: Number,
-  trendDirection: String,
-  problemsSolved: Number,
-  totalProblems: Number,
-});
+// const ContestSchema = new mongoose.Schema({
+//   title: String,
+//   rating: Number,
+//   ranking: Number,
+//   trendDirection: String,
+//   problemsSolved: Number,
+//   totalProblems: Number,
+//   date:date,
+// });
 
 // LeetCode User Schema
 const LeetCodeUserSchema = new mongoose.Schema({
@@ -26,7 +27,7 @@ const LeetCodeUserSchema = new mongoose.Schema({
   contests: {
     contestAttend:Number,
     contestRating: Number,
-    contestParticipation: [ContestSchema],
+    contestParticipation: [Object],
   },
   submissions_2024: {
     activeYears:[Number],

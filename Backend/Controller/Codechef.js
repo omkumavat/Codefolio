@@ -79,7 +79,7 @@ export const fetchUserNameExists = async (req, res) => {
             !(await page.$(".user-details-container"))) {
             // The selector .user-details-container should exist on valid profiles
             await browser.close();
-            return res.status(404).json({
+            return res.status(200).json({
                 success: false,
                 message: "CodeChef account not found for the given username.",
             });
@@ -105,12 +105,12 @@ export const fetchUserNameExists = async (req, res) => {
 
             // Only consider the first problem (break after finding it)
             if (problem) {
-                firstProblemInfo = `${problem}${result}`;
+                firstProblemInfo = `${problem}`;
                 break;
             }
         }
 
-        console.log("First problem info:", firstProblemInfo);
+        // console.log("First problem info:", firstProblemInfo);
 
         res.status(200).json({
             success: true,
@@ -218,7 +218,7 @@ export const AddCodeChefAccount = async (req, res) => {
         findUser.CodeChef = newCodeChef._id;
         await User.findByIdAndUpdate(findUser._id, { CodeChef: newCodeChef._id });
 
-        return res.status(201).json({ message: "User data stored successfully", data: newCodeChef });
+        return res.status(201).json({ message: "User data stored successfully", success:true, data: newCodeChef });
 
     } catch (error) {
         console.error("Error storing CodeChef user data:", error);
@@ -343,3 +343,26 @@ export const fetchCodeChefFromDB = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+
+
+export const deleteCodeChefUser = async (req, res) => {
+    try {
+        const { codechefid } = req.params; // The LeetCodeUser ID to delete
+    
+        // Delete the LeetCodeUser document
+        const deletedLeetCodeUser = await CodeChefUser.findByIdAndDelete(codechefid);
+        if (!deletedLeetCodeUser) {
+          return res.status(404).json({ success: false, message: 'LeetCodeUser not found.' });
+        }
+    
+        await User.findOneAndUpdate(
+          { CodeChef: codechefid },
+          { $unset: { CodeChef: "" } } // Remove the field
+        );
+    
+        return res.status(200).json({ success: true, message: 'LeetCodeUser deleted and reference removed from User.' });
+      } catch (error) {
+        console.error('Error deleting LeetCodeUser:', error);
+        return res.status(500).json({ success: false, message: 'Server error' });
+      }
+};

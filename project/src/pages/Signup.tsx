@@ -18,9 +18,11 @@ import {
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { useTheme } from '../App';
 // import { useToast } from "@/components/ui/use-toast";
 
 const Signup = () => {
+  const {isDarkMode}=useTheme();
   // Updated state: separate username and fullName fields.
   const [formData, setFormData] = useState({
     username: '',
@@ -207,20 +209,33 @@ const Signup = () => {
     );
   }
 
-
   return (
-    <><Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-white-600 to-indigo-600 flex items-center justify-center px-4 mt-[50px]">
-
+    <>
+      <Navbar />
+      <div
+        className={`min-h-screen flex items-center justify-center px-4 mt-[50px] ${
+          isDarkMode
+            ? "bg-gray-900 text-white"
+            : "bg-gradient-to-br from-white-600 to-blue-600 text-gray-900"
+        }`}
+      >
         <ToastContainer position="top-right" autoClose={3000} />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden"
+          className={`p-8 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
+          }`}
         >
           {/* Animated background effect */}
-          <div className=" absolute inset-0 top-[30px] bg-gradient-to-r from-purple-200 to-indigo-200 opacity-10 animate-pulse" />
+          <div
+            className={`absolute inset-0 top-[30px] opacity-10 animate-pulse ${
+              isDarkMode
+                ? "bg-gradient-to-r from-blue-900 to-indigo-900"
+                : "bg-gradient-to-r from-blue-200 to-indigo-200"
+            }`}
+          ></div>
           <div className="relative z-10">
             <motion.div
               initial={{ scale: 0 }}
@@ -228,33 +243,49 @@ const Signup = () => {
               transition={{ duration: 0.5 }}
               className="flex justify-center mb-8"
             >
-              <UserPlus className="h-12 w-12 text-purple-600" />
+              <UserPlus
+                className={`h-12 w-12 ${
+                  isDarkMode ? "text-blue-400" : "text-blue-600"
+                }`}
+              />
             </motion.div>
-
-            <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">
+  
+            <h2
+              className={`text-3xl font-bold text-center mb-8 ${
+                isDarkMode ? "text-gray-200" : "text-gray-800"
+              }`}
+            >
               Create Account
             </h2>
-
+  
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Username Field with availability check */}
+              {/* Username Field */}
               <motion.div
                 initial={{ x: -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.1 }}
               >
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  className={`block text-sm font-medium mb-2 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
                   User Id
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/3  transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <User className="absolute left-3 top-1/3 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input
                     type="text"
                     name="username"
                     value={formData.username}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
                     placeholder="Enter your User Name"
                     required
+                    className={`w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent ${
+                      isDarkMode
+                        ? "bg-gray-700 text-white"
+                        : "bg-white text-gray-900"
+                    }`}
                   />
                   <div className="absolute right-3 -mt-5 transform -translate-y-1/2">
                     {checkingUsername ? (
@@ -284,18 +315,23 @@ const Signup = () => {
                       <XCircle className="h-5 w-5 text-red-500" />
                     ) : null}
                   </div>
-                  <ShieldAlert className="absolute left-3 top-11 h-5 w-5 text-red-500 opacity-100" />
-                  <p className='text-red-500 w-full pl-10'>Username will not change, it must be unique </p>
                 </div>
+                <p className="text-red-500 w-full pl-10 text-sm">
+                  Username will not change; it must be unique.
+                </p>
               </motion.div>
-
+  
               {/* Full Name Field */}
               <motion.div
                 initial={{ x: -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
+                transition={{ delay: 0.2 }}
               >
-                <label className="block text-sm font-medium text-gray-700 mb-2 mt-3">
+                <label
+                  className={`block text-sm font-medium mb-2 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
                   Full Name
                 </label>
                 <div className="relative">
@@ -305,20 +341,28 @@ const Signup = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
                     placeholder="Enter your Full Name"
                     required
+                    className={`w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent ${
+                      isDarkMode
+                        ? "bg-gray-700 text-white"
+                        : "bg-white text-gray-900"
+                    }`}
                   />
                 </div>
               </motion.div>
-
+  
               {/* Email Field */}
               <motion.div
                 initial={{ x: -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  className={`block text-sm font-medium mb-2 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
                   Email
                 </label>
                 <div className="relative">
@@ -328,33 +372,48 @@ const Signup = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 
-                    ${emailVerified ? 'bg-gray-200 cursor-not-allowed text-gray-500' : 'focus:ring-purple-600 focus:border-transparent'}`}
                     placeholder="Enter your email"
-                    readOnly={emailVerified}
                     required
+                    readOnly={emailVerified}
+                    className={`w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg ${
+                      emailVerified
+                        ? "bg-gray-200 cursor-not-allowed text-gray-500"
+                        : isDarkMode
+                        ? "bg-gray-700 text-white focus:ring-blue-600 focus:border-transparent"
+                        : "bg-white text-gray-900 focus:ring-blue-600 focus:border-transparent"
+                    }`}
                   />
                   {!emailVerified && formData.email && (
                     <button
                       type="button"
                       onClick={handleEmailVerify}
-                      // disabled={!canVerify}
-                      className="absolute right-2 bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 transition"
+                      className="absolute right-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
                     >
                       Verify
                     </button>
                   )}
                   {emailVerified && (
-                    <span className="absolute right-2 text-green-600 font-bold">Verified</span>
+                    <span className="absolute right-2 text-green-600 font-bold">
+                      Verified
+                    </span>
                   )}
                 </div>
-
               </motion.div>
-
-              {/* OTP Input Boxes (appear if OTP has been sent and email is not verified) */}
+  
+              {/* OTP Input Boxes */}
               {otpSent && !emailVerified && (
-                <motion.div initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
-                  <p className="text-sm text-gray-700 mb-2">Enter the 6-digit OTP sent to your email:</p>
+                <motion.div
+                  initial={{ x: -50, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <p
+                    className={`text-sm mb-2 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    Enter the 6-digit OTP sent to your email:
+                  </p>
                   <div className="flex gap-2">
                     {otpInput.map((digit, index) => (
                       <input
@@ -365,20 +424,28 @@ const Signup = () => {
                         maxLength={1}
                         value={digit}
                         onChange={(e) => handleOtpInputChange(e, index)}
-                        className="w-10 h-10 text-center border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600"
+                        className={`w-10 h-10 text-center border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 ${
+                          isDarkMode
+                            ? "bg-gray-700 text-white"
+                            : "bg-white text-gray-900"
+                        }`}
                       />
                     ))}
                   </div>
                 </motion.div>
               )}
-
+  
               {/* Password Field */}
               <motion.div
                 initial={{ x: -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.3 }}
               >
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  className={`block text-sm font-medium mb-2 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
                   Password
                 </label>
                 <div className="relative">
@@ -388,20 +455,28 @@ const Signup = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
                     placeholder="Create a password"
                     required
+                    className={`w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent ${
+                      isDarkMode
+                        ? "bg-gray-700 text-white"
+                        : "bg-white text-gray-900"
+                    }`}
                   />
                 </div>
               </motion.div>
-
+  
               {/* Confirm Password Field */}
               <motion.div
                 initial={{ x: -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  className={`block text-sm font-medium mb-2 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
                   Confirm Password
                 </label>
                 <div className="relative">
@@ -411,13 +486,17 @@ const Signup = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
                     placeholder="Confirm your password"
                     required
+                    className={`w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent ${
+                      isDarkMode
+                        ? "bg-gray-700 text-white"
+                        : "bg-white text-gray-900"
+                    }`}
                   />
                 </div>
               </motion.div>
-
+  
               {/* Signup Button */}
               <motion.button
                 initial={{ y: 20, opacity: 0 }}
@@ -425,35 +504,39 @@ const Signup = () => {
                 transition={{ delay: 0.5 }}
                 type="submit"
                 disabled={!formData.username || usernameAvailable === false || checkingUsername}
-                className={`w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-2 rounded-lg transition-all duration-300 transform mt-6 ${!formData.username || usernameAvailable === false || checkingUsername
-                  ? 'opacity-50 cursor-not-allowed'
-                  : 'hover:scale-105 hover:from-purple-700 hover:to-indigo-700'
-                  }`}
+                className={`w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2 rounded-lg transition-all duration-300 transform mt-6 ${
+                  !formData.username || usernameAvailable === false || checkingUsername
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:scale-105 hover:from-blue-700 hover:to-indigo-700"
+                }`}
               >
                 Create Account
               </motion.button>
             </form>
-
+  
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
               className="mt-6 text-center"
             >
-              <p className="text-gray-600">
-                Already have an account?{' '}
-                <Link to="/login" className="text-purple-600 hover:text-purple-700 font-semibold">
+              <p className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                Already have an account?{" "}
+                <Link
+                  to="/login"
+                  className="text-blue-600 hover:text-blue-700 font-semibold"
+                >
                   Sign in
                 </Link>
               </p>
             </motion.div>
           </div>
         </motion.div>
-
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
+  
 };
 
 export default Signup;

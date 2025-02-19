@@ -10,6 +10,15 @@ const handleError = (res, error) => {
   res.status(500).json({ message: "Internal server error", error: error.message });
 };
 
+const formatDate = (dateString) => {
+  const d = new Date(dateString);
+  const year = d.getFullYear().toString().slice(-2); // last two digits
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+
 
 // Fetch Codeforces user info, rating, and status
 export const fetchCodeForces = async (req, res) => {
@@ -23,15 +32,15 @@ export const fetchCodeForces = async (req, res) => {
     }
 
     const findUser = await User.findOne({ username }).exec();
-      if (!findUser) {
-          return res.status(400).json({ message: "User does not exist in the database" });
-      }
+    if (!findUser) {
+      return res.status(400).json({ message: "User does not exist in the database" });
+    }
 
-      // Check if the Codeforces user already exists in the database
-      const existingUser = await CodeforcesUser.findById(findUser.CodeForces);
-      if (!existingUser) {
-          return res.status(400).json({ message: "Codeforces account already exists in the database" });
-      }
+    // Check if the Codeforces user already exists in the database
+    const existingUser = await CodeforcesUser.findById(findUser.CodeForces);
+    if (!existingUser) {
+      return res.status(400).json({ message: "Codeforces account already exists in the database" });
+    }
 
     const userStatusUrl = `${process.env.CODEFORCES_API_STATUS}${existingUser.username}&from=1&count=10`;
     const userRatingUrl = `${process.env.CODEFORCES_API_RATING}${existingUser.username}`;
@@ -82,86 +91,160 @@ export const getLatestContest = async (req, res) => {
 
 export const AddCodeForcesAccount = async (req, res) => {
   try {
-      const { username, email } = req.body;
+    const { username, email } = req.body;
 
-      if (!email || !username) {
-          return res.status(400).json({ message: "Email and username are required" });
-      }
+    if (!email || !username) {
+      return res.status(400).json({ message: "Email and username are required" });
+    }
 
-      // Find the user by email
-      const findUser = await User.findOne({ email }).exec();
-      if (!findUser) {
-          return res.status(400).json({ message: "User does not exist in the database" });
-      }
+    // Find the user by email
+    const findUser = await User.findOne({ email }).exec();
+    if (!findUser) {
+      return res.status(400).json({ message: "User does not exist in the database" });
+    }
 
-      // Check if the Codeforces user already exists in the database
-      const existingUser = await CodeforcesUser.findOne({  username });
-      if (existingUser) {
-          return res.status(400).json({ message: "Codeforces account already exists in the database" });
-      }
+    // Check if the Codeforces account already exists in the database
+    const existingUser = await CodeforcesUser.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ message: "Codeforces account already exists in the database" });
+    }
 
-      // Fetch Codeforces user submissions
-      const submissionsUrl = `https://codeforces.com/api/user.status?handle=${username}&from=1&count=1000`;
-      const userInfoUrl = `https://codeforces.com/api/user.info?handles=${username}`;
+    // Construct API URLs from environment variables
+    const submissionsUrl = `${process.env.CODEFORCES_API_STATUS}${username}&from=1&count=1000`;
+    const userInfoUrl = `${process.env.CODEFORCES_API_USER}${username}`;
+    const contestRatingUrl = `${process.env.CODEFORCES_API_RATING}${username}`;
 
-      const [submissionsResponse, userInfoResponse] = await Promise.all([
-          axios.get(submissionsUrl),
-          axios.get(userInfoUrl),
-      ]);
+    // Fetch data concurrently
+    const [submissionsResponse, userInfoResponse, contestRatingResponse] = await Promise.all([
+      axios.get(submissionsUrl),
+      axios.get(userInfoUrl),
+      axios.get(contestRatingUrl),
+    ]);
 
-      const submissions = submissionsResponse.data.result;
-      const userInfo = userInfoResponse.data.result[0];
+    const submissions = submissionsResponse.data.result;
+    const userInfoRaw = userInfoResponse.data.result[0];
+    const contestRatingRaw = contestRatingResponse.data.result;
 
-      if (!submissions || submissions.length === 0) {
-          return res.status(400).json({ message: "No submissions found for the given Codeforces username" });
-      }
+    if (!submissions || !userInfoRaw || !contestRatingRaw) {
+      return res.status(400).json({ message: "No submissions found for the given Codeforces username" });
+    }
 
-      if (!userInfo) {
-          return res.status(400).json({ message: "Failed to fetch user data from Codeforces APIs" });
-      }
+    // Helper: Convert Unix timestamp (seconds) to a formatted date string ("YYYY-MM-DD")
+    const convertUnixToDateStr = (timestamp) => {
+      const date = new Date(timestamp * 1000);
+      const year = date.getUTCFullYear();
+      const month = (date.getUTCMonth() + 1).toString().padStart(2, "0");
+      const day = date.getUTCDate().toString().padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
 
-      // Extract solved problems
-      const solvedProblemsSet = new Set();
-      submissions.forEach((submission) => {
-          if (submission.verdict === "OK") {
-              solvedProblemsSet.add(submission.problem.name);
+    // Group solved problems by rating and count unique problems
+    const solvedProblemsSet = new Set();
+    const problemsByRating = {};
+    submissions.forEach((submission) => {
+      if (submission.verdict === "OK" && submission.problem) {
+        solvedProblemsSet.add(submission.problem.name);
+        if (submission.problem.rating) {
+          const rating = submission.problem.rating;
+          if (!problemsByRating[rating]) {
+            problemsByRating[rating] = new Set();
           }
-      });
+          problemsByRating[rating].add(submission.problem.name);
+        }
+      }
+    });
+    const problemsSolved = solvedProblemsSet.size;
+    const problemsSolvedByRating = Object.entries(problemsByRating)
+      .map(([rating, problemSet]) => [parseInt(rating), Array.from(problemSet)])
+      .sort((a, b) => a[0] - b[0]);
 
-      const problemsSolved = solvedProblemsSet.size;
+    // Process contest rating info: include only required keys
+    const contestRatingInfo = contestRatingRaw.map((contest) => ({
+      contestId: contest.contestId,
+      contestName: contest.contestName,
+      handle: contest.handle,
+      rank: contest.rank,
+      ratingUpdateTimeSeconds: convertUnixToDateStr(parseInt(contest.ratingUpdateTimeSeconds)),
+      oldRating: contest.oldRating,
+      newRating: contest.newRating,
+    }));
 
-      // Create a new CodeForcesUser document
-      const newCodeForcesUser = new CodeforcesUser({
-          username: userInfo.handle,
-          problemsSolved,
-          country: userInfo.country || "N/A",
-          organization: userInfo.organization || "N/A",
-          maxRating: userInfo.maxRating,
-          currentRating: userInfo.rating,
-          rank: userInfo.rank,
-          maxRank: userInfo.maxRank,
-          // handle: userInfo.handle,
-      });
+    // Group submissions by day for each year
+    const submissionCalendars = {};
+    submissions.forEach((submission) => {
+      const dateStr = convertUnixToDateStr(submission.creationTimeSeconds);
+      const year = dateStr.substring(0, 4);
+      const key = `submissionCalendar${year}`;
+      if (!submissionCalendars[key]) {
+        submissionCalendars[key] = {};
+      }
+      if (!submissionCalendars[key][dateStr]) {
+        submissionCalendars[key][dateStr] = 0;
+      }
+      submissionCalendars[key][dateStr] += 1;
+    });
 
-      await newCodeForcesUser.save();
+    // Convert each year's calendar object into an array of { date, submissions } objects
+    const submissionCalendarsFormatted = {};
+    Object.keys(submissionCalendars).forEach((yearKey) => {
+      submissionCalendarsFormatted[yearKey] = Object.entries(submissionCalendars[yearKey])
+        .map(([date, count]) => ({ date, submissions: count }))
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+    });
 
-      // Link Codeforces account and save username in userProfile
-      findUser.CodeForces = newCodeForcesUser._id;
-      await User.findByIdAndUpdate(findUser._id, { CodeForces: newCodeForcesUser._id });
+    // Prepare userInfo object based on the sample structure.
+    // (Assumes userInfoRaw contains these fields; adjust mappings as needed.)
+    const userInfo = {
+      firstName: userInfoRaw.firstName || "",
+      lastName: userInfoRaw.lastName || "",
+      country: userInfoRaw.country || "",
+      city: userInfoRaw.city || "",
+      rating: userInfoRaw.rating || 0,
+      friendOfCount: userInfoRaw.friendOfCount || 0,
+      titlePhoto: userInfoRaw.titlePhoto || "",
+      handle: userInfoRaw.handle,
+      avatar: userInfoRaw.avatar || "",
+      contribution: userInfoRaw.contribution || 0,
+      organization: userInfoRaw.organization || "",
+      rank: userInfoRaw.rank || "",
+      maxRating: userInfoRaw.maxRating || 0,
+      registrationTimeSeconds: userInfoRaw.registrationTimeSeconds || 0,
+      maxRank: userInfoRaw.maxRank || "",
+    };
 
-      return res.status(201).json({
-          message: "Codeforces user data stored successfully",
-          submissions,
-          userInfo,
-          problemsSolved,
-      });
+    // Create and save new CodeforcesUser document
+    const newCodeForcesUser = new CodeforcesUser({
+      username: userInfo.handle,
+      problemSolved: problemsSolved,
+      country: userInfo.country,
+      organization: userInfo.organization,
+      maxRating: userInfo.maxRating,
+      currentRating: userInfo.rating,
+      rank: userInfo.rank,
+      maxRank: userInfo.maxRank,
+      contests: contestRatingInfo,
+      problemsSolvedByRating: problemsSolvedByRating,
+      submissions: submissionCalendarsFormatted, // if your schema supports this structure
+    });
+    await newCodeForcesUser.save();
+
+    // Link the Codeforces account with the user profile
+    findUser.CodeForces = newCodeForcesUser._id;
+    await User.findByIdAndUpdate(findUser._id, { CodeForces: newCodeForcesUser._id });
+
+    // Return response with only the desired fields
+    return res.status(201).json({
+      success:true,
+      message: "Codeforces user data stored successfully",
+      newCodeForcesUser
+    });
   } catch (error) {
-      console.error("Error storing Codeforces user data:", error);
-      return res.status(500).json({ message: "Internal server error" });
+    console.error("Error storing Codeforces user data:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
-export const fetchAndUpdateCodeforcesSubmissions = async (req, res) => {
+export const UpdateCodeForcesAccount = async (req, res) => {
   try {
     const { username } = req.params;
 
@@ -169,94 +252,133 @@ export const fetchAndUpdateCodeforcesSubmissions = async (req, res) => {
       return res.status(400).json({ message: "Username is required" });
     }
 
-    // Find the user in your main User collection
+    // Find the user by Codeforces username
     const findUser = await User.findOne({ username }).exec();
-
-    if (!findUser) {
-      console.log("User not found in the database.");
-      return res.status(400).json({ message: "User not exists in database" });
+    if (!findUser || !findUser.CodeForces) {
+      return res.status(400).json({ message: "User does not exist or has no linked Codeforces account" });
     }
 
-    if (!findUser.CodeForces) {
-      return res.status(400).json({ message: "Codeforces account not linked with this user" });
-    }
-
-    // Find the existing Codeforces user document
-    const existingCodeforcesUser = await CodeforcesUser.findById(findUser.CodeForces);
-    if (!existingCodeforcesUser) {
+    // Find the existing CodeforcesUser by ID
+    const existingCodeForcesUser = await CodeforcesUser.findById(findUser.CodeForces);
+    if (!existingCodeForcesUser) {
       return res.status(400).json({ message: "Codeforces user data not found" });
     }
 
-    console.log(`Fetching data for Codeforces user: ${existingCodeforcesUser.username}`);
+    // Construct API URLs
+    const submissionsUrl = `${process.env.CODEFORCES_API_STATUS}${username}&from=1&count=1000`;
+    const userInfoUrl = `${process.env.CODEFORCES_API_USER}${username}`;
+    const contestRatingUrl = `${process.env.CODEFORCES_API_RATING}${username}`;
 
-    // Fetch user info from Codeforces API
-    const userInfoUrl = `https://codeforces.com/api/user.info?handles=${existingCodeforcesUser.username}`;
-    const userInfoResponse = await axios.get(userInfoUrl);
+    // Fetch data concurrently
+    const [submissionsResponse, userInfoResponse, contestRatingResponse] = await Promise.all([
+      axios.get(submissionsUrl),
+      axios.get(userInfoUrl),
+      axios.get(contestRatingUrl),
+    ]);
 
-    if (
-      !userInfoResponse.data ||
-      userInfoResponse.data.status !== "OK" ||
-      !userInfoResponse.data.result
-    ) {
-      return res.status(400).json({ message: "Failed to fetch user info from Codeforces API" });
+    const submissions = submissionsResponse.data.result;
+    const userInfoRaw = userInfoResponse.data.result[0];
+    const contestRatingRaw = contestRatingResponse.data.result;
+
+    if (!submissions || !userInfoRaw || !contestRatingRaw) {
+      return res.status(400).json({ message: "No submissions found for the given Codeforces username" });
     }
 
-    const userInfo = userInfoResponse.data.result[0];
+    const convertUnixToDateStr = (timestamp) => {
+      const date = new Date(timestamp * 1000);
+      return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    };
 
-    // Fetch submissions from Codeforces API
-    const submissionsUrl = `https://codeforces.com/api/user.status?handle=${existingCodeforcesUser.username}&from=1&count=1000`;
-    const submissionsResponse = await axios.get(submissionsUrl);
+    const solvedProblemsSet = new Set();
+    const problemsByRating = {};
+    submissions.forEach((submission) => {
+      if (submission.verdict === "OK" && submission.problem) {
+        solvedProblemsSet.add(submission.problem.name);
+        if (submission.problem.rating) {
+          const rating = submission.problem.rating;
+          if (!problemsByRating[rating]) problemsByRating[rating] = new Set();
+          problemsByRating[rating].add(submission.problem.name);
+        }
+      }
+    });
+    const problemsSolved = solvedProblemsSet.size;
+    const problemsSolvedByRating = Object.entries(problemsByRating)
+      .map(([rating, problemSet]) => [parseInt(rating), Array.from(problemSet)])
+      .sort((a, b) => a[0] - b[0]);
 
-    if (
-      !submissionsResponse.data ||
-      submissionsResponse.data.status !== "OK" ||
-      !submissionsResponse.data.result
-    ) {
-      return res
-        .status(400)
-        .json({ message: "Failed to fetch submissions data from Codeforces API" });
-    }
+    const contestRatingInfo = contestRatingRaw.map((contest) => ({
+      contestId: contest.contestId,
+      contestName: contest.contestName,
+      handle: contest.handle,
+      rank: contest.rank,
+      ratingUpdateTimeSeconds: convertUnixToDateStr(parseInt(contest.ratingUpdateTimeSeconds)),
+      oldRating: contest.oldRating,
+      newRating: contest.newRating,
+    }));
 
-    const submissionsData = submissionsResponse.data.result;
+    const submissionCalendars = {};
+    submissions.forEach((submission) => {
+      const dateStr = convertUnixToDateStr(submission.creationTimeSeconds);
+      const year = dateStr.substring(0, 4);
+      const key = `submissionCalendar${year}`;
+      if (!submissionCalendars[key]) submissionCalendars[key] = {};
+      if (!submissionCalendars[key][dateStr]) submissionCalendars[key][dateStr] = 0;
+      submissionCalendars[key][dateStr] += 1;
+    });
+    const submissionCalendarsFormatted = {};
+    Object.keys(submissionCalendars).forEach((yearKey) => {
+      submissionCalendarsFormatted[yearKey] = Object.entries(submissionCalendars[yearKey])
+        .map(([date, count]) => ({ date, submissions: count }))
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+    });
 
-    // Update the Codeforces user document with fetched data
-    existingCodeforcesUser.problemSolved = userInfo.problemSolved || existingCodeforcesUser.problemSolved;
-    existingCodeforcesUser.rating = userInfo.rating || existingCodeforcesUser.rating;
-    existingCodeforcesUser.maxRating = userInfo.maxRating || existingCodeforcesUser.maxRating;
-    existingCodeforcesUser.rank = userInfo.rank || existingCodeforcesUser.rank;
-    existingCodeforcesUser.country = userInfo.country || existingCodeforcesUser.country;
-    existingCodeforcesUser.organization = userInfo.organization || existingCodeforcesUser.organization;
-    existingCodeforcesUser.currentRating = userInfo.rating || existingCodeforcesUser.currentRating;
-    existingCodeforcesUser.contribution = userInfo.contribution || existingCodeforcesUser.contribution;
-    existingCodeforcesUser.friendOfCount = userInfo.friendOfCount || existingCodeforcesUser.friendOfCount;
-    existingCodeforcesUser.lastOnlineTimeSeconds = userInfo.lastOnlineTimeSeconds || existingCodeforcesUser.lastOnlineTimeSeconds;
-    existingCodeforcesUser.registrationTimeSeconds = userInfo.registrationTimeSeconds || existingCodeforcesUser.registrationTimeSeconds;
-    existingCodeforcesUser.avatar = userInfo.avatar || existingCodeforcesUser.avatar;
-    existingCodeforcesUser.titlePhoto = userInfo.titlePhoto || existingCodeforcesUser.titlePhoto;
-    existingCodeforcesUser.submissions = submissionsData;
-    existingCodeforcesUser.lastUpdated = new Date();
+    const userInfo = {
+      firstName: userInfoRaw.firstName || "",
+      lastName: userInfoRaw.lastName || "",
+      country: userInfoRaw.country || existingCodeForcesUser.country,
+      city: userInfoRaw.city || "",
+      rating: userInfoRaw.rating || existingCodeForcesUser.currentRating,
+      friendOfCount: userInfoRaw.friendOfCount || 0,
+      titlePhoto: userInfoRaw.titlePhoto || "",
+      handle: userInfoRaw.handle,
+      avatar: userInfoRaw.avatar || "",
+      contribution: userInfoRaw.contribution || 0,
+      organization: userInfoRaw.organization || existingCodeForcesUser.organization,
+      rank: userInfoRaw.rank || existingCodeForcesUser.rank,
+      maxRating: userInfoRaw.maxRating || existingCodeForcesUser.maxRating,
+      registrationTimeSeconds: userInfoRaw.registrationTimeSeconds || 0,
+      maxRank: userInfoRaw.maxRank || existingCodeForcesUser.maxRank,
+    };
 
-    // Save the updated document
-    await existingCodeforcesUser.save();
+    // Update the existing CodeforcesUser document
+    existingCodeForcesUser.problemSolved = problemsSolved || existingCodeForcesUser.problemSolved;
+    existingCodeForcesUser.country = userInfo.country;
+    existingCodeForcesUser.organization = userInfo.organization;
+    existingCodeForcesUser.maxRating = userInfo.maxRating;
+    existingCodeForcesUser.currentRating = userInfo.rating;
+    existingCodeForcesUser.rank = userInfo.rank;
+    existingCodeForcesUser.maxRank = userInfo.maxRank;
+    existingCodeForcesUser.contests = contestRatingInfo || existingCodeForcesUser.contests;
+    existingCodeForcesUser.problemsSolvedByRating = problemsSolvedByRating || existingCodeForcesUser.problemsSolvedByRating;
+    existingCodeForcesUser.submissions = submissionCalendarsFormatted || existingCodeForcesUser.submissions;
 
-    // Return the updated data
+    await existingCodeForcesUser.save();
+
     return res.status(200).json({
-      success: true,
       message: "Codeforces user data updated successfully",
-      data: existingCodeforcesUser,
+      data: existingCodeForcesUser,
     });
   } catch (error) {
-    console.error("Error fetching and updating Codeforces submissions:", error);
+    console.error("Error updating Codeforces user data:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 // Fetch contest data for a specific handle
 export const fetchCodeforcesContestData = async (req, res) => {
   try {
     const { handle } = currentUser.email;
-console.log(handle);
+    console.log(handle);
 
     if (!handle) {
       return res.status(400).json({ message: "Handle is required" });
@@ -291,93 +413,90 @@ console.log(handle);
   }
 };
 
-
 export const fetchCodeforcesAccount = async (req, res) => {
-    try {
-        const { username } = req.params;
+  try {
+    const { username } = req.params;
 
-        if (!username) {
-            return res.status(400).json({ message: "Username is required" });
-        }
-
-        // const findUser = await User.findOne({ "userProfile.codeforces": username }).exec();
-        // if (!findUser) {
-        //     return res.status(400).json({ message: "User with this Codeforces handle does not exist in the database" });
-        // }
-
-        // if (!findUser.CodeForces) {
-        //     return res.status(400).json({ message: "Codeforces account not linked with this user" });
-        // }
-
-        // const existingCodeforcesUser = await CodeforcesUser.findById(findUser.CodeForces);
-        // if (!existingCodeforcesUser) {
-        //     return res.status(400).json({ message: "Codeforces user data not found" });
-        // }
-
-        const codeforcesApiUrl = `https://codeforces.com/api/user.status?handle=${username}&from=1&count=1000000`;
-        const response = await axios.get(codeforcesApiUrl);
-
-        if (!response.data || response.data.status !== "OK" || !response.data.result) {
-            return res.status(400).json({ message: "Failed to fetch user data from Codeforces API" });
-        }
-
-        const submissions = response.data.result.length;
-
-        // const uniqueProblems = new Set(
-        //     submissions
-        //         .filter(submission => submission.verdict === "OK")
-        //         .map(submission => `${submission.problem.contestId}-${submission.problem.index}`)
-        // );
-
-        const problemsSolvedCount =submissions;
-
-        // existingCodeforcesUser.problemSolved = problemsSolvedCount;
-        // existingCodeforcesUser.lastUpdated = new Date();
-
-        // await existingCodeforcesUser.save();
-
-        return res.status(200).json({
-          success:true,
-            message: "Codeforces user data updated successfully",
-            data: {
-                
-                problemSolved: problemsSolvedCount,
-                // lastUpdated: existingCodeforcesUser.lastUpdated
-            }
-        });
-
-    } catch (error) {
-        console.error("Error updating Codeforces user data:", error);
-        return res.status(500).json({ message: "Internal server error" });
+    if (!username) {
+      return res.status(400).json({ success: false, message: "Username is required" });
     }
-};
 
+    const codeforcesApiUrl = `https://codeforces.com/api/user.status?handle=${username}&from=1&count=1000000`;
+
+    const response = await axios.get(codeforcesApiUrl);
+
+    // Handle cases where API response indicates failure
+    if (!response.data || response.data.status === "FAILED") {
+      return res.status(404).json({
+        success: false,
+        message: "User not found or failed to fetch data from Codeforces API",
+      }); 
+    }
+
+    const submissions = response.data.result.length;
+    return res.status(200).json({
+      success: true,
+      message: "Codeforces user data fetched successfully",
+      data: { submissions },
+    });
+  } catch (error) {
+    console.error("Error fetching Codeforces user data:", error);
+
+    if (error.response && error.response.status === 400) {
+      return res.status(200).json({ success: false, message: "User not found on Codeforces" });
+    }
+
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 
 
 export const fetchCodeforcesFromDB = async (req, res) => {
   try {
-      const { codeforcesid } = req.params; // Get the Codeforces user ID from request parameters
+    const { codeforcesid } = req.params;
 
-      let existingUser = await CodeforcesUser.findById(codeforcesid).exec();
+    let existingUser = await CodeforcesUser.findById(codeforcesid).exec();
 
-      if (!existingUser) {
-          console.log("Codeforces user not found, creating a new one.");
-          return res.status(400).json({
-              success: false,
-              message: "Codeforces user not found",
-          });
-      } else {
-          return res.status(200).json({
-              data: existingUser,
-              success: true,
-              message: "Codeforces user found",
-          });
-      }
-  } catch (error) {
-      console.error("Error fetching Codeforces user data:", error);
-      return res.status(500).json({
-          success: false,
-          message: "Internal server error",
+    if (!existingUser) {
+      console.log("Codeforces user not found, creating a new one.");
+      return res.status(400).json({
+        success: false,
+        message: "Codeforces user not found",
       });
+    } else {
+      return res.status(200).json({
+        data: existingUser,
+        success: true,
+        message: "Codeforces user found",
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching Codeforces user data:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
+};
+
+export const deleteCodeForcesUser = async (req, res) => {
+    try {
+        const { codeforcesid } = req.params; // The LeetCodeUser ID to delete
+    
+        // Delete the LeetCodeUser document
+        const deletedLeetCodeUser = await CodeforcesUser.findByIdAndDelete(codeforcesid);
+        if (!deletedLeetCodeUser) {
+          return res.status(404).json({ success: false, message: 'LeetCodeUser not found.' });
+        }
+    
+        await User.findOneAndUpdate(
+          { CodeForces: codeforcesid },
+          { $unset: { CodeForces: "" } } // Remove the field
+        );
+    
+        return res.status(200).json({ success: true, message: 'LeetCodeUser deleted and reference removed from User.' });
+      } catch (error) {
+        console.error('Error deleting LeetCodeUser:', error);
+        return res.status(500).json({ success: false, message: 'Server error' });
+      }
 };

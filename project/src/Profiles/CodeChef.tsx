@@ -14,9 +14,11 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import RatingGraph2 from '../components/RatingGraph2';
 import ActivityCalendar from '../components/ActivityCalender';
+import DeleteModal from '../components/DeleteModal';
 
 const CodeChef = () => {
     const { username } = useParams();
+    const [isDeleteModal,setIsDeleteModal]=useState();
     const { currentUser, updateProfile } = useAuth();
     const [countryName, setcountryName] = useState("");
     const { isDarkMode } = useTheme();
@@ -34,38 +36,34 @@ const CodeChef = () => {
     const [submissionCalendar2023, setsubmissionCalendar2023] = useState([]);
     const [submissionCalendar2022, setsubmissionCalendar2022] = useState([]);
     const [selectedYear, setSelectedYear] = useState(2025);
-    const [loading, setloading] = useState(false);
+    const [loading, setloading] = useState(true);
     const [ShowRefresh, setShowRefresh] = useState(false);
     const [ShowDelete, setShowDelete] = useState(false);
     const [codeusername, setUsernameCode] = useState("");
     const [hasFetchedUser, setHasFetchedUser] = useState(false);
 
-    const setToast = (message) => {
-        console.log(message);
-        toast.success(message);
+    const setToast = (msg) => {
+        if (msg.success) {
+            toast.success(msg.text);
+        } else {
+            toast.error(msg.text);
+        }
     };
 
-    const selectedData = 
-    selectedYear === 2025 
-    ? submissionCalendar2025 
-    : selectedYear === 2024 
-    ? submissionCalendar2024 
-    : selectedYear === 2023 
-    ? submissionCalendar2023 
-    : selectedYear === 2022
-    ? submissionCalendar2022
-    : submissionCalendar2025;
-
-
-    const handleVerify = () => {
-        // Add verification logic here
-        setHasAccount(true);
-        setIsModalOpen(false);
-    };
+    const selectedData =
+        selectedYear === 2025
+            ? submissionCalendar2025
+            : selectedYear === 2024
+                ? submissionCalendar2024
+                : selectedYear === 2023
+                    ? submissionCalendar2023
+                    : selectedYear === 2022
+                        ? submissionCalendar2022
+                        : submissionCalendar2025;
 
     const fetchCodeChefData = async () => {
+        setloading(true);
         try {
-            setloading(true);
             let response = null;
 
             if (currentUser) {
@@ -94,10 +92,10 @@ const CodeChef = () => {
                 setShowDelete(false);
             }
 
-            if (!response || !response.data || response.status !== 200) {
-                window.location.href = "/notfound";  
-                return;
-              }
+            // if (!response || !response.data || response.status !== 200) {
+            //     window.location.href = "/notfound";
+            //     return;
+            // }
             const data = response.data.data;
             console.log("LeetCode Data:", data);
 
@@ -122,7 +120,6 @@ const CodeChef = () => {
 
             const parseSubmissions2 = (submissions) => {
                 return (submissions || []).map((datao) => {
-                    // Handle date formats and parse the date correctly
                     const parsedDate = new Date(datao.end_date.includes(' ') ? datao.end_date.replace(' ', 'T') : datao.end_date);
                     return {
                         date: parsedDate.toISOString().split('T')[0],
@@ -143,7 +140,7 @@ const CodeChef = () => {
 
             setHasAccount(true);
         } catch (error) {
-            window.location.href = "/notfound"; 
+            // window.location.href = "/notfound";
             console.error("Error fetching LeetCode data:", error);
         } finally {
             setloading(false);
@@ -151,7 +148,6 @@ const CodeChef = () => {
     };
 
     const fetchCodeChefDataFromDB = async () => {
-        setloading(true);
         try {
             let response = null;
 
@@ -181,9 +177,9 @@ const CodeChef = () => {
 
             console.log(response)
             if (!response || !response.data || response.status !== 200) {
-                window.location.href = "/notfound";  
+                window.location.href = "/notfound";
                 return;
-              }
+            }
 
             const data = response.data.data;
             console.log("LeetCode Data:", data);
@@ -231,7 +227,7 @@ const CodeChef = () => {
 
             setHasAccount(true);
         } catch (error) {
-            window.location.href = "/notfound";
+            // window.location.href = "/notfound";
             console.error("Error fetching LeetCode data:", error);
         } finally {
             setloading(false);
@@ -250,7 +246,6 @@ const CodeChef = () => {
     }
 
     const fetchUpdatedUser = async () => {
-        setloading(true);
         try {
             if (!currentUser?._id) {
                 console.log("No valid user ID found");
@@ -266,8 +261,6 @@ const CodeChef = () => {
             }
         } catch (error) {
             console.error("Unable to fetch user", error);
-        } finally {
-            setloading(false); // Always reset loading state
         }
     };
 
@@ -288,7 +281,6 @@ const CodeChef = () => {
             </div>
         );
     }
-
 
     return (
         <>
@@ -400,57 +392,66 @@ const CodeChef = () => {
                             </div>
 
                             {/* Stars Section */}
-                            <div className={`p-6 rounded-xl mb-12 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
-                                <h2 className="text-2xl font-bold mb-6">Stars Earned</h2>
-                                <div className="flex items-center space-x-2 overflow-x-auto pb-4">
+                            <div
+                                className={`p-6 rounded-xl mb-12 flex flex-col items-center ${isDarkMode ? "bg-gray-800" : "bg-white"
+                                    } shadow-lg`}
+                            >
+                                {/* Headline */}
+                                <h2 className="text-2xl font-bold mb-6 text-center">Stars Earned</h2>
+
+                                {/* Stars Wrapper - Centered Horizontally */}
+                                <div className="flex justify-center space-x-2 pb-4">
                                     {[...Array(5)].map((_, index) => (
                                         <motion.div
                                             key={index}
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
                                             transition={{ delay: index * 0.1 }}
-                                            className={`flex-shrink-0 p-4 rounded-lg ${index < parseInt(stars[0]) ? 'bg-orange-500' : 'bg-gray-300'}`}
+                                            className={`flex items-center justify-center flex-shrink-0 p-4 rounded-lg ${index < parseInt(stars[0]) ? "bg-orange-500" : "bg-gray-300"
+                                                }`}
                                         >
-                                            <Star className={`h-8 w-8 ${index < parseInt(stars[0]) ? 'text-white' : 'text-gray-500'}`} />
+                                            <Star
+                                                className={`h-8 w-8 ${index < parseInt(stars[0]) ? "text-white" : "text-gray-500"
+                                                    }`}
+                                            />
                                         </motion.div>
                                     ))}
                                 </div>
                             </div>
 
-                            {/* Problem Stats */}
-                            <div className={`p-6 rounded-xl mb-12 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
+
+                            <div
+                                className={`p-6 rounded-xl mb-12 text-center ${isDarkMode ? "bg-gray-800" : "bg-white"
+                                    } shadow-lg`}
+                            >
                                 <h2 className="text-2xl font-bold mb-6">Problem Solving Stats</h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {[
-                                        { label: 'Total Solved', value: problemSolved },
-                                        // { label: 'Contest Problems', value: '245' },
-                                        // { label: 'Practice Problems', value: '142' },
-                                        // { label: 'Success Rate', value: '76%' },
-                                    ].map((stat, index) => (
-                                        <motion.div
-                                            key={index}
-                                            initial={{ y: 20, opacity: 0 }}
-                                            animate={{ y: 0, opacity: 1 }}
-                                            transition={{ delay: index * 0.1 }}
-                                            className="text-center"
-                                        >
-                                            <div className="text-3xl font-bold text-orange-500">{stat.value}</div>
-                                            <div className="text-sm text-gray-500">{stat.label}</div>
-                                        </motion.div>
-                                    ))}
+
+                                {/* Flexbox container to center everything */}
+                                <div className="flex flex-wrap justify-center gap-6">
+                                    <motion.div
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.1 }}
+                                        className="flex flex-col items-center justify-center w-40 h-32 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md"
+                                    >
+                                        <div className="text-3xl font-bold text-orange-500">{problemSolved}</div>
+                                        <div className="text-sm text-gray-500 dark:text-gray-400">Total Solved</div>
+                                    </motion.div>
                                 </div>
                             </div>
 
-                            {/* Rating Graph */}
-                            <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
-                                <h2 className="text-2xl font-bold mb-6">Contest Rating History</h2>
-                                <RatingGraph2 data={contestParticipation} isDarkMode={isDarkMode} />
-                            </div>
                             <section className={`py-12 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                <div className="flex justify-between items-center px-4">
-                                    <h2 className={`text-3xl font-bold  text-center mb-8 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                <h2 className={`text-3xl text-center font-bold mb-8 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    Contest Ratings
+                                </h2>
+                                <RatingGraph2 data={contestParticipation} isDarkMode={isDarkMode} />
+                            </section>
+
+                            <section className={`py-12 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                            <h2 className={`text-3xl font-bold  text-center mb-8 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                         Activity Heatmap
                                     </h2>
+                                <div className="flex justify-between items-center px-4">
 
                                     <select
                                         value={selectedYear}
@@ -476,7 +477,7 @@ const CodeChef = () => {
                                         initial={{ y: 20, opacity: 0 }}
                                         animate={{ y: 0, opacity: 1 }}
                                         transition={{ delay: 0.4 }}
-                                        onClick={deleteLeetCodeAccount}
+                                        onClick={() => setIsDeleteModal(true)}
                                         className="flex justify-center items-center space-x-2 mt-10 px-6 py-3 bg-white text-red-600 rounded-full font-semibold hover:bg-blue-50 transition-colors mx-auto w-fit"
                                     >
                                         <DeleteIcon className="h-5 w-5" />
@@ -537,6 +538,12 @@ const CodeChef = () => {
                         <CodeChefModal isModalOpen={isModalOpen} setToast={setToast} setIsModalOpen={setIsModalOpen} />
                     )
                 }
+
+{
+          isDeleteModal && (
+            <DeleteModal accid={currentUser.CodeChef} isDeleteModal={isDeleteModal} setIsDeleteModal={setIsDeleteModal} setToast={setToast} acc={"CodeChef"} id={currentUser._id} />
+          )
+        }
             </div>
             <Footer />
         </>

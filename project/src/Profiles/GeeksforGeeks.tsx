@@ -12,15 +12,17 @@ import { useAuth } from '../Context/AuthProvider';
 import axios from 'axios';
 import Loader from '../components/Loader';
 import { useParams } from 'react-router-dom';
+import DeleteModal from '../components/DeleteModal';
 
 
 const GeeksforGeeks = () => {
     const { username } = useParams();
+    const [isDeleteModal,setIsDeleteModal]=useState(false);
     const [showModal, setShowModal] = useState(false);
     const [usernameGFG, setUsernameGFG] = useState('');
     const { isDarkMode } = useTheme();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const { currentUser, updateProfile } = useAuth();
     const [showRefresh, setShowRefresh] = useState(false);
     const [ShowDelete, setShowDelete] = useState(false);
@@ -36,9 +38,12 @@ const GeeksforGeeks = () => {
     const [difficultyLevels, setdifficultyLevels] = useState([]);
     const [hasFetchedUser, setHasFetchedUser] = useState(false);
 
-    const setToast = (message) => {
-        console.log(message);
-        toast.success(message);
+    const setToast = (msg) => {
+        if (msg.success) {
+            toast.success(msg.text);
+        } else {
+            toast.error(msg.text);
+        }
     };
     const getDifficultyColor = (difficulty) => {
         switch (difficulty.toLowerCase()) {
@@ -88,10 +93,10 @@ const GeeksforGeeks = () => {
                 setShowDelete(false);
             }
 
-            if (!response || !response.data || response.status !== 200) {
-                window.location.href = "/notfound";  
-                return;
-              }
+            // if (!response || !response.data || response.status !== 200) {
+            //     window.location.href = "/notfound";  
+            //     return;
+            //   }
 
             const data = response.data.data;
             console.log("GFG Data:", data);
@@ -116,7 +121,7 @@ const GeeksforGeeks = () => {
             setHasAccount(true);
         }
         catch (error) {
-            window.location.href = "/notfound"; 
+            // window.location.href = "/notfound"; 
             console.error("Error fetching LeetCode data:", error);
         } finally {
             setLoading(false);
@@ -124,7 +129,6 @@ const GeeksforGeeks = () => {
     };
 
     const fetchGFGCodeDataFromDB = async () => {
-        setLoading(true);
         try {
             let response = null;
 
@@ -153,11 +157,11 @@ const GeeksforGeeks = () => {
                 setShowDelete(false);
             }
 
-            console.log(response)
-            if (!response || !response.data || response.status !== 200) {
-                window.location.href = "/notfound";  
-                return;
-              }
+            // console.log(response)
+            // if (!response || !response.data || response.status !== 200) {
+            //     window.location.href = "/notfound";  
+            //     return;
+            //   }
             const data = response.data.data;
             console.log("LeetCode Data:", data);
 
@@ -183,7 +187,7 @@ const GeeksforGeeks = () => {
 
             setHasAccount(true);
         } catch (error) {
-            window.location.href = "/notfound"; 
+            // window.location.href = "/notfound"; 
             console.error("Error fetching LeetCode data:", error);
         } finally {
             setLoading(false);
@@ -202,7 +206,6 @@ const GeeksforGeeks = () => {
     }
 
     const fetchUpdatedUser = async () => {
-        setLoading(true);
         try {
             if (!currentUser?._id) {
                 console.log("No valid user ID found");
@@ -218,8 +221,6 @@ const GeeksforGeeks = () => {
             }
         } catch (error) {
             console.error("Unable to fetch user", error);
-        } finally {
-            setLoading(false); // Always reset loading state
         }
     };
 
@@ -375,11 +376,17 @@ const GeeksforGeeks = () => {
                                                 </Pie>
                                                 <Tooltip
                                                     contentStyle={{
-                                                        backgroundColor: isDarkMode ? '#1F2937' : '#FFFFFF',
-                                                        border: 'none',
-                                                        borderRadius: '0.5rem',
+                                                        backgroundColor: isDarkMode ? "white" : "black",
+                                                        color: isDarkMode ? "black" : "white", // Text color inside tooltip
+                                                        border: "none",
+                                                        borderRadius: "0.5rem",
+                                                        padding: "10px",
+                                                    }}
+                                                    itemStyle={{
+                                                        color: isDarkMode ? "black" : "white", // Text color for items inside tooltip
                                                     }}
                                                 />
+
                                             </PieChart>
                                         </ResponsiveContainer>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 -mt-12">
@@ -431,7 +438,7 @@ const GeeksforGeeks = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 className={`p-6 rounded-xl ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}
                             >
-                                <h2 className="text-2xl font-bold mb-6">Recently Solved DSA Problems</h2>
+                                <h2 className="text-2xl font-bold mb-6">Solved DSA Problems</h2>
                                 <div className="overflow-x-auto">
                                     <table className="w-full">
 
@@ -456,7 +463,7 @@ const GeeksforGeeks = () => {
                                     initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.4 }}
-                                    onClick={deleteLeetCodeAccount}
+                                    onClick={() => setIsDeleteModal(true)}
                                     className="flex justify-center items-center space-x-2 mt-10 mb-5 px-6 py-4 bg-white text-red-600 rounded-full font-semibold hover:bg-blue-50 transition-colors mx-auto w-fit"
                                 >
                                     <DeleteIcon className="h-5 w-5" />
@@ -515,6 +522,12 @@ const GeeksforGeeks = () => {
                         <GeeksforGeeksModal isModalOpen={isModalOpen} setToast={setToast} setIsModalOpen={setIsModalOpen} />
                     )
                 }
+
+{
+          isDeleteModal && (
+            <DeleteModal accid={currentUser.GeeksforGeeks} isDeleteModal={isDeleteModal} setIsDeleteModal={setIsDeleteModal} setToast={setToast} acc={"GeeksforGeeks"} id={currentUser._id} />
+          )
+        }
             </div>
             <Footer />
         </>
@@ -522,7 +535,3 @@ const GeeksforGeeks = () => {
 };
 
 export default GeeksforGeeks;
-
-function setHasFetchedUser(arg0: boolean) {
-    throw new Error('Function not implemented.');
-}

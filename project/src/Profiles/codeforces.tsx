@@ -14,13 +14,16 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import ActivityCalendar from '../components/ActivityCalender';
 import SubmissionCalendar from '../components/ac';
+import { PieChartCodeForces } from '../components/PieChartCodeForces';
+import DeleteModal from '../components/DeleteModal';
 const Codeforces = () => {
     const { username } = useParams();
+    const [isDeleteModal,setIsDeleteModal]=useState(false);
     const { currentUser, updateProfile } = useAuth();
     const { isDarkMode } = useTheme();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [hasAccount, setHasAccount] = useState(false);
-    const [loading, setloading] = useState(false);
+    const [loading, setloading] = useState(true);
     const [ShowRefresh, setShowRefresh] = useState(false);
     const [ShowDelete, setShowDelete] = useState(false);
     const [hasFetchedUser, setHasFetchedUser] = useState(false);
@@ -31,12 +34,12 @@ const Codeforces = () => {
     const [maxRating, setMaxRating] = useState(0);
     const [rank, setRank] = useState("");
     const [maxRank, setMaxRank] = useState("");
-    const [globalRank, setGlobalRank] = useState(0);
-    const [countryRank, setCountryRank] = useState(0);
     const [countryName, setCountryName] = useState("");
     const [problemsSolved, setProblemsSolved] = useState(0);
-    const [contestHistory, setContestHistory] = useState([]);
+    const [problemsSolvedByRating, setProblemSolvedByRating] = useState([]);
     const [selectedYear, setSelectedYear] = useState(2025);
+    const [organization, setOrganization] = useState("");
+    const [contestParticipation, setContestParticipation] = useState([]);
     const [submissionCalendar2025, setSubmissionCalendar2025] = useState([]);
     const [submissionCalendar2024, setSubmissionCalendar2024] = useState([]);
     const [submissionCalendar2023, setSubmissionCalendar2023] = useState([]);
@@ -54,25 +57,24 @@ const Codeforces = () => {
                         ? submissionCalendar2022
                         : submissionCalendar2025;
 
-    const setToast = (message, type = 'success') => {
-        if (type === 'error') {
-            toast.error(message);
+    const setToast = (msg) => {
+        if (msg.success) {
+            toast.success(msg.text);
         } else {
-            toast.success(message);
+            toast.error(msg.text);
         }
     };
 
     const fetchCodeforcesData = async () => {
+        setloading(true);
         try {
-            setloading(true);
             let response = null;
-    
+
             if (currentUser) {
                 if (currentUser?.username === username) {
                     if (currentUser?.CodeForces) {
                         setShowRefresh(true);
                         setShowDelete(true);
-                        // This is self account and logged in
                         response = await axios.get(`http://localhost:4000/server/codeforces/fetch/${username}`);
                     } else {
                         // Account not added
@@ -92,52 +94,87 @@ const Codeforces = () => {
                 setShowRefresh(false);
                 setShowDelete(false);
             }
-    
+
             if (!response || !response.data) {
                 setloading(false);
                 return;
             }
-    
+
             const data = response.data.data;
             console.log("Codeforces Data:", data);
-    
-            setCfUsername(data?.username || "N/A");
-            setMaxRating(data?.maxRating || 0);
-             setRating(data?.currentRating || 0);
-            setRank(data?.rank || "Unranked");
-            setOrganization(data?.organization || "N/A");
-            
-            setContestParticipation(data.contests || []);
-            console.log("API Response:", data);
 
-            // Parse submission calendars
-            const parseSubmissions = (submissions) => {
-                return (submissions || []).map((datao) => ({
-                    // Extract the date part only from the full date string
-                    date: new Date(datao.creationTimeSeconds * 1000).toISOString().split('T')[0], // Convert from Unix timestamp
-                    verdict: datao.verdict,
-                    problem: datao.problem.name,
-                    rating: datao.problem.rating || "N/A",
-                    rank:datao.problem.rank,
-                }));
-            };
-    
-            const parseContests = (contests: any) => {
-                return (contests || []).map((contest: { contestName: any; rank: any; ratingChange: any; oldRating: any; newRating: any; }) => ({
-                    contestName: contest.contestName,
-                    rank: contest.rank,
-                    ratingChange: contest.ratingChange,
-                    oldRating: contest.oldRating,
-                    newRating: contest.newRating,
-                }));
-            };
-    
-            setSubmissionCalendar2025(parseSubmissions(data.ActivityCalendar2025));
-            setSubmissionCalendar2024(parseSubmissions(data.ActivityCalendar2024));
-            setSubmissionCalendar2023(parseSubmissions(data.ActivityCalendar2023));
-            setSubmissionCalendar2022(parseSubmissions(data.ActivityCalendar2022));
-            setContestParticipation(parseContests(data.contests) || []);
-    
+            setCfUsername(data?.username);
+            setMaxRating(data?.maxRating);
+            setRating(data?.currentRating);
+            setRank(data?.rank || "Unranked");
+            setMaxRank(data?.maxRank || "Unranked");
+            setOrganization(data?.organization);
+            setCountryName(data?.country);
+            setProblemsSolved(data?.problemSolved)
+            setProblemSolvedByRating(data?.problemsSolvedByRating)
+            setSubmissionCalendar2025(data.submissions.submissionCalendar2025);
+            setSubmissionCalendar2024(data.submissions.submissionCalendar2024);
+            setSubmissionCalendar2023(data.submissions.submissionCalendar2023);
+            setSubmissionCalendar2022(data.submissions.submissionCalendar2022);
+            setContestParticipation(data.contests);
+
+            setHasAccount(true);
+        } catch (error) {
+            console.error("Error fetching Codeforces data:", error);
+        } finally {
+            setloading(false);
+        }
+    }
+
+    const fetchCodeforcesDatafromDB = async () => {
+        try {
+            let response = null;
+
+            if (currentUser) {
+                if (currentUser?.username === username) {
+                    if (currentUser?.CodeForces) {
+                        setShowRefresh(true);
+                        setShowDelete(true);
+                        const codeforcesid = currentUser?.CodeForces;
+                        response = await axios.get(`http://localhost:4000/server/codeforces/fetch-codeforces-from-db/${codeforcesid}`);
+                    } else {
+                        // Account not added
+                        console.log(hasAccount);
+                        setHasAccount(false);
+                        return;
+                    }
+                } else {
+                    // Not self account and logged in
+                    response = await axios.get(`http://localhost:4000/server/codeforces/fetch/${username}`);
+                    setShowRefresh(false);
+                    setShowDelete(false);
+                }
+            } else {
+                // Not self account and not logged in
+                response = await axios.get(`http://localhost:4000/server/codeforces/fetch/${username}`);
+                setShowRefresh(false);
+                setShowDelete(false);
+            }
+
+
+            const data = response.data.data;
+            console.log("Codeforces Data:", data);
+
+            setCfUsername(data?.username);
+            setMaxRating(data?.maxRating);
+            setRating(data?.currentRating);
+            setRank(data?.rank || "Unranked");
+            setMaxRank(data?.maxRank || "Unranked");
+            setOrganization(data?.organization);
+            setCountryName(data?.country);
+            setProblemsSolved(data?.problemSolved)
+            setProblemSolvedByRating(data?.problemsSolvedByRating)
+            setSubmissionCalendar2025(data.submissions.submissionCalendar2025);
+            setSubmissionCalendar2024(data.submissions.submissionCalendar2024);
+            setSubmissionCalendar2023(data.submissions.submissionCalendar2023);
+            setSubmissionCalendar2022(data.submissions.submissionCalendar2022);
+            setContestParticipation(data.contests);
+
             setHasAccount(true);
         } catch (error) {
             console.error("Error fetching Codeforces data:", error);
@@ -145,10 +182,11 @@ const Codeforces = () => {
             setloading(false);
         }
     };
-    
-      
+
+
 
     const deleteCodeforcesAccount = async () => {
+        setloading(true)
         try {
             if (currentUser && currentUser.CodeForces) {
                 const cfId = currentUser.CodeForces;
@@ -159,11 +197,12 @@ const Codeforces = () => {
         } catch (error) {
             console.error("Error deleting Codeforces data:", error);
             setToast("Failed to remove Codeforces account", 'error');
+        } finally {
+            setloading(false);
         }
     };
 
     const fetchUpdatedUser = async () => {
-        setloading(true);
         try {
             if (!currentUser?._id) return;
 
@@ -174,8 +213,6 @@ const Codeforces = () => {
         } catch (error) {
             console.error("Unable to fetch user", error);
             setToast("Failed to update user data", 'error');
-        } finally {
-            setloading(false);
         }
     };
 
@@ -184,14 +221,14 @@ const Codeforces = () => {
             setHasFetchedUser(true);
             fetchUpdatedUser();
         }
-        fetchCodeforcesData();
+        fetchCodeforcesDatafromDB();
     }, [currentUser]);
 
     if (loading) {
         return (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1 -translate-y-1/2">
                 <Loader />
-                <p className='relative right-1/2'>Please wait, loading data...</p>
+                <p className='relative right-1/2'>Wait upto minute, it needs some time...!</p>
             </div>
         );
     }
@@ -204,13 +241,13 @@ const Codeforces = () => {
                 <motion.section
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className={`relative py-20 px-5 overflow-hidden ${isDarkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-500 to-indigo-600'}`}
+                    className={`relative py-20 px-5 overflow-hidden ${isDarkMode ? 'bg-gray-900' : 'bg-gradient-to-br to-indigo-600'}`}
                 >
                     <div className="absolute inset-0">
                         <img
                             src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&q=80"
                             alt="Coding Background"
-                            className={`w-full h-full object-cover ${isDarkMode ? 'opacity-10' : 'opacity-20'}`}
+                            className={`w-full h-full object-cover ${isDarkMode ? 'opacity-100' : 'opacity-100'}`}
                         />
                     </div>
                     <div className="container mx-auto relative z-10 mt-10">
@@ -255,7 +292,7 @@ const Codeforces = () => {
                     </div>
                 </motion.section>
                 {/* change */}
-                {!hasAccount ? (
+                {hasAccount ? (
                     <>
                         <section className={`py-12 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                             <div className="container mx-auto px-4">
@@ -281,58 +318,92 @@ const Codeforces = () => {
                         <div className="container mx-auto px-4 py-12">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                                 {[
-                                    { icon: <Trophy />, label: 'Current Rating', value: rating, subtext: rank },
-                                    { icon: <Award />, label: 'Max Rating', value: maxRating, subtext: maxRank },
-                                    { icon: <Badge />, label: 'Rank', value: rank ? rank : 'Unranked', subtext: 'Codeforces Title' },
-                                    { icon: <Flag />, label: 'Country', value: countryName || 'N/A', subtext: countryRank ? `Rank #${countryRank}` : 'N/A' },
+                                    { icon: <Trophy />, label: 'Current Rating', value: rating || "", subtext: rank },
+                                    { icon: <Award />, label: 'Max Rating', value: maxRating || '', subtext: maxRank },
+                                    { icon: <Badge />, label: 'Rank', value: rank ? rank : '', subtext: 'Codeforces Title' },
+                                    { icon: <Flag />, label: 'Country', value: countryName || '' },
+                                    { icon: <Badge />, label: 'Organization', value: organization ? organization : '', },
                                 ].map((stat, index) => (
-                                    <motion.div
-                                        key={index}
-                                        initial={{ y: 20, opacity: 0 }}
-                                        animate={{ y: 0, opacity: 1 }}
-                                        transition={{ delay: index * 0.1 }}
-                                        className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
-                                    >
-                                        <div className="flex items-center space-x-4">
-                                            <div className="text-indigo-500">{stat.icon}</div>
-                                            <div>
-                                                <div className="text-sm text-gray-500">{stat.label}</div>
-                                                <div className="text-2xl font-bold">{stat.value}</div>
-                                                <div className="text-sm text-gray-500">{stat.subtext}</div>
+                                    stat.value !== '' && (
+                                        <motion.div
+                                            key={index}
+                                            initial={{ y: 20, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ delay: index * 0.1 }}
+                                            className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
+                                        >
+                                            <div className="flex items-center space-x-4">
+                                                <div className="text-indigo-500">{stat.icon}</div>
+                                                <div>
+                                                    <div className="text-sm text-gray-500">{stat.label}</div>
+                                                    <div className="text-2xl font-bold">{stat.value}</div>
+                                                    <div className="text-sm text-gray-500">{stat.subtext}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </motion.div>
+                                        </motion.div>
+                                    )
                                 ))}
                             </div>
-
-                            {/* Problem Stats */}
-                            <div className={`p-6 rounded-xl mb-12 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
+                            <div
+                                className={`p-6 rounded-xl mb-12 text-center ${isDarkMode ? "bg-gray-800" : "bg-white"
+                                    } shadow-lg`}
+                            >
                                 <h2 className="text-2xl font-bold mb-6">Problem Solving Stats</h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                                {/* Flexbox container to center everything */}
+                                <div className="flex flex-wrap justify-center gap-6">
                                     <motion.div
                                         initial={{ y: 20, opacity: 0 }}
                                         animate={{ y: 0, opacity: 1 }}
                                         transition={{ delay: 0.1 }}
-                                        className="text-center"
+                                        className="flex flex-col items-center justify-center w-40 h-32 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md"
                                     >
                                         <div className="text-3xl font-bold text-indigo-500">{problemsSolved}</div>
-                                        <div className="text-sm text-gray-500">Total Solved</div>
+                                        <div className="text-sm text-gray-500 dark:text-gray-400">Total Solved</div>
                                     </motion.div>
                                 </div>
                             </div>
 
-                            {/* Rating Graph */}
-                            <div className="flex justify-center items-center min-h-screen">
-                                <div className={`p-2 rounded-2xl ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg w-full max-w-4xl`}>
 
-                                    <CodeforcesGraph isDarkMode={isDarkMode} handle="balajisaw07" />
-                                </div>
+                            <div>
+                                {
+                                    problemsSolvedByRating && (
+                                        <PieChartCodeForces problemsSolvedByRating={problemsSolvedByRating} isDarkTheme={isDarkMode} />
+                                    )
+                                }
                             </div>
 
+                            <section className={`py-12 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                <h2 className={`text-3xl text-center font-bold mb-8 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    Contest Ratings
+                                </h2>
+                                <CodeforcesGraph data={contestParticipation} isDarkMode={isDarkMode} />
+                            </section>
 
-  <div>
-    <SubmissionCalendar handle={cfUsername} isDarkMode={isDarkMode} selectedYear={selectedYear} />
-  </div>
+                            <section className={`py-12 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                <h2 className={`text-3xl font-bold  text-center mb-8 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    Activity Heatmap
+                                </h2>
+                                <div className="flex justify-between items-center px-4">
+                                    <select
+                                        value={selectedYear}
+                                        onChange={(e) => {
+                                            const year = parseInt(e.target.value);
+                                            console.log("Year Selected:", year);
+                                            setSelectedYear(year);
+                                        }}
+                                        className="px-4 py-2 border rounded-lg text-gray-700 bg-white dark:bg-gray-700 dark:text-white"
+                                    >
+                                        <option value={2025}>2025</option>
+                                        <option value={2024}>2024</option>
+                                        <option value={2023}>2023</option>
+                                        <option value={2022}>2022</option>
+                                    </select>
+
+                                </div>
+                                <ActivityCalendar data={selectedData} selectedYear={selectedYear} isDarkMode={isDarkMode} />
+                                {/* <SubmissionCalendar handle={cfUsername} isDarkMode={isDarkMode} selectedYear={selectedYear} /> */}
+                            </section>
 
 
                             {ShowDelete && (
@@ -340,7 +411,7 @@ const Codeforces = () => {
                                     initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.4 }}
-                                    onClick={deleteCodeforcesAccount}
+                                    onClick={() => setIsDeleteModal(true)}
                                     className="flex justify-center items-center space-x-2 mt-10 px-6 py-3 bg-white text-red-600 rounded-full font-semibold hover:bg-indigo-50 transition-colors mx-auto w-fit"
                                 >
                                     <DeleteIcon className="h-5 w-5" />
@@ -395,6 +466,12 @@ const Codeforces = () => {
                 {isModalOpen && (
                     <CodeforcesModal isModalOpen={isModalOpen} setToast={setToast} setIsModalOpen={setIsModalOpen} />
                 )}
+
+{
+          isDeleteModal && (
+            <DeleteModal accid={currentUser.CodeForces} isDeleteModal={isDeleteModal} setIsDeleteModal={setIsDeleteModal} setToast={setToast} acc={"CodeForces"} id={currentUser._id} />
+          )
+        }
             </div>
             <Footer />
         </>
@@ -403,14 +480,4 @@ const Codeforces = () => {
 
 export default Codeforces;
 
-function setOrganization(organization: any) {
-    throw new Error('Function not implemented.');
-}
-function setContestParticipation(arg0: any) {
-    throw new Error('Function not implemented.');
-}
-
-function setCurrentRating(currentRating: any) {
-    throw new Error('Function not implemented.');
-}
 

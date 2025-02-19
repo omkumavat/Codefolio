@@ -3,12 +3,15 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import dotenv from "dotenv";
 import cloudinary from 'cloudinary'
-dotenv.config();
+import LeetCodeUser from "../Models/LeetCode.js";
+import CodeforcesUser from "../Models/CodeForces.js";
+import CodeChefUser from "../Models/CodeChef.js";
+import GeeksforGeeksUser from "../Models/GeeksforGeeks.js";
+import GitHubUser from "../Models/GitHub.js";
+dotenv.config(); 
 
 export const Signup = async (req, res) => {
     try {
-        // get data
-        // // // console.log("alll ", req.body);
         const { username, name, email, password } = req.body;
         const existingUser = await User.findOne({ email });
 
@@ -121,6 +124,97 @@ export const Login = async (req, res) => {
     }
 }
 
+export const verifyPassword = async (req, res) => {
+  try {
+    const { id, password } = req.body;
+
+    if (!id || !password) {
+      return res.status(400).json({ success: false, message: "ID and password are required." });
+    }
+
+    // Find the user by ID
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    // Compare the provided password with the stored hashed password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (isMatch) {
+      return res.status(200).json({ success: true, message: "Password matched." });
+    } else {
+      return res.status(200).json({ success: false, message: "Invalid password." });
+    }
+  } catch (error) {
+    console.error("Error in verifyPassword controller:", error);
+    return res.status(500).json({ success: false, message: "Server error." });
+  }
+};
+
+
+export const getAllStat = async (req, res) => {
+  try {
+    const [
+      leetcodeUsers,
+      codeforcesUsers,
+      codechefUsers,
+      geeksforGeeksUsers,
+      githubUsers,
+      users,
+    ] = await Promise.all([
+      LeetCodeUser.find({}),
+      CodeforcesUser.find({}),
+      CodeChefUser.find({}),
+      GeeksforGeeksUser.find({}),
+      GitHubUser.find({}),
+      User.find({}),
+    ]);
+
+    const codechefSolved = codechefUsers
+      .map((user) => user.problemSolved || 0)
+      .reduce((acc, cur) => acc + parseInt(cur), 0);
+
+    const codeforcesSolved = codeforcesUsers
+      .map((user) => user.problemSolved || 0)
+      .reduce((acc, cur) => acc + parseInt(cur), 0);
+
+    const leetcodeSolved = leetcodeUsers
+      .map((user) => user.profile.totalSolved || 0)
+      .reduce((acc, cur) => acc + parseInt(cur), 0);
+
+    const geeksforgeeksSolved = 
+    geeksforGeeksUsers.map((user) => (user.contestRating ? user.contestRating[1] || 0 : 0))
+      .reduce((acc, cur) => acc + parseInt(cur), 0);
+
+    console.log(geeksforgeeksSolved);
+    
+    const totalProblemSolved =
+      codechefSolved +
+      codeforcesSolved +
+      leetcodeSolved +
+      geeksforgeeksSolved;
+
+    // Sum up total contributions from GitHub users
+    const totalContribution = githubUsers
+      .map((user) => user.totalContributions || 0)
+      .reduce((acc, cur) => acc + cur, 0);
+
+      console.log(totalProblemSolved)
+
+    res.status(200).json({
+      success: true,
+      active: users.length,
+      totalProblemSolved,
+      totalContribution,
+    });
+  } catch (error) {
+    console.error("Error fetching all stats:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
 export const checkUsername = async (req, res) => {
     try {
         const { username } = req.params;
@@ -179,12 +273,14 @@ export const checkUser=async(req,res)=>{
 
         if (user) {
             return res.status(200).json({ 
-                exists:true
+                exists:true,
+                data:user
              });
         }
 
         return res.status(200).json({ 
-            exists:false
+            exists:false,
+            data:null
          });
     } catch (error) {
         console.error('Error checking username availability:', error);

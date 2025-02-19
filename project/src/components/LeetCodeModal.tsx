@@ -18,8 +18,8 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     const [verificationStep2, setVerificationStep2] = useState("");
     const [verificationStep3, setVerificationStep3] = useState("");
     const [showRefresh, setShowRefresh] = useState(false);
-    const [total1, setTotal1] = useState(-1);
-    const [total2, setTotal2] = useState(-1);
+    const [total1, setTotal1] = useState(0);
+    const [total2, setTotal2] = useState(0);
     const [Account, setAccount] = useState("");
     const [iShow, setIsShow] = useState(false);
     const [iShow2, setIsShow2] = useState(false);
@@ -45,24 +45,40 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
 
 
     const handleVerify = async () => {
+        setAccount("");
+        setVerificationStep1('');
+        setVerificationStep2('');
+        setVerificationStep3('');
+        setNotValid('')
         setIsShow(true);
         if (username.trim() === "") {
             setVerificationStep2("Please enter a valid username.");
+            setToast({
+                success: false,
+                text: "Please enter a valid username."
+            })
+            setIsShow(false)
             return;
         }
 
         const response = await axios.get(`http://localhost:4000/server/leetcode/check-username/${username}`);
         // const data = response.data;
         console.log(response)
-        if (response.data.success) {
-            setTotal1(response.data.total1);
-            setTotal2(response.data.total2);
+        if (response.data.success === true) {
+            const t = ((parseInt(response.data.data.total1)) + 1);
+            console.log(t);
+            setTotal1(t);
             setIsVerifying(true);
             setAccount("");
             setVerificationStep1(`1) Visit the LeetCode for problem number 2667.`);
             setVerificationStep2("2) Click on the submit (make compile time error).");
             setVerificationStep3("3) Do this within time and click on refresh after time ends !");
+            setToast({ success: true, text: "LeetCode account found, verifying..!" })
         } else {
+            setToast({
+                success: false,
+                text: "LeetCode account not found."
+            })
             setAccount('LeetCode Account does not exist !');
         }
         setIsShow(false);
@@ -73,27 +89,51 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
         setVerificationStep1("");
         setVerificationStep2("");
         setVerificationStep3("");
-        const response = await axios.get(`http://localhost:4000/server/leetcode/check-username/${username}`);
-        if (response.data.success) {
-            if (response.data.total1 === (total1 ) && response.data.total2 === (total2 )) {
-                setVerificationStep1("Problem submitted successfully! 🎉");
-                setToast("Submmission found ..!");
-                const response = await axios.post(`http://localhost:4000/server/leetcode/add-leetcode`, {
-                    username: username,
-                    email: currentUser?.email
-                })
-                console.log(response.data.data);
 
+        const response = await axios.get(`http://localhost:4000/server/leetcode/check-username/${username}`);
+        console.log(response);
+        if (response.data.success === true) {
+            console.log(total1)
+            const total = (parseInt(response.data.data.total1));
+            console.log(total);
+
+            if (total === total1) {
+                setVerificationStep1("Problem submitted successfully! 🎉");
+                setToast({
+                    success: true,
+                    text: "Submission found, don't exit the page !"
+                })
+
+                try {
+                    const response = await axios.post(`http://localhost:4000/server/leetcode/add-leetcode`, {
+                        username: username,
+                        email: currentUser?.email
+                    })
+
+                    if (response.data) {
+                        setToast({ success: true, text: "Account added successfully!" })
+                        setIsModalOpen(false);
+                        window.location.reload()
+                    } else {
+                        setIsShow(false)
+                        setIsShow2(false)
+                        setToast({ success: false, text: "Failed to add account!" })
+                    }
+                } catch (error) {
+                    setIsShow(false)
+                    setIsShow2(false)
+                    setToast({ success: false, text: "Failed to add account!" })
+                }
             } else {
+                setIsShow(false)
+                setIsShow2(false)
                 setVerificationStep1("No submission found. Try again.");
-                setToast("Submmission not found ..!");
+                setToast({
+                    success: false,
+                    text: "Submission not found, try again !"
+                })
             }
         }
-        setIsVerifying(false);
-        setShowRefresh(false);
-        setIsShow2(false);
-        setIsModalOpen(false);
-        window.location.reload()
     };
 
     return (

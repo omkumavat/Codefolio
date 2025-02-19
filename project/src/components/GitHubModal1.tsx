@@ -16,12 +16,22 @@ const GitHubModal1 = ({ isModalOpen, setToast, setIsModalOpen }) => {
     const [iShow, setIsShow] = useState(false);
 
     const handleVerify = async () => {
+        setNotValid('')
         setIsShow(true);
-        // Validate username input
         if (username.trim() === "") {
             setNotValid("Please enter a valid username.");
+            setIsShow(false);
+            setToast({
+                success: false,
+                text: "Please enter a valid username.",
+            })
             return;
         }
+
+        setToast({
+            success: true,
+            text: "Verifying your GitHub account...",
+        })
         try {
             const response = await axios.post(
                 `http://localhost:4000/server/github/add-github-basics/`, {
@@ -29,23 +39,31 @@ const GitHubModal1 = ({ isModalOpen, setToast, setIsModalOpen }) => {
                 email: currentUser?.email
             }
             );
-            console.log(response);
             if (response.data.success) {
-                setToast("GitHub Account found !");
+                setToast({
+                    success: true,
+                    text: "Your GitHub account has been successfully verified.",
+                })
+                setIsModalOpen(false);
+                window.location.reload()
             } else {
-                setToast("GitHub Account does not exist !");
+                setIsShow(false);
+                setToast({
+                    success: false,
+                    text: "Failed to verify your GitHub account. Please try again later.",
+                })
             }
         } catch (error) {
-            console.error("Error verifying account:", error);
-            setToast("An error occurred during verification!");
+            setIsShow(false);
+            setToast({
+                success: false,
+                text: "Failed to verify your GitHub account. Please try again later.",
+            })
         }
-        setIsModalOpen(false);
-        window.location.reload()
     };
 
     return (
         <AnimatePresence>
-            <ToastContainer position="top-right" autoClose={3000} />
             {isModalOpen && (
                 <>
                     <motion.div
@@ -95,8 +113,8 @@ const GitHubModal1 = ({ isModalOpen, setToast, setIsModalOpen }) => {
                                             value={username}
                                             onChange={(e) => setUsername(e.target.value)}
                                             className={`w-full px-4 py-2 rounded-lg border ${isDarkMode
-                                                    ? "bg-gray-700 border-gray-600 text-white"
-                                                    : "bg-white border-gray-300"
+                                                ? "bg-gray-700 border-gray-600 text-white"
+                                                : "bg-white border-gray-300"
                                                 } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                                             placeholder="Enter your username"
                                             disabled={isVerifying}

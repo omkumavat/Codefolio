@@ -26,7 +26,7 @@ const ContestCard = ({ contest }: { contest: any }) => {
     Enter Contest
   </button>
       </div>
-      <div className="absolute inset-0 rounded-xl blur-lg opacity-50 dark:bg-gradient-to-r from-purple-500 to-blue-500 z-[-1]"></div>
+      <div className="absolute inset-0 rounded-xl blur-lg opacity-50 dark:bg-gradient-to-r from-blue-500 to-blue-500 z-[-1]"></div>
     </div>
   );
 };
@@ -69,7 +69,7 @@ const ContestSection = () => {
   }
 
   return (
-    <div className="min-h-screen  from-gray-900 via-black to-gray-900 py-10">
+    <div className="min-h-screen from-gray-900 via-black to-gray-900 py-10">
       <h2 className="text-3xl font-bold text-center  mb-8">
         Upcoming Contests
       </h2>

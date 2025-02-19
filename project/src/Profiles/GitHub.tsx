@@ -32,14 +32,17 @@ import axios from 'axios';
 import { useAuth } from '../Context/AuthProvider';
 import { useParams } from 'react-router-dom';
 import ActivityCalender2 from '../components/ActivityCalender2'
+import DeleteModal from '../components/DeleteModal';
 
 
 const GitHub = () => {
   const { username } = useParams();
+  const [isDeleteModal, setIsDeleteModal] = useState(false);
   const { currentUser, updateProfile } = useAuth();
-  const [loading, setloading] = useState(false);
+  const [loading, setloading] = useState(true);
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [token, setToken] = useState('');
+  const [auth, setAuths] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [showContributions, setShowContributions] = useState(false);
@@ -67,14 +70,20 @@ const GitHub = () => {
 
   const { isDarkMode } = useTheme();
 
-  const setToast = (message) => {
-    console.log(message);
-    toast.success(message);
+  const setToast = (msg) => {
+    if (msg.success) {
+      toast.success(msg.text);
+    } else {
+      toast.error(msg.text);
+    }
   };
 
-  const setToast2 = (message) => {
-    console.log(message);
-    toast.success(message);
+  const setToast2 = (msg) => {
+    if (msg.success) {
+      toast.success(msg.text);
+    } else {
+      toast.error(msg.text);
+    }
   };
 
   const selectedData =
@@ -88,22 +97,22 @@ const GitHub = () => {
             ? submissionCalendar2022
             : submissionCalendar2025;
 
-            const getLanguageColor = (lang) => {
-              const languageColors = {
-                JavaScript: "#f0db4f",
-                Python: "#306998",
-                Java: "#b07219",
-                Ruby: "#701516",
-                "C++": "#f34b7d",
-                "C#": "#178600",
-                PHP: "#4F5D95",
-                TypeScript: "#2b7489",
-                // add more languages and colors as needed
-                default: "#999",
-              };
-              return languageColors[lang] || languageColors.default;
-            };
-            
+  const getLanguageColor = (lang) => {
+    const languageColors = {
+      JavaScript: "#f0db4f",
+      Python: "#306998",
+      Java: "#b07219",
+      Ruby: "#701516",
+      "C++": "#f34b7d",
+      "C#": "#178600",
+      PHP: "#4F5D95",
+      TypeScript: "#2b7489",
+      // add more languages and colors as needed
+      default: "#999",
+    };
+    return languageColors[lang] || languageColors.default;
+  };
+
 
 
   const fetchGitHubData = async () => {
@@ -118,6 +127,7 @@ const GitHub = () => {
             setShowRefresh(true);
             setShowDelete(true);
             response = await axios.get(`http://localhost:4000/server/github/fetch-git/${username}`);
+            setShowContributions(response.data.data.auth);
           } else {
             console.log(hasAccount);
             setHasAccount(false);
@@ -138,7 +148,7 @@ const GitHub = () => {
       console.log(data)
       setShowContributions(data.auth);
       setHasAccount(true);
-
+      setAuths(data.auth);
       setAvatar(data.avatar)
       setUrl(data.url);
       setCollaboratedRepos(data.collaborated_repos)
@@ -165,7 +175,7 @@ const GitHub = () => {
   }
 
   const fetchGitHubDataFromDB = async () => {
-    setloading(true);
+    // setloading(true);
     try {
       let response = null;
 
@@ -177,6 +187,7 @@ const GitHub = () => {
             setShowDelete(true);
             const geetid = currentUser?.Github;
             response = await axios.get(`http://localhost:4000/server/github/fetch-git-from-db/${geetid}`);
+            setShowContributions(response.data.data.auth);
           } else {
             console.log(hasAccount);
             setHasAccount(false);
@@ -194,14 +205,12 @@ const GitHub = () => {
       }
 
       const data = response.data.data;
-      // console.log(data.repos[0].languages)
-      setShowContributions(data.auth);
-      setHasAccount(true);
 
       setAvatar(data.avatar)
       setUrl(data.url);
       setCollaboratedRepos(data.collaborated_repos)
       setRepos(data.repos);
+      setAuths(data.auth);
       setActiveDays(data.active_days);
       setStarredRepos(data.starred_repos);
       setBio(data.bio);
@@ -213,7 +222,7 @@ const GitHub = () => {
       setsubmissionCalendar2024(data.submissions.submissionCalendar2024);
       setsubmissionCalendar2025(data.submissions.submissionCalendar2025);
       setGitUsername(data.username)
-
+      setHasAccount(true);
     }
     catch (error) {
       console.error("Error fetching GitHub data:", error);
@@ -237,7 +246,7 @@ const GitHub = () => {
 
 
   const fetchUpdatedUser = async () => {
-    setloading(true);
+    // setloading(true);
     try {
       if (!currentUser?._id) {
         console.log("No valid user ID found");
@@ -252,8 +261,6 @@ const GitHub = () => {
       }
     } catch (error) {
       console.error("Unable to fetch user", error);
-    } finally {
-      setloading(false); // Always reset loading state
     }
   };
 
@@ -266,8 +273,8 @@ const GitHub = () => {
   }, [currentUser]);
 
   useEffect(() => {
-    console.log("Year Selected:", selectedYear);
-    console.log("Data for Selected Year:", selectedData);
+    // console.log("Year Selected:", selectedYear);
+    // console.log("Data for Selected Year:", selectedData);
   }, [selectedYear, selectedData]);
 
   const cardAnimation = useSpring({
@@ -283,79 +290,84 @@ const GitHub = () => {
       </div>
     );
   }
-
   return (
-    <><Navbar />
-      <div className={`min-h-screen mt-9 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+    <>
+      <Navbar />
+      <div
+        className={`min-h-screen mt-14 ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}
+      >
         <ToastContainer position="top-right" autoClose={3000} />
+
         {/* Hero Section */}
-        <div className="relative py-20 px-4">
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className={`relative py-20 px-5 overflow-hidden ${isDarkMode ? "bg-gray-900" : "bg-gradient-to-br from-sky-500 to-blue-600"
+            }`}
+        >
           <div className="absolute inset-0 overflow-hidden">
             <img
               src="https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&q=80"
               alt="GitHub Background"
-              className={`w-full h-full object-cover ${isDarkMode ? 'opacity-100' : 'opacity-100'}`}
+              className="w-full h-full object-cover"
             />
           </div>
-          <div className="container mx-auto relative z-10">
-            <div className="flex flex-col items-center">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="flex justify-center mb-6"
-              >
-                <Github className="h-16 w-16 text-white " />
-              </motion.div>
-              <motion.h1
+          <div className="container mx-auto relative z-10 flex flex-col items-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="flex justify-center mb-6"
+            >
+              <Github className="h-16 w-16 text-white" />
+            </motion.div>
+            <motion.h1
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className="text-4xl md:text-5xl font-bold mb-6 text-center text-white"
+            >
+              GitHub Profile
+            </motion.h1>
+            {!hasAccount ? (
+              <motion.button
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="text-4xl text-white md:text-5xl font-bold mb-6"
+                transition={{ delay: 0.4 }}
+                onClick={() => setIsModalOpen(true)}
+                className="flex items-center space-x-2 px-6 py-3 bg-white text-blue-600 rounded-full font-semibold hover:bg-blue-50 transition-colors"
               >
-                GitHub Profile
-              </motion.h1>
-              {!hasAccount ? (
-                <motion.button
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  onClick={() => setIsModalOpen(true)}
-                  className="flex items-center space-x-2 px-6 py-3 bg-white text-blue-600 rounded-full font-semibold hover:bg-blue-50 transition-colors"
-                >
-                  <PlusCircle className="h-5 w-5" />
-                  <span>Add GitHub Account</span>
-                </motion.button>
-              ) : (
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  className="space-y-4"
-                >
-                  <div className="flex items-center justify-center space-x-4">
-                    <img
-                      src={avatar}
-                      alt="Profile"
-                      className="w-16 h-16 rounded-full border-4 border-black"
-                    />
-                    <div className="text-xl text-white font-semibold">
-                      {username}
-                    </div>
-                  </div>
-                  {!showContributions && (
-                    <motion.button
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      onClick={() => setShowTokenModal(true)}
-                      className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center space-x-2 mx-auto"
-                    >
-                      <Key className="h-5 w-5" />
-                      <span>Add GitHub Token for More Stats</span>
-                    </motion.button>
-                  )}
-                </motion.div>
-              )}
-            </div>
+                <PlusCircle className="h-5 w-5" />
+                <span>Add GitHub Account</span>
+              </motion.button>
+            ) : (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="space-y-4"
+              >
+                <div className="flex items-center justify-center space-x-4">
+                  <img
+                    src={avatar}
+                    alt="Profile"
+                    className="w-16 h-16 rounded-full border-4 border-black"
+                  />
+                  <div className="text-xl text-white font-semibold">{username}</div>
+                </div>
+                {currentUser.username===username &&
+                currentUser.Github && !showContributions && (
+                  <motion.button
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    onClick={() => setShowTokenModal(true)}
+                    className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center space-x-2 mx-auto"
+                  >
+                    <Key className="h-5 w-5" />
+                    <span>Add GitHub Token for More Stats</span>
+                  </motion.button>
+                )}
+              </motion.div>
+            )}
           </div>
-        </div>
+        </motion.section>
 
         {/* Repository Section */}
         {hasAccount && (
@@ -371,9 +383,11 @@ const GitHub = () => {
                 <RefreshCwIcon className="h-5 w-5" />
                 <span>Refresh</span>
               </motion.button>
-            )
-            }
-            <h2 className={`text-3xl font-bold text-center mt-2 mb-14 md:mb-0 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            )}
+            <h2
+              className={`text-3xl font-bold text-center mt-2 mb-14 md:mb-0 ${isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+            >
               GitHub Repositories
             </h2>
             <motion.div
@@ -385,7 +399,7 @@ const GitHub = () => {
                 <animated.div
                   key={index}
                   style={cardAnimation}
-                  className={`p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform ${isDarkMode ? 'bg-gray-800' : 'bg-white'
+                  className={`p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform ${isDarkMode ? "bg-gray-800" : "bg-white"
                     }`}
                 >
                   <div className="flex justify-between items-start mb-4">
@@ -395,7 +409,7 @@ const GitHub = () => {
                         href={repo.git_link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-500 hover:text-purple-500 transition-colors"
+                        className="text-gray-500 hover:text-blue-500 transition-colors"
                       >
                         <Github className="h-5 w-5" />
                       </a>
@@ -404,40 +418,34 @@ const GitHub = () => {
                           href={repo.live_link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-500 hover:text-purple-500 transition-colors"
+                          className="text-gray-500 hover:text-blue-500 transition-colors"
                         >
                           <ExternalLink className="h-5 w-5" />
                         </a>
                       )}
                     </div>
                   </div>
-                  <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <p className={`mb-4 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
                     {repo.description}
                   </p>
                   <div className="flex items-center space-x-4 mb-4">
-                  {repo.languages && (
-  <div className="flex items-center space-x-4">
-    {repo.languages.map((lang, index) => (
-      <div key={index} className="flex items-center space-x-1">
-        {/* Dot with a dynamic background color */}
-        <span
-          className="w-3 h-3 rounded-full"
-          style={{ backgroundColor: getLanguageColor(lang) }}
-        />
-        <span className="text-sm">{lang}</span>
-      </div>
-    ))}
-  </div>
-)}
-
+                    {repo.languages && (
+                      <div className="flex items-center space-x-4">
+                        {repo.languages.map((lang, index) => (
+                          <div key={index} className="flex items-center space-x-1">
+                            <span
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: getLanguageColor(lang) }}
+                            />
+                            <span className="text-sm">{lang}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     <div className="flex items-center space-x-1">
                       <Star className="h-4 w-4 text-yellow-500" />
                       <span className="text-sm">{repo.starred}</span>
                     </div>
-                    {/* <div className="flex items-center space-x-1">
-                      <GitFork className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">{repo.commits}</span>
-                    </div> */}
                   </div>
                   <div className="flex items-center space-x-2">
                     <Users className="h-4 w-4 text-blue-500" />
@@ -448,7 +456,7 @@ const GitHub = () => {
                           src={collaborator.avatar_col}
                           alt={collaborator.name}
                           title={collaborator.name}
-                          className="w-8 h-8 rounded-full border-2 border-white  hover:cursor-pointer"
+                          className="w-8 h-8 rounded-full border-2 border-white hover:cursor-pointer"
                         />
                       ))}
                     </div>
@@ -458,36 +466,45 @@ const GitHub = () => {
             </motion.div>
 
             {/* Contribution Section */}
-            {showContributions && (
+            {auth && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="mt-12 mb-5"
               >
-                <h2 className={`text-3xl font-bold text-center -mt-2 mb-14 md:mb-0 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                <h2
+                  className={`text-3xl font-bold text-center -mt-2 mb-14 md:mb-0 ${isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
+                >
                   GitHub Statistics
                 </h2>
-                <div className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                <div
+                  className={`p-6 rounded-xl shadow-lg ${isDarkMode ? "bg-gray-800" : "bg-white"
+                    }`}
+                >
                   <h2 className="text-2xl font-bold mb-6">Contributions</h2>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                    <div className={`p-4 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-100"}`}>
                       <Activity className="h-8 w-8 text-green-500 mb-2" />
                       <div className="text-2xl font-bold">{totalContributions}</div>
                       <div className="text-sm text-gray-500">Total Contributions</div>
                     </div>
-                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                    <div className={`p-4 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-100"}`}>
                       <Calendar className="h-8 w-8 text-blue-500 mb-2" />
                       <div className="text-2xl font-bold">{active_days}</div>
                       <div className="text-sm text-gray-500">Days Active</div>
                     </div>
-                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                    <div className={`p-4 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-100"}`}>
                       <Star className="h-8 w-8 text-yellow-500 mb-2" />
                       <div className="text-2xl font-bold">{starred_repos}</div>
                       <div className="text-sm text-gray-500">Starred Repositories</div>
                     </div>
                   </div>
 
-                  <h2 className={`text-3xl font-bold text-center mt-2 mb-14 md:mb-0 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <h2
+                    className={`text-3xl font-bold text-center mt-2 mb-14 md:mb-0 ${isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
+                  >
                     Collaborated GitHub Repositories
                   </h2>
                   <motion.div
@@ -495,12 +512,11 @@ const GitHub = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="grid grid-cols-1 md:grid-cols-2 gap-8"
                   >
-
                     {collaboratedRepos.map((repo, index) => (
                       <animated.div
                         key={index}
                         style={cardAnimation}
-                        className={`p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform ${isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        className={`p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform ${isDarkMode ? "bg-gray-800" : "bg-white"
                           }`}
                       >
                         <div className="flex justify-between items-start mb-4">
@@ -510,7 +526,7 @@ const GitHub = () => {
                               href={repo.git_link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-gray-500 hover:text-purple-500 transition-colors"
+                              className="text-gray-500 hover:text-blue-500 transition-colors"
                             >
                               <Github className="h-5 w-5" />
                             </a>
@@ -519,25 +535,30 @@ const GitHub = () => {
                                 href={repo.live_link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-gray-500 hover:text-purple-500 transition-colors"
+                                className="text-gray-500 hover:text-blue-500 transition-colors"
                               >
                                 <ExternalLink className="h-5 w-5" />
                               </a>
                             )}
                           </div>
                         </div>
-                        <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        <p className={`mb-4 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
                           {repo.description}
                         </p>
                         <div className="flex items-center space-x-4 mb-4">
-                          {
-                            repo.languages && (
-                              <div className="flex items-center space-x-1">
-                                <Code className="h-4 w-4 text-purple-500" />
-                                <span className="text-sm">{repo.languages[0]}</span>
-                              </div>
-                            )
-                          }
+                          {repo.languages && (
+                            <div className="flex items-center space-x-4">
+                              {repo.languages.map((lang, index) => (
+                                <div key={index} className="flex items-center space-x-1">
+                                  <span
+                                    className="w-3 h-3 rounded-full"
+                                    style={{ backgroundColor: getLanguageColor(lang) }}
+                                  />
+                                  <span className="text-sm">{lang}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                           <div className="flex items-center space-x-1">
                             <Star className="h-4 w-4 text-yellow-500" />
                             <span className="text-sm">{repo.starred}</span>
@@ -552,7 +573,7 @@ const GitHub = () => {
                                 src={collaborator.avatar_col}
                                 alt={collaborator.name}
                                 title={collaborator.name}
-                                className="w-8 h-8 rounded-full border-2 border-white  hover:cursor-pointer"
+                                className="w-8 h-8 rounded-full border-2 border-white hover:cursor-pointer"
                               />
                             ))}
                           </div>
@@ -561,8 +582,11 @@ const GitHub = () => {
                     ))}
                   </motion.div>
 
-                  <section className={`py-12 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                    <h2 className={`text-3xl font-bold text-center -mt-2 mb-14 md:mb-0 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <section className={`py-12 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+                    <h2
+                      className={`text-3xl font-bold text-center -mt-2 mb-14 md:mb-0 ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
+                    >
                       Contribution Activity
                     </h2>
                     <div className="flex flex-col md:flex-row justify-center md:justify-between items-center px-4">
@@ -582,91 +606,96 @@ const GitHub = () => {
                         <option value={2022}>2022</option>
                       </select>
                     </div>
-
                     <ActivityCalender2 data={selectedData} selectedYear={selectedYear} isDarkMode={isDarkMode} />
                   </section>
-
-
-
                 </div>
 
-                {
-                  ShowDelete && (
-                    <motion.button
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.4 }}
-                      onClick={deleteGitHubAccount}
-                      className="flex justify-center items-center space-x-2 mt-10 px-6 py-3 bg-white text-red-600 rounded-full font-semibold hover:bg-blue-50 transition-colors mx-auto w-fit"
-                    >
-                      <DeleteIcon className="h-5 w-5" />
-                      <span>Remove GitHub Account</span>
-                    </motion.button>
-                  )
-                }
+                {ShowDelete && (
+                  <motion.button
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    onClick={() => setIsDeleteModal(true)}
+                    className="flex justify-center items-center space-x-2 mt-10 px-6 py-3 bg-white text-red-600 rounded-full font-semibold hover:bg-blue-50 transition-colors mx-auto w-fit"
+                  >
+                    <DeleteIcon className="h-5 w-5" />
+                    <span>Remove GitHub Account</span>
+                  </motion.button>
+                )}
               </motion.div>
-
             )}
-
           </div>
         )}
 
-        {
-          !isConnected && !showContributions && (
-            <>
-              <section className={`py-20 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                <div className="container mx-auto px-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {[
-                      {
-                        icon: <Brain className="h-12 w-12 text-blue-500" />,
-                        title: "2500+ Problems",
-                        description: "Access a vast collection of coding problems across various difficulty levels"
-                      },
-                      {
-                        icon: <Trophy className="h-12 w-12 text-blue-500" />,
-                        title: "Weekly Contests",
-                        description: "Participate in weekly coding competitions and improve your ranking"
-                      },
-                      {
-                        icon: <Target className="h-12 w-12 text-blue-500" />,
-                        title: "Interview Preparation",
-                        description: "Practice problems frequently asked in technical interviews"
-                      }
-                    ].map((feature, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: index * 0.1 }}
-                        className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
-                          }`}
-                      >
-                        <div className="mb-4">{feature.icon}</div>
-                        <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                          {feature.title}
-                        </h3>
-                        <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                          {feature.description}
-                        </p>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              </section>
-            </>
-          )
-        }
+        {/* Features Section for non-connected users */}
+        {!hasAccount && (
+          <section className={`py-20 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+            <div className="container mx-auto px-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {[
+                  {
+                    icon: <Brain className="h-12 w-12 text-blue-500" />,
+                    title: "2500+ Problems",
+                    description:
+                      "Access a vast collection of coding problems across various difficulty levels",
+                  },
+                  {
+                    icon: <Trophy className="h-12 w-12 text-blue-500" />,
+                    title: "Weekly Contests",
+                    description:
+                      "Participate in weekly coding competitions and improve your ranking",
+                  },
+                  {
+                    icon: <Target className="h-12 w-12 text-blue-500" />,
+                    title: "Interview Preparation",
+                    description:
+                      "Practice problems frequently asked in technical interviews",
+                  },
+                ].map((feature, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`p-6 rounded-xl shadow-lg ${isDarkMode ? "bg-gray-900" : "bg-gray-50"
+                      }`}
+                  >
+                    <div className="mb-4">{feature.icon}</div>
+                    <h3
+                      className={`text-xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
+                    >
+                      {feature.title}
+                    </h3>
+                    <p className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
+                      {feature.description}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Modals */}
+        {isModalOpen && (
+          <GitHubModal1
+            isModalOpen={isModalOpen}
+            setToast={setToast}
+            setIsModalOpen={setIsModalOpen}
+          />
+        )}
+        {showTokenModal && (
+          <GitHubModal2
+            showTokenModal={showTokenModal}
+            setToast2={setToast2}
+            setShowTokenModal={setShowTokenModal}
+          />
+        )}
 
         {
-          isModalOpen && (
-            <GitHubModal1 isModalOpen={isModalOpen} setToast={setToast} setIsModalOpen={setIsModalOpen} />
-          )
-        }
-
-        {
-          showTokenModal && (
-            <GitHubModal2 showTokenModal={showTokenModal} setToast2={setToast2} setShowTokenModal={setShowTokenModal} />
+          isDeleteModal && (
+            <DeleteModal accid={currentUser.Github} isDeleteModal={isDeleteModal} setIsDeleteModal={setIsDeleteModal} setToast={setToast} acc={"Github"} id={currentUser._id} />
           )
         }
       </div>

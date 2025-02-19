@@ -14,33 +14,54 @@ const GitHubModal2 = ({ showTokenModal, setToast2, setShowTokenModal }) => {
 
     const handleTokenSubmit = async () => {
         setIsVerifying(true);
-
-        if(!currentUser){
+        setNotValid('')
+        if (!currentUser) {
             return;
         }
         if (token.trim() === "") {
+            setIsVerifying(false);
             setNotValid("Please enter a valid Token of your account.");
+            setToast2({
+                success: false,
+                text: "Please enter a valid Token of your account.",
+            })
             return;
         }
+        setToast2({
+            success: true,
+            text: "Verifying your GitHub Account Token...",
+        })
+
         try {
             const response = await axios.post(
                 `http://localhost:4000/server/github/add-github-advanced`, {
                 pat: token,
-                username:currentUser?.username
+                username: currentUser?.username
             }
             );
-            console.log(response);
+
             if (response.data.success) {
-                setToast2("Token Successfule Verified");
+                setToast2({
+                    success: true,
+                    text: "Your GitHub Token has been added successfully.",
+                })
+                setShowTokenModal(false);
+                window.location.reload()
             } else {
-                setToast2("Fail to Verify Token");
+                setIsVerifying(false);
+                setToast2({
+                    success: false,
+                    text: "Failed to add your GitHub Token. Please try again.",
+                })
+
             }
         } catch (error) {
-            console.error("Error verifying account:", error);
-            setToast2("An error occurred during verification!");
+            setIsVerifying(false);
+            setToast2({
+                success: false,
+                text: "Failed to add your GitHub Token. Please try again.",
+            })
         }
-        setShowTokenModal(false);
-        window.location.reload()
     }
 
     return (
@@ -79,18 +100,18 @@ const GitHubModal2 = ({ showTokenModal, setToast2, setShowTokenModal }) => {
                                     value={token}
                                     onChange={(e) => setToken(e.target.value)}
                                     className={`w-full px-4 py-2 rounded-lg border ${isDarkMode
-                                            ? 'bg-gray-700 border-gray-600 text-white'
-                                            : 'bg-white border-gray-300'
+                                        ? 'bg-gray-700 border-gray-600 text-white'
+                                        : 'bg-white border-gray-300'
                                         }`}
                                     placeholder="Enter your token"
                                 />
                             </div>
                             <button
                                 onClick={handleTokenSubmit}
-                                disabled={isVerifying || !token}
+                                disabled={isVerifying}
                                 className={`w-full py-2 rounded-lg ${isVerifying
-                                        ? 'bg-gray-400 cursor-not-allowed'
-                                        : 'bg-green-500 hover:bg-green-600'
+                                    ? 'bg-gray-400 cursor-not-allowed'
+                                    : 'bg-green-500 hover:bg-green-600'
                                     } text-white transition-colors`}
                             >
                                 {isVerifying ? 'Verifying...' : 'Add Token'}

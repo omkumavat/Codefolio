@@ -85,15 +85,16 @@ export const fetchLeetCode = async (req, res) => {
                 mediumSolved: profileData.mediumSolved,
                 hardSolved: profileData.hardSolved,
                 acceptanceRate: acceptanceRate,
-                recentSubmissions: profileData.recentSubmissions,
+                recentSubmissions: profileData.recentSubmissions || recentSubmissions,
             }
             : existingUser.profile;
 
+        console.log(contestData)
         existingUser.contests = contestData
             ? {
                 contestAttend: contestData.contestAttend,
-                contestRating: Number.isFinite(contestData.contestRating) ? Math.floor(contestData.contestRating) : 0,
-                contestParticipation: contestData.contestParticipation || [],
+                contestRating: Number.isFinite(contestData.contestRating) ? Math.floor(contestData.contestRating) : existingUser.contests.contestRating,
+                contestParticipation: contestData.contestParticipation || existingUser.contests.contestParticipation,
             }
             : existingUser.contests;
 
@@ -161,14 +162,17 @@ export const fetchUserExist = async (req, res) => {
             total2: total2
         };
 
-        return res.status(200).json(response);
+        return res.status(200).json({
+            success:true,
+            data: response
+        });
 
     } catch (error) {
         // Log the error to the console for debugging
         console.error('Error fetching data:', error);
 
         // Send an error response to the client
-        res.status(500).json({ message: 'Internal server error', error: error.message });
+        res.status(500).json({ message: 'Internal server error', success:false, error: error.message });
     }
 
 }
@@ -341,17 +345,22 @@ console.log(profilePromise);
 
 export const deleteLeetCodeUser = async (req, res) => {
     try {
-        const { leetid } = req.params;
-
-        const leetcodeUser = await LeetCodeUser.findOneAndDelete(leetid);
-
-        if (!leetcodeUser) {
-            return res.status(404).json({ message: "LeetCode user not found" });
+        const { leetid } = req.params; // The LeetCodeUser ID to delete
+    
+        // Delete the LeetCodeUser document
+        const deletedLeetCodeUser = await LeetCodeUser.findByIdAndDelete(leetid);
+        if (!deletedLeetCodeUser) {
+          return res.status(404).json({ success: false, message: 'LeetCodeUser not found.' });
         }
-
-        return res.status(200).json({ message: "LeetCode user deleted successfully" });
-    } catch (error) {
-        console.error("Error deleting LeetCode user:", error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
+    
+        await User.findOneAndUpdate(
+          { LeetCode: leetid },
+          { $unset: { LeetCode: "" } } // Remove the field
+        );
+    
+        return res.status(200).json({ success: true, message: 'LeetCodeUser deleted and reference removed from User.' });
+      } catch (error) {
+        console.error('Error deleting LeetCodeUser:', error);
+        return res.status(500).json({ success: false, message: 'Server error' });
+      }
 };

@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
 
     email: { type: String, required: true, unique: true },
 
-    mobileno: { type: Number},
+    mobileno: { type: Number },
 
     password: { type: String, required: true },
 
@@ -36,25 +36,17 @@ const userSchema = new mongoose.Schema({
     skills: { type: String },
     position: { type: String },
 
-    avgScore: {
-        rank: { type: Number, default: 0 },
-        score: { type: Number, default: 0 },
-        totalActiveDays: { type: Number, default: 0 },
-        stars: {
-            type: Number,
-            enum: [0, 1, 2, 3, 4, 5],
-            default: 0,
-        },
-        graph: {
-            activedates: [
-                {
-                    date: { type: Date },
-                    problemsolved: { type: Number },
-                    contribution: { type: Number },
-                },
-            ],
-        },
+    combinedSubmissions: {
+        type: Object
     },
+
+    hardProblemsSolved:{type:Number},
+    totalProblemSolved:{type:Number},
+    avgContestRating:{type:Number},
+    totalContributions:{type:Number},
+    totalSubmissions:{type:Number},
+    totalActiveDays:{type:Number},
+    overallScore : {type:Number},
 
     GeeksforGeeks: { type: mongoose.Schema.Types.ObjectId, ref: 'GeeksforGeeks' },
     LeetCode: { type: mongoose.Schema.Types.ObjectId, ref: 'LeetCode' },
@@ -69,7 +61,7 @@ const userSchema = new mongoose.Schema({
         codeforces: { type: String },
         github: { type: String },
         linkedin: { type: String },
-        twitter:{type:String},
+        twitter: { type: String },
         other: { type: String },
     },
 

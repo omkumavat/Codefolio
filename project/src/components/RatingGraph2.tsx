@@ -80,7 +80,7 @@ const RatingGraph2: React.FC<RatingGraphProps> = ({ data = [], isDarkMode }) => 
           <YAxis
             stroke={isDarkMode ? '#9CA3AF' : '#6B7280'}
             tick={{ fill: isDarkMode ? '#9CA3AF' : '#6B7280' }}
-            domain={[minRating - 10, maxRating + 10]} // Ensure all data fits comfortably
+            domain={[minRating - 50, maxRating + 50]} // Ensure all data fits comfortably
           />
           {/* Use the custom tooltip */}
           <Tooltip content={<CustomTooltip isDarkMode={isDarkMode} />} />

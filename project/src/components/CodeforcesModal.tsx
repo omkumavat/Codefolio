@@ -12,13 +12,13 @@ const CodeforcesModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     const { isDarkMode } = useTheme();
     const [username, setUsername] = useState("");
     const [isVerifying, setIsVerifying] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(10);
+    const [timeLeft, setTimeLeft] = useState(60);
     const [notValid, setNotValid] = useState("");
     const [verificationStep1, setVerificationStep1] = useState("");
     const [verificationStep2, setVerificationStep2] = useState("");
     const [verificationStep3, setVerificationStep3] = useState("");
     const [showRefresh, setShowRefresh] = useState(false);
-    const [Problem, setProblem] = useState("");
+    const [Problem, setProblem] = useState(0);
     const [Account, setAccount] = useState("");
     const [iShow, setIsShow] = useState(false);
     const [iShow2, setIsShow2] = useState(false);
@@ -42,9 +42,18 @@ const CodeforcesModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     };
 
     const handleVerify = async () => {
+        setAccount("");
+        setVerificationStep1('');
+        setVerificationStep2('');
+        setVerificationStep3('');
+        setNotValid('')
         setIsShow(true);
         if (username.trim() === "") {
             setNotValid("Please enter a valid username.");
+            setToast({
+                success: false,
+                text: "Please enter a valid username.",
+            })
             setIsShow(false);
             return;
         }
@@ -52,19 +61,32 @@ const CodeforcesModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
         const response = await axios.get(`http://localhost:4000/server/codeforces/fetch-codeforces/${username}`);
         console.log(response);
         if (response.data.success) {
-            setProblem(response.data.data.problemsolved);
+            setToast({
+                success: true,
+                text: "CodeForces account found..!",
+            })
+            setProblem((response.data.data.submissions) + 1);
             setIsVerifying(true);
             setAccount("");
-            setVerificationStep1(`1) Visit Codeforces and solve any problem.`);
-            setVerificationStep2("2) Submit your solution to any problem.");
-            setVerificationStep3("3) After submitting, click refresh when time ends!");
+            setVerificationStep1(`1) Visit Codeforces and solve problem number 2067A.`);
+            setVerificationStep2("2) Click on the submit (make compile time error).");
+            setVerificationStep3("3)  Do this within time and click on refresh after time ends !");
         } else {
+            console.log("hiii")
+            setToast({
+                success: false,
+                text: "CodeForces account not found..!",
+            })
             setAccount('Codeforces Account does not exist!');
         }
         setIsShow(false);
     };
 
     const handleRefresh = async () => {
+        setToast({
+            success: true,
+            text: 'Verification Started'
+        })
         setIsShow2(true);
         setIsVerifying(true);
         setVerificationStep1("");
@@ -72,22 +94,53 @@ const CodeforcesModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
         setVerificationStep3("");
         const response = await axios.get(`http://localhost:4000/server/codeforces/fetch-codeforces/${username}`);
         if (response.data.success) {
-            if (response.data.data.problemsolved===Problem) {
+            if ((response.data.data.submissions) === (Problem)) {
                 setVerificationStep1("Problem submitted successfully! 🎉");
-                const response = await axios.post(`http://localhost:4000/server/codeforces/add-codeforces`, {
-                    username: username,
-                    email: currentUser?.email
-                });
-                console.log(response.data.data);
-                setToast("Submission found!");
+                setToast({
+                    success: true,
+                    text: "Submission found",
+                })
+                try {
+                    const response = await axios.post(`http://localhost:4000/server/codeforces/add-codeforces`, {
+                        username: username,
+                        email: currentUser?.email
+                    });
+                    if (response.data) {
+                        setToast({
+                            success: true,
+                            text: "Verification Successfull",
+                        })
+                        setIsModalOpen(false);
+        window.location.reload();
+                    } else {
+                        setIsShow2(false);
+        setIsVerifying(false);
+                        setToast({
+                            success: false,
+                            text: "Verification Failed, try again later..",
+                        })
+                    }
+                } catch (error) {
+                    setIsShow2(false);
+        setIsVerifying(false);
+                    setToast({
+                        success: false,
+                        text: "Verification Failed, try again later..",
+                    })
+                }
             } else {
+                setIsShow2(false);
+        setIsVerifying(false);
                 setVerificationStep1("No submission found. Try again.");
-                setToast("Submission not found!");
+                setToast({
+                    success: false,
+                    text: "Submission not found",
+                })
             }
         }
-        setIsVerifying(false);
-        setShowRefresh(false);
-        setIsShow2(false);
+        // setIsVerifying(false);
+        // setShowRefresh(false);
+        // setIsShow2(false);
         setIsModalOpen(false);
         window.location.reload();
     };
@@ -166,6 +219,7 @@ const CodeforcesModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
                                                 </svg>
                                             ) : (
                                                 <button
+                                                    className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                                     onClick={handleVerify}
                                                     disabled={isVerifying}
                                                 >
@@ -178,6 +232,18 @@ const CodeforcesModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
                                     <p className="text-sm mt-2 text-red-500">{notValid}</p>
                                     <p className="text-sm mt-2 text-gray-500">
                                         {verificationStep1}
+                                        {
+                                            verificationStep1 !== "" && (
+                                                <a
+                                                    href="https://codeforces.com/problemset/problem/2067/A"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:underline"
+                                                >
+                                                    Click here
+                                                </a>
+                                            )
+                                        }
                                     </p>
                                     <p className="text-sm mt-2 text-gray-500">{verificationStep2}</p>
                                     <p className="text-sm mt-2 text-gray-500">{verificationStep3}</p>

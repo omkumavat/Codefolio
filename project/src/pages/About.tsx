@@ -1,18 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Code, Award, Users, Zap, Star, Trophy, Target } from 'lucide-react';
+import { Code, Award, Users, Zap, Star, Trophy, Target, GitFork } from 'lucide-react';
 import { useTheme } from '../App';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import axios from 'axios';
 
 const About = () => {
+  const [stat,setStat]=useState([]);
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   });
 
   const { isDarkMode } = useTheme();
+
+  useEffect(() => {
+    async function fetchStat() {
+      try {
+        const response = await axios.get('http://localhost:4000/server/user/stat')
+        console.log(response)
+        setStat(response.data);
+      } catch (error) {
+        console.log(error);
+        
+      }
+    }
+
+    fetchStat();
+  },[])
 
   return (
     <><Navbar/>
@@ -29,17 +46,17 @@ const About = () => {
           <img
             src="https://images.unsplash.com/photo-1517134191118-9d595e4c8c2b?auto=format&fit=crop&q=80"
             alt="Tech Background"
-            className={`w-full h-full object-cover ${isDarkMode ? 'opacity-10' : 'opacity-20'}`}
+            className={`w-full h-full object-cover ${isDarkMode ? 'opacity-100' : 'opacity-100'}`}
           />
         </div>
-        <div className="container mx-auto relative z-10">
+        <div className="container mx-auto mt-10 relative z-10">
           <motion.h1
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
             className="text-4xl md:text-6xl font-bold text-white text-center mb-6"
           >
-            About DevProfiles
+            About CodeFolio
           </motion.h1>
           <motion.p
             initial={{ y: 20, opacity: 0 }}
@@ -157,10 +174,10 @@ const About = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { icon: <Users />, stat: '10,000+', label: 'Active Users' },
-              { icon: <Code />, stat: '3', label: 'Platforms Integrated' },
-              { icon: <Award />, stat: '50,000+', label: 'Problems Solved' },
-              { icon: <Trophy />, stat: '1,000+', label: 'Daily Submissions' },
+              { icon: <Users />, stat: stat.active, label: 'Active Users' },
+              { icon: <Code />, stat: '5', label: 'Platforms Integrated' },
+              { icon: <Award />, stat: stat.totalProblemSolved, label: 'Problems Solved' },
+              { icon: <GitFork />, stat: stat.totalContribution, label: 'Total Contributions' },
             ].map((item, index) => (
               <motion.div
                 key={index}

@@ -6,6 +6,7 @@ import BasicInfo from '../components/EditSections/BasicInfo';
 import Account from '../components/EditSections/Account';
 import { useAuth } from '../Context/AuthProvider';
 import axios from 'axios';
+import { useTheme } from '../App';
 
 const menuItems = [
   { id: 'basic-info', label: 'Basic Info', icon: User },
@@ -16,6 +17,7 @@ const menuItems = [
 ];
 
 function EditProfile() {
+  const {isDarkMode}=useTheme();
   const { currentUser, updateProfile } = useAuth();
   const [activeSection, setActiveSection] = useState('basic-info');
   const [editMode, setEditMode] = useState(null);
@@ -87,10 +89,12 @@ function EditProfile() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen mt-20 bg-gray-50">
+      <div className={`min-h-screen mt-20 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
         <div className="flex flex-col lg:flex-row">
           {/* Sidebar */}
-          <aside className="w-full lg:w-64 bg-white shadow-lg p-6 mb-6 lg:mb-0">
+          <aside
+            className={`w-full lg:w-64 ${isDarkMode ? "bg-gray-800" : "bg-white"} shadow-lg p-6 mb-6 lg:mb-0`}
+          >
             <div className="border-b pb-4">
               <div className="relative w-24 h-24 mx-auto mb-4">
                 <img
@@ -99,7 +103,11 @@ function EditProfile() {
                   className="rounded-full w-full h-full object-cover"
                 />
                 <button
-                  className="absolute bottom-0 right-0 bg-white p-1.5 rounded-full shadow hover:bg-gray-50"
+                  className={`absolute bottom-0 right-0 p-1.5 rounded-full shadow ${
+                    isDarkMode
+                      ? "bg-gray-700 hover:bg-gray-600"
+                      : "bg-white hover:bg-gray-50"
+                  }`}
                   onClick={() => fileInputRef.current && fileInputRef.current.click()}
                 >
                   <Pencil size={16} />
@@ -124,7 +132,7 @@ function EditProfile() {
                   </button>
                 </div>
               )}
-              <p className="text-gray-500 text-sm text-center">
+              <p className={`text-sm text-center ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
                 {currentUser?.username}
               </p>
             </div>
@@ -136,8 +144,16 @@ function EditProfile() {
                     setActiveSection(item.id);
                     setEditMode(null);
                   }}
-                  className={`w-full px-6 py-3 flex items-center space-x-3 hover:bg-gray-50 ${
-                    activeSection === item.id ? 'text-sky-500 bg-sky-50' : 'text-gray-700'
+                  className={`w-full px-6 py-3 flex items-center space-x-3 hover:${
+                    isDarkMode ? "bg-gray-700" : "bg-gray-50"
+                  } ${
+                    activeSection === item.id
+                      ? isDarkMode
+                        ? "text-sky-400 bg-sky-900"
+                        : "text-sky-500 bg-sky-50"
+                      : isDarkMode
+                      ? "text-gray-300"
+                      : "text-gray-700"
                   }`}
                 >
                   <item.icon size={20} />
@@ -146,7 +162,7 @@ function EditProfile() {
               ))}
             </div>
           </aside>
-
+  
           {/* Main Content */}
           <main className="flex-1 px-4 lg:px-8">
             <div className="max-w-3xl mx-auto py-8">
@@ -166,6 +182,7 @@ function EditProfile() {
       <Footer />
     </>
   );
+  
 }
 
 export default EditProfile;

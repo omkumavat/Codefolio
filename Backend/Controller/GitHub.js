@@ -208,7 +208,7 @@ export const updateGitHubAdvanced = async (req, res) => {
 
     const { data } = graphqlResponse.data;
     if (!data || !data.user) {
-      return res.status(404).json({ message: "GitHub user not found via GraphQL" });
+      return res.status(404).json({ success: false, message: "GitHub user not found via GraphQL" });
     }
     const userData = data.user;
 
@@ -220,7 +220,7 @@ export const updateGitHubAdvanced = async (req, res) => {
       "2022": []
     };
 
-    totalContribution = 0;
+    let totalContribution = 0;
     userData.contributionsCollection.contributionCalendar.weeks.forEach(week => {
       week.contributionDays.forEach(day => {
         if (day.contributionCount > 0) { // only include days with contributions > 0
@@ -231,7 +231,7 @@ export const updateGitHubAdvanced = async (req, res) => {
               submissions: day.contributionCount,
             });
           }
-          totalContribution += submissions
+          totalContribution += day.contributionCount;
         }
       });
     });
@@ -278,7 +278,7 @@ export const updateGitHubAdvanced = async (req, res) => {
     existingUser.active_days = activeDays;
     existingUser.starred_repos = starredRepos;
     existingUser.auth = true;
-    existingUser.totalContributions = totalContributions;
+    existingUser.totalContributions = totalContribution;
 
     await existingUser.save();
     res.status(200).json({
@@ -395,7 +395,7 @@ const fetchAuthData = async (githubUser) => {
 
     let totalContribution = 0;
     let activeDays = 0;
-    
+
     userData.contributionsCollection.contributionCalendar.weeks.forEach(week => {
       week.contributionDays.forEach(day => {
         if (day.contributionCount > 0) { // only include days with contributions > 0
@@ -484,7 +484,7 @@ export const updateGitHubData = async (req, res) => {
       if (githubUser.auth && githubUser.pat) {
         await fetchAuthData(githubUser);
       }
-      return res.status(500).json({ success: false, data: githubUser, message: "Error fetching GitHub basic data" });
+      return res.status(201).json({ success: true, data: githubUser, message: "Error fetching GitHub basic data" });
     }
 
     const profileData = profileRes.data;
@@ -521,7 +521,7 @@ export const updateGitHubData = async (req, res) => {
           git_link: repo.svn_url,
           starred: repo.stargazers_count || 0,
           commits: 0, // placeholder for commits count
-          collaborators: collaborators 
+          collaborators: collaborators
         };
       })
     );
@@ -551,5 +551,27 @@ export const updateGitHubData = async (req, res) => {
   } catch (error) {
     console.error("Error in updateGitHubData:", error.message);
     return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+  }
+};
+
+export const deleteGithubUser = async (req, res) => {
+  try {
+    const { geetid } = req.params; // The LeetCodeUser ID to delete
+
+    // Delete the LeetCodeUser document
+    const deletedGithubUser = await GitHubUser.findByIdAndDelete(geetid);
+    if (!deletedGithubUser) {
+      return res.status(404).json({ success: false, message: 'LeetCodeUser not found.' });
+    }
+
+    await User.findOneAndUpdate(
+      { Github: geetid },
+      { $unset: { Github: "" } } // Remove the field
+    );
+
+    return res.status(200).json({ success: true, message: 'LeetCodeUser deleted and reference removed from User.' });
+  } catch (error) {
+    console.error('Error deleting LeetCodeUser:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
   }
 };

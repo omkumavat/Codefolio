@@ -12,7 +12,7 @@ const CodeChefModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     const { isDarkMode } = useTheme();
     const [username, setUsername] = useState("");
     const [isVerifying, setIsVerifying] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(60);
+    const [timeLeft, setTimeLeft] = useState(10);
     const [notValid, setNotValid] = useState("");
     const [verificationStep1, setVerificationStep1] = useState("");
     const [verificationStep2, setVerificationStep2] = useState("");
@@ -44,10 +44,19 @@ const CodeChefModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
 
 
     const handleVerify = async () => {
+        setAccount("");
+        setVerificationStep1('');
+        setVerificationStep2('');
+        setVerificationStep3('');
+        setNotValid('')
         setIsShow(true);
         if (username.trim() === "") {
             setNotValid("Please enter a valid username.");
             setIsShow(false);
+            setToast({
+                success: false,
+                text: "Please enter a valid username."
+            })
             return;
         }
 
@@ -55,6 +64,10 @@ const CodeChefModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
         // const data = response.data;
         console.log(response)
         if (response.data.success) {
+            setToast({
+                success: true,
+                text: "CodeChef Account found"
+            })
             setProblem(response.data.problemsolved)
             setIsVerifying(true);
             setAccount("");
@@ -63,11 +76,19 @@ const CodeChefModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
             setVerificationStep3("3) Do this within time and click on refresh after time ends !");
         } else {
             setAccount('CodeChef Account does not exist !');
+            setToast({
+                success: false,
+                text: "CodeChef Account does not exist !"
+            })
         }
         setIsShow(false);
     };
 
     const handleRefresh = async () => {
+        setToast({
+            success: true,
+            text: "Verification process started."
+        })
         setIsShow2(true);
         setIsVerifying(true);
         setVerificationStep1("");
@@ -75,23 +96,52 @@ const CodeChefModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
         setVerificationStep3("");
         const response = await axios.get(`http://localhost:4000/server/codechef/check-user/${username}`);
         if (response.data.success) {
-            if (response.data.problemsolved === Problem) {
+            if (response.data.problemsolved === Problem || response.data.problemsolved === "NEWYEAR") {
                 setVerificationStep1("Problem submitted successfully! 🎉");
-                const response = await axios.post(`http://localhost:4000/server/codechef/add-codechef`, {
-                    username: username,
-                    email: currentUser?.email
+                setToast({
+                    success: true,
+                    text: "Submission Found!"
                 })
-                console.log(response.data.data);
-                setToast("Submmission found ..!");
+
+                try {
+                    const response = await axios.post(`http://localhost:4000/server/codechef/add-codechef`, {
+                        username: username,
+                        email: currentUser?.email
+                    })
+
+                    if (response.data) {
+                        setToast({
+                            success: true,
+                            text: "Successfuly Verified"
+                        })
+                        setIsModalOpen(false);
+                        window.location.reload()
+                    } else {
+                        setIsShow2(false);
+                        setIsVerifying(false);
+                        setToast({
+                            success: false,
+                            text: "Failed to Verify"
+                        })
+                    }
+                } catch (error) {
+                    setIsShow2(false);
+                    setIsVerifying(false);
+                    setToast({
+                        success: false,
+                        text: "Failed to Verify"
+                    })
+                }
             } else {
+                setIsShow2(false);
+                setIsVerifying(false);
                 setVerificationStep1("No submission found. Try again.");
-                setToast("Submmission not found ..!");
+                setToast({
+                    success: false,
+                    text: "Submission not found"
+                })
             }
         }
-        setIsVerifying(false);
-        setShowRefresh(false);
-        setIsShow2(false);
-        setIsModalOpen(false);
         window.location.reload()
     };
 

@@ -264,3 +264,27 @@ export const fetchGFG = async (req, res) => {
     });
   }
 };
+
+
+
+export const deleteGeekforGeeksUser = async (req, res) => {
+    try {
+        const { geekid } = req.params; // The LeetCodeUser ID to delete
+    
+        // Delete the LeetCodeUser document
+        const deletedGeeksforGeeksUser = await GeeksforGeeksUser.findByIdAndDelete(geekid);
+        if (!deletedGeeksforGeeksUser) {
+          return res.status(404).json({ success: false, message: 'LeetCodeUser not found.' });
+        }
+    
+        await User.findOneAndUpdate(
+          { GeeksforGeeks: geekid },
+          { $unset: { GeeksforGeeks: "" } } // Remove the field
+        );
+    
+        return res.status(200).json({ success: true, message: 'LeetCodeUser deleted and reference removed from User.' });
+      } catch (error) {
+        console.error('Error deleting LeetCodeUser:', error);
+        return res.status(500).json({ success: false, message: 'Server error' });
+      }
+};

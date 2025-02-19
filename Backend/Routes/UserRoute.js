@@ -2,13 +2,17 @@ import express from 'express';
 const router = express.Router();
 
 import { sendOTPEmail,sendSignUpSuccessfulEmail } from '../Controller/EmailService.js';
-import { Signup,Login,checkUsername,getUser,checkUser,getUserbyId ,editUserbyId} from '../Controller/AuthUser.js';
+
+import { Signup,Login,checkUsername,getUser,checkUser,getUserbyId ,
+    editUserbyId,verifyPassword,getAllStat} from '../Controller/AuthUser.js';
 
 router.post('/user/sign-up',Signup)
 router.post('/user/login',Login)
 router.get('/user/check-username/:username',checkUsername)
 router.get('/user/getuser/:id',getUserbyId)
 router.put('/user/edituser/:id',editUserbyId)
+router.post('/user/verify-pass',verifyPassword);
+router.get('/user/stat',getAllStat)
 
 router.get('/user/get-user/:id',getUser)
 router.get('/user/check-user/:username',checkUser)
@@ -21,6 +25,10 @@ router.post('/user/email/email-otp',sendOTPEmail)
 import {updateUserProfile } from '../Controller/useredit.js'
 import { authMiddleware } from '../Middleware/authMiddleware.js';
 router.put('/user/edit-profile',updateUserProfile);
-// router.get('./user/getdata',getUserProfile )
+
+
+import {checkUserProfile} from '../Controller/UserGrowth.js';
+router.get('/user/check-user-profile/:username',checkUserProfile)
+
 
 export default router;
