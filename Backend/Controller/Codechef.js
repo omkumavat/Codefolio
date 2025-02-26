@@ -57,103 +57,102 @@ export const getfuturecontest = async (requestAnimationFrame, res) => {
     }
 }
 
-export const fetchUserNameExists = async (req, res) => {
-  try {
-    const { username } = req.params;
-    console.log("Fetching for username:", username);
+// export const fetchUserNameExists = async (req, res) => {
+//   try {
+//     const { username } = req.params;
+//     console.log("Fetching for username:", username);
 
-    if (!username) {
-      return res.status(400).json({ error: 'Username is required in the request body.' });
-    }
+//     if (!username) {
+//       return res.status(400).json({ error: 'Username is required in the request body.' });
+//     }
 
-    const url = `https://www.codechef.com/users/${username}`;
-    let browser;
-    let puppeteer;
-    let chrome;
+//     const url = `https://www.codechef.com/users/${username}`;
+//     let browser;
+//     let puppeteer;
+//     let chrome;
 
-    if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
-      console.log("Running on AWS Lambda/Vercel environment");
+//     if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+//       console.log("Running on AWS Lambda/Vercel environment");
       
-      // Dynamically import modules and use their default exports
-      chrome = (await import("chrome-aws-lambda")).default;
-      puppeteer = (await import("puppeteer-core")).default;
+//       // Dynamically import modules and use their default exports
+//       chrome = (await import("chrome-aws-lambda")).default;
+//       puppeteer = (await import("puppeteer-core")).default;
 
-      // Get the Chromium executable path
-      const execPath = await chrome.executablePath;
-      if (!execPath) {
-        console.error("Chromium executablePath not found");
-        throw new Error("Chromium executablePath not found");
-      }
-      console.log("Chromium executablePath:", execPath);
+//       // Get the Chromium executable path
+//       const execPath = await chrome.executablePath;
+//       if (!execPath) {
+//         console.error("Chromium executablePath not found");
+//         throw new Error("Chromium executablePath not found");
+//       }
+//       console.log("Chromium executablePath:", execPath);
 
-      browser = await puppeteer.launch({
-        args: [...chrome.args, '--no-sandbox', '--disable-setuid-sandbox'],
-        defaultViewport: chrome.defaultViewport,
-        executablePath: execPath,
-        headless: true,
-      });
-    } else {
-      console.log("Running locally");
-      puppeteer = (await import("puppeteer")).default;
-      browser = await puppeteer.launch({
-        headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      });
-    }
+//       browser = await puppeteer.launch({
+//         args: [...chrome.args, '--no-sandbox', '--disable-setuid-sandbox'],
+//         defaultViewport: chrome.defaultViewport,
+//         executablePath: execPath,
+//         headless: true,
+//       });
+//     } else {
+//       console.log("Running locally");
+//       puppeteer = (await import("puppeteer")).default;
+//       browser = await puppeteer.launch({
+//         headless: true,
+//         args: ["--no-sandbox", "--disable-setuid-sandbox"],
+//       });
+//     }
 
-    const page = await browser.newPage();
-    console.log("Navigating to URL:", url);
-    await page.goto(url, { waitUntil: 'networkidle2' });
-    console.log("Page loaded");
+//     const page = await browser.newPage();
+//     console.log("Navigating to URL:", url);
+//     await page.goto(url, { waitUntil: 'networkidle2' });
+//     console.log("Page loaded");
 
-    // Check if the profile exists
-    const pageContent = await page.content();
-    if (
-      pageContent.includes("The user you are looking for does not exist") ||
-      !(await page.$(".user-details-container"))
-    ) {
-      await browser.close();
-      return res.status(200).json({
-        success: false,
-        message: "CodeChef account not found for the given username.",
-      });
-    }
+//     // Check if the profile exists
+//     const pageContent = await page.content();
+//     if (
+//       pageContent.includes("The user you are looking for does not exist") ||
+//       !(await page.$(".user-details-container"))
+//     ) {
+//       await browser.close();
+//       return res.status(200).json({
+//         success: false,
+//         message: "CodeChef account not found for the given username.",
+//       });
+//     }
 
-    // Wait for table selector (ignore timeout errors)
-    await page.waitForSelector("#rankContentDiv .dataTable tbody tr", { timeout: 5000 }).catch(() => {});
-    const html = await page.content();
-    await browser.close();
+//     // Wait for table selector (ignore timeout errors)
+//     await page.waitForSelector("#rankContentDiv .dataTable tbody tr", { timeout: 5000 }).catch(() => {});
+//     const html = await page.content();
+//     await browser.close();
 
-    const dom = new JSDOM(html);
-    const document = dom.window.document;
-    const rows = document.querySelectorAll("#rankContentDiv .dataTable tbody tr");
-    console.log("Rows found:", rows.length);
+//     const dom = new JSDOM(html);
+//     const document = dom.window.document;
+//     const rows = document.querySelectorAll("#rankContentDiv .dataTable tbody tr");
+//     console.log("Rows found:", rows.length);
 
-    let firstProblemInfo = "No solved problems found";
-    // Loop through rows to extract the first solved problem
-    for (let row of rows) {
-      const problem = row.querySelector("td:nth-child(2) a")?.textContent.trim();
-      if (problem) {
-        firstProblemInfo = problem;
-        break;
-      }
-    }
+//     let firstProblemInfo = "No solved problems found";
+//     // Loop through rows to extract the first solved problem
+//     for (let row of rows) {
+//       const problem = row.querySelector("td:nth-child(2) a")?.textContent.trim();
+//       if (problem) {
+//         firstProblemInfo = problem;
+//         break;
+//       }
+//     }
 
-    res.status(200).json({
-      success: true,
-      message: 'First problem fetched successfully',
-      problemsolved: firstProblemInfo
-    });
+//     res.status(200).json({
+//       success: true,
+//       message: 'First problem fetched successfully',
+//       problemsolved: firstProblemInfo
+//     });
 
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    res.status(500).json({
-      success: false,
-      message: 'An error occurred while fetching contests.',
-    });
-  }
-};
-
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'An error occurred while fetching contests.',
+//     });
+//   }
+// };
 
 
 
@@ -181,21 +180,18 @@ export const AddCodeChefAccount = async (req, res) => {
             return res.status(400).json({ message: "CodeChef account already exists in the database" });
         }
 
-        const url = `https://www.codechef.com/users/${username}`;
+        // const url = `https://www.codechef.com/users/${username}`;
 
-        const browser = await puppeteer.launch({ headless: true });
-        const page = await browser.newPage();
+        // // Fetch HTML content of the CodeChef profile page
+        // const response = await axios.get(url);
+        // const dom = new JSDOM(response.data);
+        // const document = dom.window.document;
 
-        await page.goto(url, { waitUntil: "domcontentloaded" });
+        // // Extract number of problems solved
+        // const problemsSolvedElement = document.querySelector(".rating-data-section.problems-solved h3");
+        // const problemsSolved = problemsSolvedElement ? problemsSolvedElement.textContent.trim() : "Not found";
 
-        // Extract number of problems solved
-        const problemsSolved = await page.evaluate(() => {
-            const h3Elements = document.querySelectorAll(".rating-data-section.problems-solved h3");
-            return h3Elements.length > 0 ? h3Elements[3].innerText.trim() : "Not found";
-        });
-
-        console.log(`Problems Solved: ${problemsSolved}`);
-        await browser.close();
+        // console.log(`Problems Solved: ${problemsSolved}`);
 
         // Fetch CodeChef profile data
         const profilePromise = axios.get(`${process.env.codechef_api_user}/${username}`).catch(() => null);
@@ -228,7 +224,7 @@ export const AddCodeChefAccount = async (req, res) => {
         // Create a new CodeChefUser document
         const newCodeChef = new CodeChefUser({
             username: username,
-            problemSolved: parseInt(problemsSolved.match(/\d+/)[0], 10),
+            // problemSolved: parseInt(problemsSolved.match(/\d+/)[0], 10),
             countryRank: profileData.countryRank,
             globalRank: profileData.globalRank,
             countryName: profileData.countryName,
@@ -254,6 +250,7 @@ export const AddCodeChefAccount = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
 
 export const fetchCodeChefAccount = async (req, res) => {
     try {

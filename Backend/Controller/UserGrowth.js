@@ -121,7 +121,7 @@ export const checkUserProfile = async (req, res) => {
             githubid ? GitHubUser.findById(githubid) : null,
             geeksforgeeksid ? GeeksforGeeksUser.findById(geeksforgeeksid) : null,
         ]);
-        
+
         // Combine all submission/contribution activity data across platforms.
         let allActivityData = [];
 
@@ -203,9 +203,9 @@ export const checkUserProfile = async (req, res) => {
         if (codeforcesProfile && codeforcesProfile.problemSolved) {
             totalProblemsSolved += codeforcesProfile.problemSolved;
         }
-        if (codechefProfile && codechefProfile.problemSolved) {
-            totalProblemsSolved += codechefProfile.problemSolved;
-        }
+        // if (codechefProfile && codechefProfile.problemSolved) {
+        //     totalProblemsSolved += codechefProfile.problemSolved;
+        // }
         if (leetCodeProfile && leetCodeProfile.profile && leetCodeProfile.profile.totalSolved) {
             totalProblemsSolved += leetCodeProfile.profile.totalSolved;
         }

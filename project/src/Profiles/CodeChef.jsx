@@ -35,7 +35,7 @@ const CodeChef = () => {
   const [globalRank, setglobalRank] = useState(0)
   const [countryRank, setcountryRank] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [problemSolved, setproblemSolved] = useState("")
+  // const [problemSolved, setproblemSolved] = useState("")
   const [hasAccount, setHasAccount] = useState(true)
   const [stars, setStars] = useState("")
   const [contestRating, setcontestRating] = useState(0)
@@ -122,7 +122,7 @@ const CodeChef = () => {
       setcountryRank(data.countryRank)
       setcontestRating(data.currentRating)
       sethighestcontestRating(data.highestRating)
-      setproblemSolved(data.problemSolved)
+      // setproblemSolved(data.problemSolved)
       setcontestParticipation(data.contests || [])
 
       // Parse submission calendars
@@ -215,7 +215,7 @@ const CodeChef = () => {
       setcountryRank(data.countryRank)
       setcontestRating(data.currentRating)
       sethighestcontestRating(data.highestRating)
-      setproblemSolved(data.problemSolved)
+      // setproblemSolved(data.problemSolved)
       setcontestParticipation(data.contests || [])
 
       // Parse submission calendars
@@ -498,34 +498,6 @@ const CodeChef = () => {
                   ))}
                 </div>
               </div>
-
-              <div
-                className={`p-6 rounded-xl mb-12 text-center ${
-                  isDarkMode ? "bg-gray-800" : "bg-white"
-                } shadow-lg`}
-              >
-                <h2 className="text-2xl font-bold mb-6">
-                  Problem Solving Stats
-                </h2>
-
-                {/* Flexbox container to center everything */}
-                <div className="flex flex-wrap justify-center gap-6">
-                  <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.1 }}
-                    className="flex flex-col items-center justify-center w-40 h-32 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md"
-                  >
-                    <div className="text-3xl font-bold text-orange-500">
-                      {problemSolved}
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      Total Solved
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
-
               <section
                 className={`py-12 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}
               >

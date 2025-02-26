@@ -1,32 +1,32 @@
-import puppeteer from 'puppeteer';
+// import puppeteer from 'puppeteer';
 import axios from 'axios';
 import User from '../../Models/User.js';
 import CodeChefUser from '../../Models/CodeChef.js';
 
 
-const scrapeProblemsSolved = async (url, timeout = 10000) => {
-  try {
-    return await Promise.race([
-      (async () => {
-        const browser = await puppeteer.launch({ headless: true });
-        const page = await browser.newPage();
-        await page.goto(url, { waitUntil: 'domcontentloaded' });
-        const problemsSolved = await page.evaluate(() => {
-          const h3Elements = document.querySelectorAll(".rating-data-section.problems-solved h3");
-          // Check if we have enough elements; otherwise default to "0"
-          return h3Elements.length > 3 ? h3Elements[3].innerText.trim() : "0";
-        });
-        await browser.close();
-        const match = problemsSolved.match(/\d+/);
-        return match ? parseInt(match[0], 10) : 0;
-      })(),
-      new Promise((resolve) => setTimeout(() => resolve(0), timeout))
-    ]);
-  } catch (error) {
-    console.error("Error in scrapeProblemsSolved helper:", error);
-    return 0;
-  }
-};
+// const scrapeProblemsSolved = async (url, timeout = 10000) => {
+//   try {
+//     return await Promise.race([
+//       (async () => {
+//         const browser = await puppeteer.launch({ headless: true });
+//         const page = await browser.newPage();
+//         await page.goto(url, { waitUntil: 'domcontentloaded' });
+//         const problemsSolved = await page.evaluate(() => {
+//           const h3Elements = document.querySelectorAll(".rating-data-section.problems-solved h3");
+//           // Check if we have enough elements; otherwise default to "0"
+//           return h3Elements.length > 3 ? h3Elements[3].innerText.trim() : "0";
+//         });
+//         await browser.close();
+//         const match = problemsSolved.match(/\d+/);
+//         return match ? parseInt(match[0], 10) : 0;
+//       })(),
+//       new Promise((resolve) => setTimeout(() => resolve(0), timeout))
+//     ]);
+//   } catch (error) {
+//     console.error("Error in scrapeProblemsSolved helper:", error);
+//     return 0;
+//   }
+// };
 
 
 export const updateCodeChefUserData = async (username) => {
@@ -52,10 +52,10 @@ export const updateCodeChefUserData = async (username) => {
   }
   
   // Build the CodeChef profile URL for scraping
-  const url = `https://www.codechef.com/users/${existingCodeChefUser.username}`;
+  // const url = `https://www.codechef.com/users/${existingCodeChefUser.username}`;
   
   // Scrape problems solved (with a 10-second timeout)
-  const problemsSolved = await scrapeProblemsSolved(url, 10000);
+  // const problemsSolved = await scrapeProblemsSolved(url, 10000);
   
   // Fetch CodeChef profile data via API
   const profileUrl = `${process.env.codechef_api_user}/${existingCodeChefUser.username}`;
@@ -88,7 +88,7 @@ export const updateCodeChefUserData = async (username) => {
   }
   
   // Update the CodeChefUser document fields
-  existingCodeChefUser.problemSolved = problemsSolved;
+  // existingCodeChefUser.problemSolved = problemsSolved;
   existingCodeChefUser.countryRank = profileData.countryRank;
   existingCodeChefUser.globalRank = profileData.globalRank;
   existingCodeChefUser.countryName = profileData.countryName;
