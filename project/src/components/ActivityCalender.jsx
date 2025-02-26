@@ -2,9 +2,9 @@ import React from "react"
 import { motion } from "framer-motion"
 
 const ActivityCalendar = ({ data, isDarkMode, selectedYear }) => {
-  // console.log(data)
+  console.log(data)
   const getIntensityColor = count => {
-    // // console.log(count);
+    // console.log(count);
     if (count === 0) return isDarkMode ? "bg-gray-800" : "bg-gray-200"
     if (count <= 2) return "bg-green-200"
     if (count <= 5) return "bg-green-300"

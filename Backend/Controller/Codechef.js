@@ -9,7 +9,7 @@ dotenv.config();
 export const getfuturecontest = async (requestAnimationFrame, res) => {
     try {
         const response = await axios.get(`${process.env.codechef_api}`)
-        // console.log(response)
+        console.log(response)
 
         if (response.data.status === 'success') {
             const futureContest = response.data.future_contests;
@@ -60,7 +60,7 @@ export const getfuturecontest = async (requestAnimationFrame, res) => {
 // export const fetchUserNameExists = async (req, res) => {
 //   try {
 //     const { username } = req.params;
-//     // console.log("Fetching for username:", username);
+//     console.log("Fetching for username:", username);
 
 //     if (!username) {
 //       return res.status(400).json({ error: 'Username is required in the request body.' });
@@ -72,7 +72,7 @@ export const getfuturecontest = async (requestAnimationFrame, res) => {
 //     let chrome;
 
 //     if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
-//       // console.log("Running on AWS Lambda/Vercel environment");
+//       console.log("Running on AWS Lambda/Vercel environment");
       
 //       // Dynamically import modules and use their default exports
 //       chrome = (await import("chrome-aws-lambda")).default;
@@ -84,7 +84,7 @@ export const getfuturecontest = async (requestAnimationFrame, res) => {
 //         console.error("Chromium executablePath not found");
 //         throw new Error("Chromium executablePath not found");
 //       }
-//       // console.log("Chromium executablePath:", execPath);
+//       console.log("Chromium executablePath:", execPath);
 
 //       browser = await puppeteer.launch({
 //         args: [...chrome.args, '--no-sandbox', '--disable-setuid-sandbox'],
@@ -93,7 +93,7 @@ export const getfuturecontest = async (requestAnimationFrame, res) => {
 //         headless: true,
 //       });
 //     } else {
-//       // console.log("Running locally");
+//       console.log("Running locally");
 //       puppeteer = (await import("puppeteer")).default;
 //       browser = await puppeteer.launch({
 //         headless: true,
@@ -102,9 +102,9 @@ export const getfuturecontest = async (requestAnimationFrame, res) => {
 //     }
 
 //     const page = await browser.newPage();
-//     // console.log("Navigating to URL:", url);
+//     console.log("Navigating to URL:", url);
 //     await page.goto(url, { waitUntil: 'networkidle2' });
-//     // console.log("Page loaded");
+//     console.log("Page loaded");
 
 //     // Check if the profile exists
 //     const pageContent = await page.content();
@@ -127,7 +127,7 @@ export const getfuturecontest = async (requestAnimationFrame, res) => {
 //     const dom = new JSDOM(html);
 //     const document = dom.window.document;
 //     const rows = document.querySelectorAll("#rankContentDiv .dataTable tbody tr");
-//     // console.log("Rows found:", rows.length);
+//     console.log("Rows found:", rows.length);
 
 //     let firstProblemInfo = "No solved problems found";
 //     // Loop through rows to extract the first solved problem
@@ -164,13 +164,13 @@ export const AddCodeChefAccount = async (req, res) => {
             return res.status(400).json({ message: "Email is required" });
         }
 
-        // console.log("Email:", email);
+        console.log("Email:", email);
 
         // Find the user by email
         const findUser = await User.findOne({ email }).exec();
 
         if (!findUser) {
-            // console.log("User not found in the database.");
+            console.log("User not found in the database.");
             return res.status(400).json({ message: "User not exists in database" });
         }
 
@@ -191,7 +191,7 @@ export const AddCodeChefAccount = async (req, res) => {
         // const problemsSolvedElement = document.querySelector(".rating-data-section.problems-solved h3");
         // const problemsSolved = problemsSolvedElement ? problemsSolvedElement.textContent.trim() : "Not found";
 
-        // // console.log(`Problems Solved: ${problemsSolved}`);
+        // console.log(`Problems Solved: ${problemsSolved}`);
 
         // Fetch CodeChef profile data
         const profilePromise = axios.get(`${process.env.codechef_api_user}/${username}`).catch(() => null);
@@ -273,7 +273,7 @@ export const fetchCodeChefFromDB = async (req, res) => {
         let existingUser = await CodeChefUser.findById(codechefid).exec();
 
         if (!existingUser) {
-            // console.log("CodeChef user not found, creating a new one.");
+            console.log("CodeChef user not found, creating a new one.");
             return res.status(400).json({
                 success: false,
                 message: "CodeChef user not found"

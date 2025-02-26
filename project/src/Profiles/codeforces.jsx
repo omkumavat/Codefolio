@@ -85,18 +85,18 @@ const Codeforces = () => {
             setShowRefresh(true)
             setShowDelete(true)
             response = await axios.get(
-              `https://codefolio-backend.vercel.app/server/codeforces/fetch/${username}`
+              `http://localhost:4000/server/codeforces/fetch/${username}`
             )
           } else {
             // Account not added
-            // console.log(hasAccount)
+            console.log(hasAccount)
             setHasAccount(false)
             return
           }
         } else {
           // Not self account and logged in
           response = await axios.get(
-            `https://codefolio-backend.vercel.app/server/codeforces/fetch/${username}`
+            `http://localhost:4000/server/codeforces/fetch/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
@@ -104,7 +104,7 @@ const Codeforces = () => {
       } else {
         // Not self account and not logged in
         response = await axios.get(
-          `https://codefolio-backend.vercel.app/server/codeforces/fetch/${username}`
+          `http://localhost:4000/server/codeforces/fetch/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -116,7 +116,7 @@ const Codeforces = () => {
       }
 
       const data = response.data.data
-      // console.log("Codeforces Data:", data)
+      console.log("Codeforces Data:", data)
 
       setCfUsername(data?.username)
       setMaxRating(data?.maxRating)
@@ -153,18 +153,18 @@ const Codeforces = () => {
             setShowDelete(true)
             const codeforcesid = currentUser?.CodeForces
             response = await axios.get(
-              `https://codefolio-backend.vercel.app/server/codeforces/fetch-codeforces-from-db/${codeforcesid}`
+              `http://localhost:4000/server/codeforces/fetch-codeforces-from-db/${codeforcesid}`
             )
           } else {
             // Account not added
-            // console.log(hasAccount)
+            console.log(hasAccount)
             setHasAccount(false)
             return
           }
         } else {
           // Not self account and logged in
           response = await axios.get(
-            `https://codefolio-backend.vercel.app/server/codeforces/fetch/${username}`
+            `http://localhost:4000/server/codeforces/fetch/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
@@ -172,7 +172,7 @@ const Codeforces = () => {
       } else {
         // Not self account and not logged in
         response = await axios.get(
-          `https://codefolio-backend.vercel.app/server/codeforces/fetch/${username}`
+          `http://localhost:4000/server/codeforces/fetch/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -184,7 +184,7 @@ const Codeforces = () => {
       }
 
       const data = response.data.data
-      // console.log("Codeforces Data:", data)
+      console.log("Codeforces Data:", data)
 
       setCfUsername(data?.username)
       setMaxRating(data?.maxRating)
@@ -216,7 +216,7 @@ const Codeforces = () => {
       if (currentUser && currentUser.CodeForces) {
         const cfId = currentUser.CodeForces
         await axios.delete(
-          `https://codefolio-backend.vercel.app/server/codeforces/delete-codeforces/${cfId}`
+          `http://localhost:4000/server/codeforces/delete-codeforces/${cfId}`
         )
         setToast("Codeforces account removed successfully")
         fetchUpdatedUser()
@@ -234,7 +234,7 @@ const Codeforces = () => {
       if (!currentUser?._id) return
 
       const response = await axios.get(
-        `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
+        `http://localhost:4000/server/user/get-user/${currentUser._id}`
       )
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)
@@ -491,7 +491,7 @@ const Codeforces = () => {
                     value={selectedYear}
                     onChange={e => {
                       const year = parseInt(e.target.value)
-                      // console.log("Year Selected:", year)
+                      console.log("Year Selected:", year)
                       setSelectedYear(year)
                     }}
                     className="px-4 py-2 border rounded-lg text-gray-700 bg-white dark:bg-gray-700 dark:text-white"

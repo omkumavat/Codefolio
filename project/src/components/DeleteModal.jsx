@@ -25,7 +25,7 @@ const DeleteModal = ({
       setIsVerifying(true)
       // Verify the password
       const verifyResponse = await axios.post(
-        "https://codefolio-backend.vercel.app/server/user/verify-pass",
+        "http://localhost:4000/server/user/verify-pass",
         {
           password,
           id
@@ -35,13 +35,13 @@ const DeleteModal = ({
       if (verifyResponse.data.success) {
         // Map account type to its deletion endpoint
         const endpoints = {
-          LeetCode: "https://codefolio-backend.vercel.app/server/leetcode/delete-leetcode",
+          LeetCode: "http://localhost:4000/server/leetcode/delete-leetcode",
           CodeForces:
-            "https://codefolio-backend.vercel.app/server/codeforces/delete-codeforces",
-          CodeChef: "https://codefolio-backend.vercel.app/server/codechef/delete-codechef",
+            "http://localhost:4000/server/codeforces/delete-codeforces",
+          CodeChef: "http://localhost:4000/server/codechef/delete-codechef",
           GeeksforGeeks:
-            "https://codefolio-backend.vercel.app/server/gfg/delete-geeksforgeeks",
-          Github: "https://codefolio-backend.vercel.app/server/github/delete-github"
+            "http://localhost:4000/server/gfg/delete-geeksforgeeks",
+          Github: "http://localhost:4000/server/github/delete-github"
         }
 
         const endpoint = endpoints[acc] || endpoints.Github

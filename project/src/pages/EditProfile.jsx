@@ -46,17 +46,17 @@ function EditProfile() {
     // setloading(true);
     try {
       if (!currentUser?._id) {
-        // console.log("No valid user ID found")
+        console.log("No valid user ID found")
         return
       }
 
       const response = await axios.get(
-        `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
+        `http://localhost:4000/server/user/get-user/${currentUser._id}`
       )
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)
       } else {
-        // console.log("Invalid response received")
+        console.log("Invalid response received")
       }
     } catch (error) {
       console.error("Unable to fetch user", error)
@@ -73,9 +73,9 @@ function EditProfile() {
       const base64data = reader.result // this is a data URI string (e.g., "data:image/png;base64,...")
       try {
         const id = currentUser._id
-        // console.log(base64data)
+        console.log(base64data)
         const response = await axios.put(
-          `https://codefolio-backend.vercel.app/server/user/edituser/${id}`,
+          `http://localhost:4000/server/user/edituser/${id}`,
           { imageData: base64data }
         )
         if (response.data.success) {

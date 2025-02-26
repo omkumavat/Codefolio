@@ -115,31 +115,31 @@ const GitHub = () => {
     try {
       let response = null
 
-      // console.log(currentUser)
+      console.log(currentUser)
       if (currentUser) {
         if (currentUser?.username === username) {
           if (currentUser?.Github) {
             setShowRefresh(true)
             setShowDelete(true)
             response = await axios.get(
-              `https://codefolio-backend.vercel.app/server/github/fetch-git/${username}`
+              `http://localhost:4000/server/github/fetch-git/${username}`
             )
             setShowContributions(response.data.data.auth)
           } else {
-            // console.log(hasAccount)
+            console.log(hasAccount)
             setHasAccount(false)
             return
           }
         } else {
           response = await axios.get(
-            `https://codefolio-backend.vercel.app/server/github/fetch-git/${username}`
+            `http://localhost:4000/server/github/fetch-git/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
         }
       } else {
         response = await axios.get(
-          `https://codefolio-backend.vercel.app/server/github/fetch-git/${username}`
+          `http://localhost:4000/server/github/fetch-git/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -151,7 +151,7 @@ const GitHub = () => {
       }
 
       const data = response.data.data
-      // console.log(data)
+      console.log(data)
       setShowContributions(data.auth)
       setHasAccount(true)
       setAuths(data.auth)
@@ -183,7 +183,7 @@ const GitHub = () => {
     try {
       let response = null
 
-      // console.log(currentUser)
+      console.log(currentUser)
       if (currentUser) {
         if (currentUser?.username === username) {
           if (currentUser?.Github) {
@@ -191,24 +191,24 @@ const GitHub = () => {
             setShowDelete(true)
             const geetid = currentUser?.Github
             response = await axios.get(
-              `https://codefolio-backend.vercel.app/server/github/fetch-git-from-db/${geetid}`
+              `http://localhost:4000/server/github/fetch-git-from-db/${geetid}`
             )
             setShowContributions(response.data.data.auth)
           } else {
-            // console.log(hasAccount)
+            console.log(hasAccount)
             setHasAccount(false)
             return
           }
         } else {
           response = await axios.get(
-            `https://codefolio-backend.vercel.app/server/github/fetch-git/${username}`
+            `http://localhost:4000/server/github/fetch-git/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
         }
       } else {
         response = await axios.get(
-          `https://codefolio-backend.vercel.app/server/github/fetch-git/${username}`
+          `http://localhost:4000/server/github/fetch-git/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -250,7 +250,7 @@ const GitHub = () => {
       if (currentUser && currentUser.LeetCode) {
         const leetid = currentUser.LeetCode
         const response = await axios.delete(
-          `https://codefolio-backend.vercel.app/server/leetcode/delete-leetcode/${leetid}`
+          `http://localhost:4000/server/leetcode/delete-leetcode/${leetid}`
         )
       }
     } catch (error) {
@@ -262,17 +262,17 @@ const GitHub = () => {
     // setloading(true);
     try {
       if (!currentUser?._id) {
-        // console.log("No valid user ID found")
+        console.log("No valid user ID found")
         return
       }
 
       const response = await axios.get(
-        `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
+        `http://localhost:4000/server/user/get-user/${currentUser._id}`
       )
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)
       } else {
-        // console.log("Invalid response received")
+        console.log("Invalid response received")
       }
     } catch (error) {
       console.error("Unable to fetch user", error)
@@ -288,8 +288,8 @@ const GitHub = () => {
   }, [currentUser])
 
   useEffect(() => {
-    // // console.log("Year Selected:", selectedYear);
-    // // console.log("Data for Selected Year:", selectedData);
+    // console.log("Year Selected:", selectedYear);
+    // console.log("Data for Selected Year:", selectedData);
   }, [selectedYear, selectedData])
 
   const cardAnimation = useSpring({
@@ -666,8 +666,8 @@ const GitHub = () => {
                         value={selectedYear}
                         onChange={e => {
                           const year = parseInt(e.target.value)
-                          // console.log("Year Selected:", year)
-                          // console.log("Year Selected:", selectedData)
+                          console.log("Year Selected:", year)
+                          console.log("Year Selected:", selectedData)
                           setSelectedYear(year)
                         }}
                         className="px-4 py-2 border rounded-lg text-gray-700 bg-white dark:bg-gray-700 dark:text-white"

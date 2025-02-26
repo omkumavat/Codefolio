@@ -39,7 +39,7 @@ const AutoCompleteInput = ({
   }
 
   const handleSelect = value => {
-    // console.log("Option selected:", value)
+    console.log("Option selected:", value)
     setInputValue(value)
     onSelect(value)
     setIsOpen(false)
@@ -137,7 +137,7 @@ const BasicInfo = () => {
         setCollegeOptions(res.data)
       })
       .catch(err => console.error("Error fetching colleges:", err))
-    // console.log(currentUser)
+    console.log(currentUser)
   }, [])
 
   // When selected country changes, update states and reset state/city fields
@@ -171,17 +171,17 @@ const BasicInfo = () => {
     // setloading(true);
     try {
       if (!currentUser?._id) {
-        // console.log("No valid user ID found")
+        console.log("No valid user ID found")
         return
       }
 
       const response = await axios.get(
-        `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
+        `http://localhost:4000/server/user/get-user/${currentUser._id}`
       )
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)
       } else {
-        // console.log("Invalid response received")
+        console.log("Invalid response received")
       }
     } catch (error) {
       console.error("Unable to fetch user", error)
@@ -192,17 +192,17 @@ const BasicInfo = () => {
 
   // Dummy save handler
   const handleSave = async () => {
-    // console.log("Saved fields:", fields)
+    console.log("Saved fields:", fields)
     const id = currentUser._id
     const response = await axios.put(
-      `https://codefolio-backend.vercel.app/server/user/edituser/${id}`,
+      `http://localhost:4000/server/user/edituser/${id}`,
       fields
     )
     if (response.data.success) {
       toast.success("Profile updated successfully ..!")
       fetchUpdatedUser()
       setEditMode(false)
-      // console.log("User updated successfully")
+      console.log("User updated successfully")
     } else {
       toast.success("Failed to update Profile ..!")
     }

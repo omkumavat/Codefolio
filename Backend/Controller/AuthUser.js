@@ -59,7 +59,7 @@ export const Signup = async (req, res) => {
 // Login
 export const Login = async (req, res) => {
     try {
-        // console.log(req.body)
+        console.log(req.body)
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({
@@ -186,7 +186,7 @@ export const getAllStat = async (req, res) => {
     geeksforGeeksUsers.map((user) => (user.contestRating ? user.contestRating[1] || 0 : 0))
       .reduce((acc, cur) => acc + parseInt(cur), 0);
 
-    // console.log(geeksforgeeksSolved);
+    console.log(geeksforgeeksSolved);
     
     const totalProblemSolved =
       codechefSolved +
@@ -199,7 +199,7 @@ export const getAllStat = async (req, res) => {
       .map((user) => user.totalContributions || 0)
       .reduce((acc, cur) => acc + cur, 0);
 
-      // console.log(totalProblemSolved)
+      console.log(totalProblemSolved)
 
     res.status(200).json({
       success: true,
@@ -425,7 +425,7 @@ import Contactus from "../Models/Contact.js";  // Ensure correct path
 
 export const submitContactForm = async (req, res) => {
     try {
-        // console.log("Received Request Body:", req.body);
+        console.log("Received Request Body:", req.body);
 
         const { fullName, email, phone, message } = req.body;
 
