@@ -11,7 +11,7 @@ import {
   Target,
   Badge
 } from "lucide-react"
-import CodeforcesGraph from "../components/CodeforcesGraph"
+import CodeforcesGraph from "../components/codeforcesgraph"
 import { useTheme } from "../App"
 import Navbar from "../components/Navbar"
 import Footer from "../components/Footer"

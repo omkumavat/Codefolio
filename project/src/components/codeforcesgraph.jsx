@@ -35,7 +35,7 @@ const CustomTooltip = ({ active, payload, isDarkMode }) => {
   return null
 }
 
-const RatingGraph2 = ({ data = [], isDarkMode }) => {
+const CodeforcesGraph = ({ data = [], isDarkMode }) => {
   // Validate that data is an array
   if (!Array.isArray(data)) {
     console.error("Invalid data format, expected an array")
@@ -84,4 +84,4 @@ const RatingGraph2 = ({ data = [], isDarkMode }) => {
   )
 }
 
-export default RatingGraph2
+export default CodeforcesGraph
