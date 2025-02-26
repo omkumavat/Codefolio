@@ -22,17 +22,17 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
-# Set working directory inside the container
-WORKDIR /app
+# Set working directory inside the container to /backend
+WORKDIR /backend
 
-# Copy package.json and package-lock.json (if available) into the container
-COPY package*.json ./
+# Copy package.json and package-lock.json from the backend folder into the container
+COPY backend/package*.json ./
 
 # Install Node.js dependencies
 RUN npm install
 
-# Copy the rest of your application code into the container
-COPY . .
+# Copy the rest of your application code from the backend folder
+COPY backend/ .
 
 # Expose the port your app listens on (adjust if necessary)
 EXPOSE 3000
