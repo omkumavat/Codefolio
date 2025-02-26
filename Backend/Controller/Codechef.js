@@ -60,89 +60,95 @@ export const getfuturecontest = async (requestAnimationFrame, res) => {
 }
 
 export const fetchUserNameExists = async (req, res) => {
-    try {
-        const { username } = req.params;
-        console.log("Fetching for username:", username);
+  try {
+    const { username } = req.params;
+    console.log("Fetching for username:", username);
 
-        if (!username) {
-            return res.status(400).json({ error: 'Username is required in the request body.' });
-        }
-
-        const url = `https://www.codechef.com/users/${username}`;
-
-        let browser;
-
-        if (process.env.VERCEL) {
-            // Running in a serverless environment (e.g., Vercel)
-            browser = await chromium.puppeteer.launch({
-                args: chromium.args,
-                defaultViewport: chromium.defaultViewport,
-                executablePath: await chromium.executablePath(),
-                headless: chromium.headless,
-            });
-        } else {
-            // Running locally, use the full puppeteer package which bundles Chromium
-            browser = await puppeteer.launch({
-                headless: true,
-                args: ["--no-sandbox", "--disable-setuid-sandbox"],
-            });
-        }
-
-        const page = await browser.newPage();
-        await page.goto(url, { waitUntil: 'networkidle2' });
-
-        // Check if the profile exists
-        const pageContent = await page.content();
-        if (pageContent.includes("The user you are looking for does not exist") ||
-            !(await page.$(".user-details-container"))) {
-            // The selector .user-details-container should exist on valid profiles
-            await browser.close();
-            return res.status(200).json({
-                success: false,
-                message: "CodeChef account not found for the given username.",
-            });
-        }
-
-        await page.waitForSelector("#rankContentDiv .dataTable tbody tr", { timeout: 5000 }).catch(() => null);
-        const html = await page.content();
-        await browser.close();
-
-        const dom = new JSDOM(html);
-        const document = dom.window.document;
-
-        const rows = document.querySelectorAll("#rankContentDiv .dataTable tbody tr");
-        console.log("Rows found:", rows.length);
-
-        let firstProblemInfo = "No solved problems found";
-
-        // Get the first solved problem
-        for (let row of rows) {
-            const problem = row.querySelector("td:nth-child(2) a")?.textContent.trim();
-            const resultIcon = row.querySelector("td:nth-child(3) img")?.getAttribute("src");
-            const result = resultIcon?.includes("tick-icon.gif") ? "Accepted" : "Wrong Answer";
-
-            // Only consider the first problem (break after finding it)
-            if (problem) {
-                firstProblemInfo = `${problem}`;
-                break;
-            }
-        }
-
-        // console.log("First problem info:", firstProblemInfo);
-
-        res.status(200).json({
-            success: true,
-            message: 'First problem fetched successfully',
-            problemsolved: firstProblemInfo
-        });
-
-    } catch (error) {
-        console.error("Error fetching data:", error);
-        res.status(500).json({
-            success: false,
-            message: 'An error occurred while fetching contests.',
-        });
+    if (!username) {
+      return res.status(400).json({ error: 'Username is required in the request body.' });
     }
+
+    const url = `https://www.codechef.com/users/${username}`;
+
+    let browser;
+
+    // Check if running on Vercel by verifying process.env.VERCEL
+    if (process.env.VERCEL) {
+      console.log("Running on Vercel environment");
+      
+      // Get executablePath and log it for debugging
+      const execPath = await chromium.executablePath();
+      if (!execPath) {
+        console.error("Chromium executablePath not found");
+        throw new Error("Chromium executablePath not found");
+      }
+      console.log("Chromium executablePath:", execPath);
+      
+      browser = await chromium.puppeteer.launch({
+        args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
+        defaultViewport: chromium.defaultViewport,
+        executablePath: execPath,
+        headless: chromium.headless,
+      });
+    } else {
+      console.log("Running locally");
+      browser = await puppeteer.launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      });
+    }
+
+    const page = await browser.newPage();
+    console.log("Navigating to URL:", url);
+    await page.goto(url, { waitUntil: 'networkidle2' });
+    console.log("Page loaded");
+
+    // Check if the profile exists
+    const pageContent = await page.content();
+    if (
+      pageContent.includes("The user you are looking for does not exist") ||
+      !(await page.$(".user-details-container"))
+    ) {
+      await browser.close();
+      return res.status(200).json({
+        success: false,
+        message: "CodeChef account not found for the given username.",
+      });
+    }
+
+    // Wait for table selector (ignore timeout errors)
+    await page.waitForSelector("#rankContentDiv .dataTable tbody tr", { timeout: 5000 }).catch(() => null);
+    const html = await page.content();
+    await browser.close();
+
+    const dom = new JSDOM(html);
+    const document = dom.window.document;
+    const rows = document.querySelectorAll("#rankContentDiv .dataTable tbody tr");
+    console.log("Rows found:", rows.length);
+
+    let firstProblemInfo = "No solved problems found";
+    // Get the first solved problem
+    for (let row of rows) {
+      const problem = row.querySelector("td:nth-child(2) a")?.textContent.trim();
+      if (problem) {
+        firstProblemInfo = problem;
+        break;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'First problem fetched successfully',
+      problemsolved: firstProblemInfo
+    });
+
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred while fetching contests.',
+    });
+  }
 };
 
 
