@@ -84,7 +84,7 @@ const GeeksforGeeks = () => {
             setShowDelete(true)
             //this is self account and logged in
             response = await axios.get(
-              `http://localhost:4000/server/gfg/fetch-gfg/${username}`
+              `https://codefolio-backend.vercel.app/server/gfg/fetch-gfg/${username}`
             )
           } else {
             setHasAccount(false)
@@ -93,7 +93,7 @@ const GeeksforGeeks = () => {
         } else {
           //not self account and logged in
           response = await axios.get(
-            `http://localhost:4000/server/gfg/fetch-gfg/${username}`
+            `https://codefolio-backend.vercel.app/server/gfg/fetch-gfg/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
@@ -101,7 +101,7 @@ const GeeksforGeeks = () => {
       } else {
         //not self account and not logged in
         response = await axios.get(
-          `http://localhost:4000/server/gfg/fetch-gfg/${username}`
+          `https://codefolio-backend.vercel.app/server/gfg/fetch-gfg/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -113,7 +113,7 @@ const GeeksforGeeks = () => {
       }
 
       const data = response.data.data
-      console.log("GFG Data:", data)
+      // console.log("GFG Data:", data)
 
       setUsernameGFG(data.username)
       setStars(data.stars)
@@ -145,44 +145,44 @@ const GeeksforGeeks = () => {
     try {
       let response = null
 
-      console.log(currentUser)
+      // console.log(currentUser)
       if (currentUser) {
         if (currentUser?.username === username) {
           if (currentUser?.GeeksforGeeks) {
             setShowRefresh(true)
             setShowDelete(true)
             const gfgid = currentUser?.GeeksforGeeks
-            console.log("1212", gfgid)
+            // console.log("1212", gfgid)
             response = await axios.get(
-              `http://localhost:4000/server/gfg/fetch-gfg-db/${gfgid}`
+              `https://codefolio-backend.vercel.app/server/gfg/fetch-gfg-db/${gfgid}`
             )
           } else {
-            console.log(hasAccount)
+            // console.log(hasAccount)
             setHasAccount(false)
             return
           }
         } else {
           response = await axios.get(
-            `http://localhost:4000/server/gfg/fetch-gfg/${username}`
+            `https://codefolio-backend.vercel.app/server/gfg/fetch-gfg/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
         }
       } else {
         response = await axios.get(
-          `http://localhost:4000/server/gfg/fetch-gfg/${username}`
+          `https://codefolio-backend.vercel.app/server/gfg/fetch-gfg/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
       }
 
-      // console.log(response)
+      // // console.log(response)
       if (!response || !response.data || response.status !== 200) {
         window.location.href = "/notfound"
         return
       }
       const data = response.data.data
-      console.log("LeetCode Data:", data)
+      // console.log("LeetCode Data:", data)
 
       setUsernameGFG(data.username)
       setStars(data.stars)
@@ -200,7 +200,7 @@ const GeeksforGeeks = () => {
         ...level,
         color: getDifficultyColor(level.difficulty)
       }))
-      console.log(coloredLevels)
+      // console.log(coloredLevels)
       setdifficultyLevels(coloredLevels)
 
       setHasAccount(true)
@@ -217,7 +217,7 @@ const GeeksforGeeks = () => {
       if (currentUser && currentUser.GeeksforGeeks) {
         const leetid = currentUser.GeeksforGeeks
         const response = await axios.delete(
-          `http://localhost:4000/server/leetcode/delete-leetcode/${leetid}`
+          `https://codefolio-backend.vercel.app/server/leetcode/delete-leetcode/${leetid}`
         )
       }
     } catch (error) {
@@ -228,18 +228,18 @@ const GeeksforGeeks = () => {
   const fetchUpdatedUser = async () => {
     try {
       if (!currentUser?._id) {
-        console.log("No valid user ID found")
+        // console.log("No valid user ID found")
         return
       }
 
       const response = await axios.get(
-        `http://localhost:4000/server/user/get-user/${currentUser._id}`
+        `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
       )
-      console.log("111", response.data?.data)
+      // console.log("111", response.data?.data)
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)
       } else {
-        console.log("Invalid response received")
+        // console.log("Invalid response received")
       }
     } catch (error) {
       console.error("Unable to fetch user", error)

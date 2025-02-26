@@ -51,7 +51,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/server/user/login",
+        "https://codefolio-backend.vercel.app/server/user/login",
         {
           email,
           password
@@ -59,7 +59,7 @@ const Login = () => {
       )
 
       const data = await response.data.user
-      console.log(data)
+      // console.log(data)
       if (!response.data.success) {
         toast.error("Login failed, try again later..")
       } else {

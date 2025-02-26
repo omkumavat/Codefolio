@@ -28,16 +28,16 @@ const Account = () => {
   const fetchUpdatedUser = async () => {
     try {
       if (!currentUser?._id) {
-        console.log("No valid user ID found")
+        // console.log("No valid user ID found")
         return
       }
       const response = await axios.get(
-        `http://localhost:4000/server/user/get-user/${currentUser._id}`
+        `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
       )
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)
       } else {
-        console.log("Invalid response received")
+        // console.log("Invalid response received")
       }
     } catch (error) {
       console.error("Unable to fetch user", error)
@@ -47,14 +47,14 @@ const Account = () => {
   const handleSave = async () => {
     const id = currentUser._id
     const response = await axios.put(
-      `http://localhost:4000/server/user/edituser/${id}`,
+      `https://codefolio-backend.vercel.app/server/user/edituser/${id}`,
       fields
     )
     if (response.data.success) {
       await fetchUpdatedUser()
       toast.success("Profile updated successfully ..!")
       setEditMode(false)
-      console.log("User updated successfully")
+      // console.log("User updated successfully")
     } else {
       toast.success("Failed to update Profile ..!")
     }

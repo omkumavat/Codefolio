@@ -71,16 +71,16 @@ const ContestSection = () => {
       try {
         // Fetch Codeforces contests
         const codeforcesResponse = await axios.get(
-          "http://localhost:4000/server/codeforces/contestfetch"
+          "https://codefolio-backend.vercel.app/server/codeforces/contestfetch"
         )
         if (codeforcesResponse.data.success) {
           setCodeforcesData(codeforcesResponse.data.contest)
         }
-        console.log(codeforcesResponse.data.contest)
+        // console.log(codeforcesResponse.data.contest)
 
         // Fetch CodeChef contests
         const codechefResponse = await axios.get(
-          "http://localhost:4000/server/codechef/contestfetch"
+          "https://codefolio-backend.vercel.app/server/codechef/contestfetch"
         )
         if (codechefResponse.data.success) {
           setCodechefData(codechefResponse.data.contests)

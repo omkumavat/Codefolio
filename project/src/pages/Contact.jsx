@@ -22,7 +22,7 @@ const Contact = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://localhost:4000/server/contact/contact", {
+            const response = await fetch("https://codefolio-backend.vercel.app/server/contact/contact", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -35,7 +35,7 @@ const Contact = () => {
             }
 
             const data = await response.json();
-            console.log("Response from server:", data);
+            // console.log("Response from server:", data);
             alert("Message sent successfully!");
         } catch (error) {
             console.error("Error:", error);

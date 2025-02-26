@@ -111,11 +111,11 @@ function Profile() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        console.log("Fetching user data...");
+        // console.log("Fetching user data...");
         const response = await axios.get(
-          `http://localhost:4000/server/user/check-user-profile/${username}`
+          `https://codefolio-backend.vercel.app/server/user/check-user-profile/${username}`
         );
-        console.log(response.data);
+        // console.log(response.data);
 
         if (response.data.exists) {
           const userData = response.data;
@@ -180,7 +180,7 @@ function Profile() {
           alert("Username not found");
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       } finally {
         setloading(false); // Stop loading once data is fetched
       }
@@ -222,7 +222,7 @@ function Profile() {
     );
 
     try {
-      const response = await axios.get(`http://localhost:4000/server/user/refresh-user-profile/${username}`);
+      const response = await axios.get(`https://codefolio-backend.vercel.app/server/user/refresh-user-profile/${username}`);
 
       if (response.data.success) {
         toast.update(toastId, {
@@ -238,7 +238,7 @@ function Profile() {
         }, 2000);
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       toast.update(toastId, {
         render: "Error updating profile",
         type: "error",
@@ -674,7 +674,7 @@ function Profile() {
                           value={selectedYear}
                           onChange={(e) => {
                             const year = parseInt(e.target.value);
-                            console.log("Year Selected:", year);
+                            // console.log("Year Selected:", year);
                             setSelectedYear(year);
                           }}
                           className="px-4 py-2 border rounded-lg text-gray-700 bg-white dark:bg-gray-700 dark:text-white"

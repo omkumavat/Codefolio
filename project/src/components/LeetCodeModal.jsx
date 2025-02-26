@@ -61,13 +61,13 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     }
 
     const response = await axios.get(
-      `http://localhost:4000/server/leetcode/check-username/${username}`
+      `https://codefolio-backend.vercel.app/server/leetcode/check-username/${username}`
     )
     // const data = response.data;
-    console.log(response)
+    // console.log(response)
     if (response.data.success === true) {
       const t = parseInt(response.data.data.total1) + 1
-      console.log(t)
+      // console.log(t)
       setTotal1(t)
       setIsVerifying(true)
       setAccount("")
@@ -94,13 +94,13 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     setVerificationStep3("")
 
     const response = await axios.get(
-      `http://localhost:4000/server/leetcode/check-username/${username}`
+      `https://codefolio-backend.vercel.app/server/leetcode/check-username/${username}`
     )
-    console.log(response)
+    // console.log(response)
     if (response.data.success === true) {
-      console.log(total1)
+      // console.log(total1)
       const total = parseInt(response.data.data.total1)
-      console.log(total)
+      // console.log(total)
 
       if (total === total1) {
         setVerificationStep1("Problem submitted successfully! 🎉")
@@ -111,7 +111,7 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
 
         try {
           const response = await axios.post(
-            `http://localhost:4000/server/leetcode/add-leetcode`,
+            `https://codefolio-backend.vercel.app/server/leetcode/add-leetcode`,
             {
               username: username,
               email: currentUser?.email

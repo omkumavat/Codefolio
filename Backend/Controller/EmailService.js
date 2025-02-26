@@ -21,7 +21,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const sendOTPEmail = async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     const { name, email, otp } = req.body;
     const templatePath = path.join(__dirname, "../views", 'SignupOTP.hbs');
     const templateSource = fs.readFileSync(templatePath, "utf-8");
@@ -37,7 +37,7 @@ export const sendOTPEmail = async (req, res) => {
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log("OTP email sent successfully.");
+        // console.log("OTP email sent successfully.");
         res.status(200).json({ message: "Email sent successfully" });
     } catch (error) {
         console.error("Error sending OTP email:", error);
@@ -46,7 +46,7 @@ export const sendOTPEmail = async (req, res) => {
 };
 
 export const sendSignUpSuccessfulEmail = async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     const { name, email } = req.body;
     const templatePath = path.join(__dirname, "../views", 'SignupSuccess.hbs');
     const templateSource = fs.readFileSync(templatePath, "utf-8");
@@ -62,7 +62,7 @@ export const sendSignUpSuccessfulEmail = async (req, res) => {
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log("OTP email sent successfully.");
+        // console.log("OTP email sent successfully.");
         res.status(200).json({ message: "Email sent successfully" });
     } catch (error) {
         console.error("Error sending OTP email:", error);

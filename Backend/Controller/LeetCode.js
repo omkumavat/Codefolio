@@ -39,12 +39,12 @@ export const fetchUserExist = async (req, res) => {
                 success: false
             });
         }
-        console.log(leetcode_profile)
+        // console.log(leetcode_profile)
 
         total1 = leetcode_profile.data.totalSubmissions[0]?.submissions;
         total2 = leetcode_profile.data.totalSubmissions[1]?.submissions;
-        console.log(total1);
-        console.log(total2);
+        // console.log(total1);
+        // console.log(total2);
 
         const response = {
             success: true,
@@ -73,7 +73,7 @@ export const fetchUserNameExists = async (req, res) => {
         let existingUser = await LeetCodeUser.findById(leetid).exec();
 
         if (!existingUser) {
-            console.log("LeetCode user not found, creating a new one.");
+            // console.log("LeetCode user not found, creating a new one.");
             return res.status(400).json({
                 success: false,
                 message: "LeetCode user not found"
@@ -97,7 +97,7 @@ export const fetchFromDB = async (req, res) => {
         let existingUser = await LeetCodeUser.findById(leetid).exec();
 
         if (!existingUser) {
-            console.log("LeetCode user not found, creating a new one.");
+            // console.log("LeetCode user not found, creating a new one.");
             return res.status(400).json({
                 success: false,
                 message: "LeetCode user not found"
@@ -118,13 +118,13 @@ export const AddLeetCodeAccount = async (req, res) => {
     try {
         const { email, username } = req.body;
 
-        console.log("Email:", email);
+        // console.log("Email:", email);
 
         // Find the user by email
         const findUser = await User.findOne({ email }).exec();
 
         if (!findUser) {
-            console.log("User not found in the database.");
+            // console.log("User not found in the database.");
             return res.status(400).json({ message: "User not exists in database" });
         }
 
@@ -140,7 +140,7 @@ export const AddLeetCodeAccount = async (req, res) => {
         const submissionsPromise2025 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${username}&year=2025`).catch(() => null);
         const submissionsPromise2024 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${username}&year=2024`).catch(() => null);
         const rankPromise = axios.get(`${process.env.leetcode_api}/${username}`).catch(() => null);
-        console.log(profilePromise);
+        // console.log(profilePromise);
 
         // Await all API responses
         const [profileRes, contestRes, submissionsRes2024, submissionsRes2025, rankRes] = await Promise.all([
@@ -221,7 +221,7 @@ export const AddLeetCodeAccount = async (req, res) => {
                 : undefined,
         });
 
-        console.log(newLeetCode);
+        // console.log(newLeetCode);
         await newLeetCode.save();
         findUser.LeetCode = newLeetCode._id;
         await User.findByIdAndUpdate(findUser._id, { LeetCode: newLeetCode._id });
