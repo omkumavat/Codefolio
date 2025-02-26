@@ -3,14 +3,14 @@ import dotenv from 'dotenv'
 import { JSDOM } from 'jsdom';
 import puppeteer from 'puppeteer';
 import CodeChefUser from '../Models/CodeChef.js';
-import CodeChef from '../Models/CodeChef.js';
 import User from '../Models/User.js';
+import chromium from 'chrome-aws-lambda';
 import { updateCodeChefUserData } from './Helper/CodeChef.js';
 dotenv.config();
 
-export const getfuturecontest=async(requestAnimationFrame,res)=>{
-    try{
-        const response=await axios.get(`${process.env.codechef_api}`)
+export const getfuturecontest = async (requestAnimationFrame, res) => {
+    try {
+        const response = await axios.get(`${process.env.codechef_api}`)
         console.log(response)
 
         if (response.data.status === 'success') {
@@ -58,6 +58,7 @@ export const getfuturecontest=async(requestAnimationFrame,res)=>{
         });
     }
 }
+
 export const fetchUserNameExists = async (req, res) => {
     try {
         const { username } = req.params;
@@ -69,8 +70,24 @@ export const fetchUserNameExists = async (req, res) => {
 
         const url = `https://www.codechef.com/users/${username}`;
 
-        // Use Puppeteer to fetch rendered HTML
-        const browser = await puppeteer.launch({ headless: true });
+        let browser;
+
+        if (process.env.VERCEL) {
+            // Running in a serverless environment (e.g., Vercel)
+            browser = await chromium.puppeteer.launch({
+                args: chromium.args,
+                defaultViewport: chromium.defaultViewport,
+                executablePath: await chromium.executablePath(),
+                headless: chromium.headless,
+            });
+        } else {
+            // Running locally, use the full puppeteer package which bundles Chromium
+            browser = await puppeteer.launch({
+                headless: true,
+                args: ["--no-sandbox", "--disable-setuid-sandbox"],
+            });
+        }
+
         const page = await browser.newPage();
         await page.goto(url, { waitUntil: 'networkidle2' });
 
@@ -199,7 +216,7 @@ export const AddCodeChefAccount = async (req, res) => {
 
         // Create a new CodeChefUser document
         const newCodeChef = new CodeChefUser({
-            username:username,
+            username: username,
             problemSolved: parseInt(problemsSolved.match(/\d+/)[0], 10),
             countryRank: profileData.countryRank,
             globalRank: profileData.globalRank,
@@ -219,7 +236,7 @@ export const AddCodeChefAccount = async (req, res) => {
         findUser.CodeChef = newCodeChef._id;
         await User.findByIdAndUpdate(findUser._id, { CodeChef: newCodeChef._id });
 
-        return res.status(201).json({ message: "User data stored successfully", success:true, data: newCodeChef });
+        return res.status(201).json({ message: "User data stored successfully", success: true, data: newCodeChef });
 
     } catch (error) {
         console.error("Error storing CodeChef user data:", error);
@@ -228,17 +245,17 @@ export const AddCodeChefAccount = async (req, res) => {
 };
 
 export const fetchCodeChefAccount = async (req, res) => {
-  try {
-    const { username } = req.params;
-    const updatedData = await updateCodeChefUserData(username);
-    return res.status(200).json({
-      message: "User data updated successfully",
-      data: updatedData,
-    });
-  } catch (error) {
-    console.error("Error updating CodeChef user data:", error);
-    return res.status(500).json({ message: error.message || "Internal server error" });
-  }
+    try {
+        const { username } = req.params;
+        const updatedData = await updateCodeChefUserData(username);
+        return res.status(200).json({
+            message: "User data updated successfully",
+            data: updatedData,
+        });
+    } catch (error) {
+        console.error("Error updating CodeChef user data:", error);
+        return res.status(500).json({ message: error.message || "Internal server error" });
+    }
 };
 
 
@@ -270,21 +287,21 @@ export const fetchCodeChefFromDB = async (req, res) => {
 export const deleteCodeChefUser = async (req, res) => {
     try {
         const { codechefid } = req.params; // The LeetCodeUser ID to delete
-    
+
         // Delete the LeetCodeUser document
         const deletedLeetCodeUser = await CodeChefUser.findByIdAndDelete(codechefid);
         if (!deletedLeetCodeUser) {
-          return res.status(404).json({ success: false, message: 'LeetCodeUser not found.' });
+            return res.status(404).json({ success: false, message: 'LeetCodeUser not found.' });
         }
-    
+
         await User.findOneAndUpdate(
-          { CodeChef: codechefid },
-          { $unset: { CodeChef: "" } } // Remove the field
+            { CodeChef: codechefid },
+            { $unset: { CodeChef: "" } } // Remove the field
         );
-    
+
         return res.status(200).json({ success: true, message: 'LeetCodeUser deleted and reference removed from User.' });
-      } catch (error) {
+    } catch (error) {
         console.error('Error deleting LeetCodeUser:', error);
         return res.status(500).json({ success: false, message: 'Server error' });
-      }
+    }
 };
