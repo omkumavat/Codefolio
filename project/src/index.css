@@ -101,3 +101,59 @@
 .btn-secondary {
   @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
 }
+
+@font-face {
+  font-family: 'Queensby';
+  src: url('./../public/Fonts/name_website.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.body{
+  font-family: 'Queensby', sans-serif;
+}
+
+.queen {
+  font-size: 30px;
+  font-family: 'Queensby', sans-serif;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+
+.gradient-text {
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradient 8s linear infinite;
+  background-size: 200% 200%;
+}
+
+.section-card {
+  @apply relative overflow-hidden rounded-xl p-6 border border-gray-100;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  transform-style: preserve-3d;
+  transition: all 0.3s ease;
+}
+
+.section-card:hover {
+  transform: translateY(-5px) rotateX(5deg);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.icon-wrapper {
+  @apply absolute -right-4 -top-4 p-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white transform rotate-12 transition-transform duration-300;
+}
+
+.section-card:hover .icon-wrapper {
+  transform: rotate(0deg) scale(1.1);
+}

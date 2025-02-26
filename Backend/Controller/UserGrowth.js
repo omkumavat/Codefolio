@@ -268,3 +268,68 @@ export const checkUserProfile = async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 };
+
+import { updateCodeforcesUserData } from "./Helper/CodeForces.js";
+import { updateCodeChefUserData } from "./Helper/CodeChef.js";
+import { updateGFGUserData } from "./Helper/GeeksForGeeks.js";
+import { updateLeetCodeUserData } from "./Helper/LeetCode.js";
+import { updateGitHubUserData } from "./Helper/Github.js";
+
+export const refreshWholeProfile = async (req, res) => {
+    try {
+        const { username } = req.params;
+        if (!username) {
+            return res.status(400).json({ error: "Username is required" });
+        }
+
+        console.log("Refreshing profile for:", username);
+
+        // Run all update functions concurrently, each with its own try-catch block
+        const results = await Promise.allSettled([
+            (async () => {
+                try {
+                    return await updateCodeforcesUserData(username);
+                } catch (error) {
+                    return { error: error.message };
+                }
+            })(),
+            (async () => {
+                try {
+                    return await updateCodeChefUserData(username);
+                } catch (error) {
+                    return { error: error.message };
+                }
+            })(),
+            (async () => {
+                try {
+                    return await updateGFGUserData(username);
+                } catch (error) {
+                    return { error: error.message };
+                }
+            })(),
+            (async () => {
+                try {
+                    return await updateLeetCodeUserData(username);
+                } catch (error) {
+                    return { error: error.message };
+                }
+            })(),
+            (async () => {
+                try {
+                    return await updateGitHubUserData(username);
+                } catch (error) {
+                    return { error: error.message };
+                }
+            })()
+        ]);
+
+        return res.status(200).json({
+            message: "Profile update process completed",
+            success: true,
+            // details: responseSummary, // Return details of each update
+        });
+    } catch (error) {
+        console.error("Error refreshing whole profile:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+};

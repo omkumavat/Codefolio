@@ -1,6 +1,7 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import User from "../Models/User.js";
+import { updateCodeforcesUserData } from "./Helper/CodeForces.js";
 import CodeforcesUser from "../Models/CodeForces.js"; // Make sure this import is here
 dotenv.config();
 
@@ -244,133 +245,18 @@ export const AddCodeForcesAccount = async (req, res) => {
   }
 };
 
+
 export const UpdateCodeForcesAccount = async (req, res) => {
   try {
     const { username } = req.params;
-
-    if (!username) {
-      return res.status(400).json({ message: "Username is required" });
-    }
-
-    // Find the user by Codeforces username
-    const findUser = await User.findOne({ username }).exec();
-    if (!findUser || !findUser.CodeForces) {
-      return res.status(400).json({ message: "User does not exist or has no linked Codeforces account" });
-    }
-
-    // Find the existing CodeforcesUser by ID
-    const existingCodeForcesUser = await CodeforcesUser.findById(findUser.CodeForces);
-    if (!existingCodeForcesUser) {
-      return res.status(400).json({ message: "Codeforces user data not found" });
-    }
-
-    // Construct API URLs
-    const submissionsUrl = `${process.env.CODEFORCES_API_STATUS}${username}&from=1&count=1000`;
-    const userInfoUrl = `${process.env.CODEFORCES_API_USER}${username}`;
-    const contestRatingUrl = `${process.env.CODEFORCES_API_RATING}${username}`;
-
-    // Fetch data concurrently
-    const [submissionsResponse, userInfoResponse, contestRatingResponse] = await Promise.all([
-      axios.get(submissionsUrl),
-      axios.get(userInfoUrl),
-      axios.get(contestRatingUrl),
-    ]);
-
-    const submissions = submissionsResponse.data.result;
-    const userInfoRaw = userInfoResponse.data.result[0];
-    const contestRatingRaw = contestRatingResponse.data.result;
-
-    if (!submissions || !userInfoRaw || !contestRatingRaw) {
-      return res.status(400).json({ message: "No submissions found for the given Codeforces username" });
-    }
-
-    const convertUnixToDateStr = (timestamp) => {
-      const date = new Date(timestamp * 1000);
-      return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-    };
-
-    const solvedProblemsSet = new Set();
-    const problemsByRating = {};
-    submissions.forEach((submission) => {
-      if (submission.verdict === "OK" && submission.problem) {
-        solvedProblemsSet.add(submission.problem.name);
-        if (submission.problem.rating) {
-          const rating = submission.problem.rating;
-          if (!problemsByRating[rating]) problemsByRating[rating] = new Set();
-          problemsByRating[rating].add(submission.problem.name);
-        }
-      }
-    });
-    const problemsSolved = solvedProblemsSet.size;
-    const problemsSolvedByRating = Object.entries(problemsByRating)
-      .map(([rating, problemSet]) => [parseInt(rating), Array.from(problemSet)])
-      .sort((a, b) => a[0] - b[0]);
-
-    const contestRatingInfo = contestRatingRaw.map((contest) => ({
-      contestId: contest.contestId,
-      contestName: contest.contestName,
-      handle: contest.handle,
-      rank: contest.rank,
-      ratingUpdateTimeSeconds: convertUnixToDateStr(parseInt(contest.ratingUpdateTimeSeconds)),
-      oldRating: contest.oldRating,
-      newRating: contest.newRating,
-    }));
-
-    const submissionCalendars = {};
-    submissions.forEach((submission) => {
-      const dateStr = convertUnixToDateStr(submission.creationTimeSeconds);
-      const year = dateStr.substring(0, 4);
-      const key = `submissionCalendar${year}`;
-      if (!submissionCalendars[key]) submissionCalendars[key] = {};
-      if (!submissionCalendars[key][dateStr]) submissionCalendars[key][dateStr] = 0;
-      submissionCalendars[key][dateStr] += 1;
-    });
-    const submissionCalendarsFormatted = {};
-    Object.keys(submissionCalendars).forEach((yearKey) => {
-      submissionCalendarsFormatted[yearKey] = Object.entries(submissionCalendars[yearKey])
-        .map(([date, count]) => ({ date, submissions: count }))
-        .sort((a, b) => new Date(a.date) - new Date(b.date));
-    });
-
-    const userInfo = {
-      firstName: userInfoRaw.firstName || "",
-      lastName: userInfoRaw.lastName || "",
-      country: userInfoRaw.country || existingCodeForcesUser.country,
-      city: userInfoRaw.city || "",
-      rating: userInfoRaw.rating || existingCodeForcesUser.currentRating,
-      friendOfCount: userInfoRaw.friendOfCount || 0,
-      titlePhoto: userInfoRaw.titlePhoto || "",
-      handle: userInfoRaw.handle,
-      avatar: userInfoRaw.avatar || "",
-      contribution: userInfoRaw.contribution || 0,
-      organization: userInfoRaw.organization || existingCodeForcesUser.organization,
-      rank: userInfoRaw.rank || existingCodeForcesUser.rank,
-      maxRating: userInfoRaw.maxRating || existingCodeForcesUser.maxRating,
-      registrationTimeSeconds: userInfoRaw.registrationTimeSeconds || 0,
-      maxRank: userInfoRaw.maxRank || existingCodeForcesUser.maxRank,
-    };
-
-    // Update the existing CodeforcesUser document
-    existingCodeForcesUser.problemSolved = problemsSolved || existingCodeForcesUser.problemSolved;
-    existingCodeForcesUser.country = userInfo.country;
-    existingCodeForcesUser.organization = userInfo.organization;
-    existingCodeForcesUser.maxRating = userInfo.maxRating;
-    existingCodeForcesUser.currentRating = userInfo.rating;
-    existingCodeForcesUser.rank = userInfo.rank;
-    existingCodeForcesUser.maxRank = userInfo.maxRank;
-    existingCodeForcesUser.contests = contestRatingInfo || existingCodeForcesUser.contests;
-    existingCodeForcesUser.problemsSolvedByRating = problemsSolvedByRating || existingCodeForcesUser.problemsSolvedByRating;
-    existingCodeForcesUser.submissions = submissionCalendarsFormatted || existingCodeForcesUser.submissions;
-
-    await existingCodeForcesUser.save();
-
+    const updatedData = await updateCodeforcesUserData(username);
     return res.status(200).json({
       message: "Codeforces user data updated successfully",
-      data: existingCodeForcesUser,
+      data: updatedData,
     });
   } catch (error) {
     console.error("Error updating Codeforces user data:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
 

@@ -421,3 +421,27 @@ export const editUserbyId = async (req, res) => {
   }
 };
 
+import Contactus from "../Models/Contact.js";  // Ensure correct path
+
+export const submitContactForm = async (req, res) => {
+    try {
+        console.log("Received Request Body:", req.body);
+
+        const { fullName, email, phone, message } = req.body;
+
+        if (!fullName || !email || !phone || !message) {
+            return res.status(400).json({ error: "All fields required" });
+        }
+
+        const newContact = new Contactus({ fullName, email, phone, message });
+
+        console.time("DB Save");
+        await newContact.save();
+        console.timeEnd("DB Save");
+
+        res.status(201).json({ message: "Message sent successfully!" });
+    } catch (error) {
+        console.error("Error in submitContactForm:", error);
+        res.status(500).json({ error: "Server Error" });
+    }
+};

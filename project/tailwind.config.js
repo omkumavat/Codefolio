@@ -4,6 +4,9 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        queensby: ['Queensby', 'sans-serif'],
+      },
       // animation: {
       //   fill: 'fill 1s ease-in infinite alternate',
       // },

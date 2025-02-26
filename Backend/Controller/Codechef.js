@@ -5,6 +5,7 @@ import puppeteer from 'puppeteer';
 import CodeChefUser from '../Models/CodeChef.js';
 import CodeChef from '../Models/CodeChef.js';
 import User from '../Models/User.js';
+import { updateCodeChefUserData } from './Helper/CodeChef.js';
 dotenv.config();
 
 export const getfuturecontest=async(requestAnimationFrame,res)=>{
@@ -227,98 +228,19 @@ export const AddCodeChefAccount = async (req, res) => {
 };
 
 export const fetchCodeChefAccount = async (req, res) => {
-    try {
-        const { username } = req.params;
-
-        if (!username) {
-            return res.status(400).json({ message: "Email is required" });
-        }
-
-        const findUser = await User.findOne({ username }).exec();
-
-        if (!findUser) {
-            console.log("User not found in the database.");
-            return res.status(400).json({ message: "User not exists in database" });
-        }
-
-        if (!findUser.CodeChef) {
-            return res.status(400).json({ message: "CodeChef account not linked with this user" });
-        }
-
-        // Find the existing CodeChef user document
-        const existingCodeChefUser = await CodeChefUser.findById(findUser.CodeChef);
-        if (!existingCodeChefUser) {
-            return res.status(400).json({ message: "CodeChef user data not found" });
-        }
-
-        const url = `https://www.codechef.com/users/${existingCodeChefUser.username}`;
-
-        const browser = await puppeteer.launch({ headless: true });
-        const page = await browser.newPage();
-
-        await page.goto(url, { waitUntil: "domcontentloaded" });
-
-        // Extract number of problems solved
-        const problemsSolved = await page.evaluate(() => {
-            const h3Elements = document.querySelectorAll(".rating-data-section.problems-solved h3");
-            return h3Elements.length > 0 ? h3Elements[3].innerText.trim() : "Not found";
-        });
-
-        console.log(`Problems Solved: ${problemsSolved}`);
-        await browser.close();
-
-        // Fetch CodeChef profile data
-        const profilePromise = axios.get(`${process.env.codechef_api_user}/${existingCodeChefUser.username}`).catch(() => null);
-        const [profileRes] = await Promise.all([profilePromise]);
-
-        const profileData = profileRes?.data || null;
-
-        if (!profileData) {
-            return res.status(400).json({ message: "Failed to fetch user data from CodeChef APIs" });
-        }
-
-        const simplifiedRatingData = profileData.ratingData.map(entry => ({
-            name: entry.name,
-            end_date: entry.end_date,
-            rating: entry.rating,
-            rank: entry.rank
-        }));
-
-        // Categorizing heat map activity by year
-        let year2022 = [], year2023 = [], year2024 = [], year2025 = [];
-
-        profileData.heatMap.forEach(item => {
-            const year = item.date.split("-")[0]; // Extract year from date
-            if (year === "2022") year2022.push(item);
-            else if (year === "2023") year2023.push(item);
-            else if (year === "2024") year2024.push(item);
-            else if (year === "2025") year2025.push(item);
-        });
-
-        // Update existing CodeChefUser document
-        existingCodeChefUser.username = existingCodeChefUser.username;
-        existingCodeChefUser.problemSolved = parseInt(problemsSolved.match(/\d+/)[0], 10);
-        existingCodeChefUser.countryRank = profileData.countryRank;
-        existingCodeChefUser.globalRank = profileData.globalRank;
-        existingCodeChefUser.countryName = profileData.countryName;
-        existingCodeChefUser.currentRating = profileData.currentRating;
-        existingCodeChefUser.highestRating = profileData.highestRating;
-        existingCodeChefUser.stars = profileData.stars;
-        existingCodeChefUser.contests = simplifiedRatingData.length > 0 ? simplifiedRatingData : undefined;
-        existingCodeChefUser.ActivityCalender2022 = year2022.length > 0 ? year2022 : undefined;
-        existingCodeChefUser.ActivityCalender2023 = year2023.length > 0 ? year2023 : undefined;
-        existingCodeChefUser.ActivityCalender2024 = year2024.length > 0 ? year2024 : undefined;
-        existingCodeChefUser.ActivityCalender2025 = year2025.length > 0 ? year2025 : undefined;
-
-        await existingCodeChefUser.save();
-
-        return res.status(200).json({ message: "User data updated successfully", data: existingCodeChefUser });
-
-    } catch (error) {
-        console.error("Error updating CodeChef user data:", error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
+  try {
+    const { username } = req.params;
+    const updatedData = await updateCodeChefUserData(username);
+    return res.status(200).json({
+      message: "User data updated successfully",
+      data: updatedData,
+    });
+  } catch (error) {
+    console.error("Error updating CodeChef user data:", error);
+    return res.status(500).json({ message: error.message || "Internal server error" });
+  }
 };
+
 
 export const fetchCodeChefFromDB = async (req, res) => {
     try {

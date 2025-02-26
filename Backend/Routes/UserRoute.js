@@ -27,8 +27,14 @@ import { authMiddleware } from '../Middleware/authMiddleware.js';
 router.put('/user/edit-profile',updateUserProfile);
 
 
-import {checkUserProfile} from '../Controller/UserGrowth.js';
+import {checkUserProfile,refreshWholeProfile} from '../Controller/UserGrowth.js';
 router.get('/user/check-user-profile/:username',checkUserProfile)
+router.get('/user/refresh-user-profile/:username',refreshWholeProfile)
+
+
+import {submitContactForm} from '../Controller/AuthUser.js'
+// import Contactus from '../Models/Contactus.js';
+router.post("/contact", submitContactForm);  // Submit form
 
 
 export default router;

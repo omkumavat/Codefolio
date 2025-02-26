@@ -2,6 +2,7 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import GitHubUser from "../Models/GitHub.js";
 import User from "../Models/User.js";
+import { updateGitHubUserData } from './Helper/Github.js';
 dotenv.config();
 
 // --------------------------------------
@@ -110,9 +111,6 @@ export const addGitHubBasics = async (req, res) => {
   }
 };
 
-// --------------------------------------
-// Helper function: Format date into "YY-MM-DD"
-// --------------------------------------
 const formatDate = (dateString) => {
   const d = new Date(dateString);
   const year = d.getFullYear().toString().slice(-2); // last two digits
@@ -121,9 +119,6 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${day}`;
 };
 
-// --------------------------------------
-// Advanced Controller: Update GitHubUser Document with Authenticated Data
-// --------------------------------------
 export const updateGitHubAdvanced = async (req, res) => {
   try {
     const { pat, username } = req.body;
@@ -278,6 +273,7 @@ export const updateGitHubAdvanced = async (req, res) => {
     existingUser.active_days = activeDays;
     existingUser.starred_repos = starredRepos;
     existingUser.auth = true;
+    existingUser.pat=pat;
     existingUser.totalContributions = totalContribution;
 
     await existingUser.save();
@@ -317,236 +313,17 @@ export const fetchFromDB = async (req, res) => {
   }
 }
 
-const fetchAuthData = async (githubUser) => {
-  const query = `
-    query ($login: String!) {
-      user(login: $login) {
-        contributionsCollection {
-          contributionCalendar {
-            totalContributions
-            weeks {
-              contributionDays {
-                date
-                contributionCount
-              }
-            }
-          }
-        }
-        repositoriesContributedTo(first: 100, includeUserRepositories: false) {
-          nodes {
-            name
-            description
-            homepageUrl
-            url
-            stargazerCount
-            visibility
-            languages(first: 5) {
-              nodes {
-                name
-              }
-            }
-            collaborators(first: 5) {
-              nodes {
-                login
-                avatarUrl
-              }
-            }
-            defaultBranchRef {
-              target {
-                ... on Commit {
-                  history {
-                    totalCount
-                  }
-                }
-              }
-            }
-          }
-        }
-        starredRepositories {
-          totalCount
-        }
-      }
-    }
-  `;
-  const variables = { login: githubUser.username };
-
-  const graphqlResponse = await axios.post(
-    'https://api.github.com/graphql',
-    { query, variables },
-    {
-      headers: {
-        'Authorization': `bearer ${githubUser.pat}`,
-        'Content-Type': 'application/json'
-      }
-    }
-  );
-
-  const data = graphqlResponse.data.data;
-  if (data && data.user) {
-    const userData = data.user;
-
-    // Prepare submissions grouped by year according to your schema.
-    const submissionsByYear = {
-      "2024": [],
-      "2025": [],
-      "2023": [],
-      "2022": []
-    };
-
-    let totalContribution = 0;
-    let activeDays = 0;
-
-    userData.contributionsCollection.contributionCalendar.weeks.forEach(week => {
-      week.contributionDays.forEach(day => {
-        if (day.contributionCount > 0) { // only include days with contributions > 0
-          activeDays++;
-          const year = new Date(day.date).getFullYear().toString();
-          if (submissionsByYear.hasOwnProperty(year)) {
-            submissionsByYear[year].push({
-              date: formatDate(day.date), // formatted as "YY-MM-DD"
-              submissions: day.contributionCount,
-            });
-          }
-          totalContribution += day.contributionCount;
-        }
-      });
-    });
-
-    // Process collaborated repositories (only public ones).
-    const collaboratedRepos = userData.repositoriesContributedTo.nodes
-      .filter(repo => repo.visibility === "PUBLIC")
-      .map(repo => ({
-        name: repo.name,
-        description: repo.description,
-        languages: repo.languages.nodes.map(lang => lang.name),
-        live_link: repo.homepageUrl || "",
-        git_link: repo.svn_url || repo.url,
-        starred: repo.stargazerCount || 0,
-        commits: repo.defaultBranchRef?.target?.history?.totalCount || 0,
-        collaborators: repo.collaborators.nodes.map(collab => ({
-          name: collab.login,
-          avatar_col: collab.avatarUrl
-        }))
-      }));
-
-    // Update advanced data in the GitHubUser document.
-    githubUser.collaborated_repos = collaboratedRepos;
-    githubUser.submissions = {
-      submissionCalendar2024: submissionsByYear["2024"],
-      submissionCalendar2025: submissionsByYear["2025"],
-      submissionCalendar2023: submissionsByYear["2023"],
-      submissionCalendar2022: submissionsByYear["2022"]
-    };
-    githubUser.active_days = activeDays;
-    githubUser.starred_repos = userData.starredRepositories.totalCount;
-    githubUser.totalContributions = totalContribution;
-    await githubUser.save();
-  } else {
-    console.log("Authenticated GitHub data not found for user.");
-  }
-}
-
 
 export const updateGitHubData = async (req, res) => {
   try {
-    // 1. Get username from request body and find the User document.
+    // Get username from request parameters
     const { username } = req.params;
-    const findUser = await User.findOne({ username }).exec();
-    if (!findUser) {
-      console.log("User not found in the database.");
-      return res.status(400).json({ success: false, message: "User does not exist in database" });
-    }
-
-    // 2. Find the corresponding GitHubUser using the reference in the User document.
-    const githubUser = await GitHubUser.findById(findUser.Github);
-    if (!githubUser) {
-      return res.status(404).json({ success: false, message: "GitHub user not found. Please create basic data first." });
-    }
-
-    // 3. Extract the GitHub account username from GitHubUser.
-    const ghUsername = githubUser.username;
-
-    // 4. Make unauthenticated API calls to GitHub to fetch basic data.
-    const profilePromise = axios.get(`${process.env.github_api1}/${ghUsername}`).catch(() => null);
-    const reposPromise = axios.get(`${process.env.github_api1}/${ghUsername}/repos`).catch(() => null);
-    const followersPromise = axios.get(`${process.env.github_api1}/${ghUsername}/followers`).catch(() => null);
-    const followingPromise = axios.get(`${process.env.github_api1}/${ghUsername}/following`).catch(() => null);
-
-    const [profileRes, reposRes, followersRes, followingRes] = await Promise.all([
-      profilePromise,
-      reposPromise,
-      followersPromise,
-      followingPromise
-    ]);
-
-    if (!profileRes || !reposRes) {
-      // Optionally, you could wait for advanced data here if desired.
-      if (githubUser.auth && githubUser.pat) {
-        await fetchAuthData(githubUser);
-      }
-      return res.status(201).json({ success: true, data: githubUser, message: "Error fetching GitHub basic data" });
-    }
-
-    const profileData = profileRes.data;
-    const reposData = reposRes.data;
-
-    // Process repositories to extract relevant data.
-    const processedRepos = await Promise.all(
-      reposData.map(async (repo) => {
-
-        let collaborators = [];
-        try {
-          const contributorsRes = await axios.get(repo.contributors_url);
-          const contributorsData = contributorsRes.data;
-          collaborators = contributorsData.map((contributor) => ({
-            name: contributor.login,
-            avatar_col: contributor.avatar_url
-          }));
-        } catch (error) {
-          console.error(`Error fetching contributors for repo ${repo.name}:`, error.message);
-        }
-
-        let languages = [];
-        try {
-          const languagesRes = await axios.get(repo.languages_url);
-          languages = Object.keys(languagesRes.data);
-        } catch (error) {
-          console.error(`Error fetching languages for repo ${repo.name}:`, error.message);
-        }
-        return {
-          name: repo.name,
-          description: repo.description,
-          languages: languages,
-          live_link: repo.homepage || "",
-          git_link: repo.svn_url,
-          starred: repo.stargazers_count || 0,
-          commits: 0, // placeholder for commits count
-          collaborators: collaborators
-        };
-      })
-    );
-
-    const followersCount = (followersRes && Array.isArray(followersRes.data)) ? followersRes.data.length : 0;
-    const followingCount = (followingRes && Array.isArray(followingRes.data)) ? followingRes.data.length : 0;
-
-    // 5. Update the GitHubUser document with the basic data.
-    githubUser.avatar = profileData.avatar_url;
-    githubUser.url = profileData.html_url;
-    githubUser.bio = profileData.bio;
-    githubUser.repos = processedRepos;
-    githubUser.followers = followersCount;
-    githubUser.following = followingCount;
-
-    // 6. If auth is true and a PAT is stored in the document, fetch advanced data.
-    if (githubUser.auth && githubUser.pat) {
-      await fetchAuthData(githubUser);
-    }
-
-    await githubUser.save();
+    const updatedData = await updateGitHubUserData(username);
+    // console.log(updatedData)
     return res.status(200).json({
       success: true,
       message: "GitHub data updated successfully",
-      data: githubUser
+      data: updatedData
     });
   } catch (error) {
     console.error("Error in updateGitHubData:", error.message);
