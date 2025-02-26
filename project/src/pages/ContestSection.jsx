@@ -76,7 +76,7 @@ const ContestSection = () => {
         if (codeforcesResponse.data.success) {
           setCodeforcesData(codeforcesResponse.data.contest)
         }
-        console.log(codeforcesResponse.data.contest)
+        // console(codeforcesResponse.data.contest)
 
         // Fetch CodeChef contests
         const codechefResponse = await axios.get(

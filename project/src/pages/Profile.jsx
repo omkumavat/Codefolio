@@ -96,7 +96,7 @@ function Profile() {
     {
       show: false,
       name: 'CodeChef',
-      solved: 0,
+      // solved: 0,
       rating: 0,
       stars: "",
       logo: codechef,
@@ -111,11 +111,11 @@ function Profile() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        console.log("Fetching user data...");
+        // console("Fetching user data...");
         const response = await axios.get(
           `https://codefolio-backend.vercel.app/server/user/check-user-profile/${username}`
         );
-        console.log(response.data);
+        // console(response.data);
 
         if (response.data.exists) {
           const userData = response.data;
@@ -157,7 +157,7 @@ function Profile() {
                   return {
                     ...platform,
                     show: !!userData.codechefProfile, // Check if profile exists
-                    solved: userData.codechefProfile?.problemSolved || 0,
+                    // solved: userData.codechefProfile?.problemSolved || 0,
                     rating: userData.codechefProfile?.currentRating || 0,
                     stars: userData.codechefProfile?.stars || "",
                   };
@@ -180,7 +180,7 @@ function Profile() {
           alert("Username not found");
         }
       } catch (error) {
-        console.log(error);
+        // console(error);
       } finally {
         setloading(false); // Stop loading once data is fetched
       }
@@ -238,7 +238,7 @@ function Profile() {
         }, 2000);
       }
     } catch (error) {
-      console.log(error);
+      // console(error);
       toast.update(toastId, {
         render: "Error updating profile",
         type: "error",
@@ -674,7 +674,7 @@ function Profile() {
                           value={selectedYear}
                           onChange={(e) => {
                             const year = parseInt(e.target.value);
-                            console.log("Year Selected:", year);
+                            // console("Year Selected:", year);
                             setSelectedYear(year);
                           }}
                           className="px-4 py-2 border rounded-lg text-gray-700 bg-white dark:bg-gray-700 dark:text-white"

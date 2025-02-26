@@ -15,7 +15,7 @@ export const addGFG = async (req, res) => {
     const findUser = await User.findOne({ email }).exec();
 
     if (!findUser) {
-      console.log("User not found in the database.");
+      // console("User not found in the database.");
       return res.status(400).json({ success: false, message: "User not exists in database" });
     }
 
@@ -131,7 +131,7 @@ export const fetchGFGfromDB = async (req, res) => {
     let existingUser = await GeeksforGeeksUser.findById(gfgid).exec();
 
     if (!existingUser) {
-      console.log("GeeksforGeeks user not found, creating a new one.");
+      // console("GeeksforGeeks user not found, creating a new one.");
       return res.status(400).json({
         success: false,
         message: "LeetCode user not found"

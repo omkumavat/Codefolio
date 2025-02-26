@@ -85,7 +85,7 @@ const LeetCode = () => {
             )
           } else {
             //account not added and and logged in
-            console.log(hasAccount)
+            // console(hasAccount)
             setHasAccount(false)
             return
           }
@@ -107,12 +107,12 @@ const LeetCode = () => {
       }
 
       if (!response || !response.data || response.status !== 200) {
-        window.location.href = "/notfound"
+        window.location.href = "/"
         return
       }
 
       const data = response.data.data
-      // console.log("LeetCode Data:", data);
+      // // console("LeetCode Data:", data);
 
       setUsernameLeet(data.username)
       setProfile(data.profile)
@@ -161,7 +161,7 @@ const LeetCode = () => {
         }))
       }
 
-      // console.log(
+      // // console(
       //   "1212",
       //   parseSubmissions2(data.contests?.contestParticipation)
       // )
@@ -176,12 +176,12 @@ const LeetCode = () => {
       setsubmissionCalendar2024(
         parseSubmissions(data.submissions_2024?.submissionCalendar)
       )
-      // console.log("Submission Calendar 2024:", data.submissions_2024?.submissionCalendar);
-      // console.log("Submission Calendar 2025:", data.submissions_2025?.submissionCalendar);
+      // // console("Submission Calendar 2024:", data.submissions_2024?.submissionCalendar);
+      // // console("Submission Calendar 2025:", data.submissions_2025?.submissionCalendar);
 
       setHasAccount(true)
     } catch (error) {
-      window.location.href = "/notfound"
+      window.location.href = "/"
       console.error("Error fetching LeetCode data:", error)
     } finally {
       setloading(false)
@@ -192,7 +192,7 @@ const LeetCode = () => {
     try {
       let response = null
 
-      console.log(currentUser)
+      // console(currentUser)
       if (currentUser) {
         if (currentUser?.username === username) {
           if (currentUser?.LeetCode) {
@@ -203,7 +203,7 @@ const LeetCode = () => {
               `https://codefolio-backend.vercel.app/server/leetcode/fetch-from-db/${leetid}`
             )
           } else {
-            console.log(hasAccount)
+            // console(hasAccount)
             setHasAccount(false)
             return
           }
@@ -222,15 +222,15 @@ const LeetCode = () => {
         setShowDelete(false)
       }
 
-      // // console.log("LeetCode Data:", data);
+      // // // console("LeetCode Data:", data);
       // // // **Check if response is invalid**
       if (!response || !response.data) {
-        window.location.href = "/notfound"
+        window.location.href = "/"
         return
       }
 
       const data = response.data.data
-      // console.log("LeetCode Data:", data);
+      // // console("LeetCode Data:", data);
 
       setUsernameLeet(data.username)
       setProfile(data.profile)
@@ -278,7 +278,7 @@ const LeetCode = () => {
         }))
       }
 
-      // console.log("1212",parseSubmissions2);
+      // // console("1212",parseSubmissions2);
 
       setcontestParticipation(
         parseSubmissions2(data.contests?.contestParticipation)
@@ -290,50 +290,50 @@ const LeetCode = () => {
         parseSubmissions(data.submissions_2024?.submissionCalendar)
       )
 
-      // console.log("Submission Calendar 2024:", data.submissions_2024?.submissionCalendar);
-      // console.log("Submission Calendar 2025:", data.submissions_2025?.submissionCalendar);
+      // // console("Submission Calendar 2024:", data.submissions_2024?.submissionCalendar);
+      // // console("Submission Calendar 2025:", data.submissions_2025?.submissionCalendar);
 
       setHasAccount(true)
     } catch (error) {
       console.error("Error fetching LeetCode data:", error)
-      window.location.href = "/notfound"
+      window.location.href = "/"
     } finally {
       setloading(false)
     }
   }
 
   const deleteLeetCodeAccount = async () => {
-    try {
-      if (
-        currentUser &&
-        currentUser.username === username &&
-        currentUser.LeetCode
-      ) {
-        ;() => {
-          setIsDeleteModal(true)
-        }
-        // const response = await axios.delete(`https://codefolio-backend.vercel.app/server/leetcode/delete-leetcode/${leetid}`)
-      }
-    } catch (error) {
-      console.error("Error deleting LeetCode data:", error)
-    }
+    // try {
+    //   if (
+    //     currentUser &&
+    //     currentUser.username === username &&
+    //     currentUser.LeetCode
+    //   ) {
+    //     ;() => {
+    //       setIsDeleteModal(true)
+    //     }
+    //     // const response = await axios.delete(`https://codefolio-backend.vercel.app/server/leetcode/delete-leetcode/${leetid}`)
+    //   }
+    // } catch (error) {
+    //   console.error("Error deleting LeetCode data:", error)
+    // }
   }
 
   const fetchUpdatedUser = async () => {
     try {
       if (!currentUser?._id) {
-        console.log("No valid user ID found")
+        // console("No valid user ID found")
         return
       }
 
       const response = await axios.get(
         `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
       )
-      console.log("111", response.data?.data)
+      // console("111", response.data?.data)
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)
       } else {
-        console.log("Invalid response received")
+        // console("Invalid response received")
       }
     } catch (error) {
       console.error("Unable to fetch user", error)
@@ -630,7 +630,7 @@ const LeetCode = () => {
                   value={selectedYear}
                   onChange={e => {
                     const year = parseInt(e.target.value)
-                    console.log("Year Selected:", year)
+                    // console("Year Selected:", year)
                     setSelectedYear(year)
                   }}
                   className="px-4 py-2 border rounded-lg text-gray-700 bg-white dark:bg-gray-700 dark:text-white"

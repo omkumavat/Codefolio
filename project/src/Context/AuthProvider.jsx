@@ -1,21 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
 
-// Define the User type
-/**
- * @typedef {Object} User
- * @property {string} id
- * @property {string} email
- * @property {string} name
- */
-
-/**
- * @typedef {Object} AuthContextType
- * @property {User|null} currentUser
- * @property {function(User): void} login
- * @property {function(): void} logout
- * @property {function(User): void} updateProfile
- */
-
 const AuthContext = createContext(undefined);
 
 export const useAuth = () => {
@@ -25,11 +9,6 @@ export const useAuth = () => {
   }
   return context;
 };
-
-/**
- * @typedef {Object} AuthProviderProps
- * @property {React.ReactNode} children
- */
 
 export const AuthProvider = ({ children }) => {
   // Check if 'Users' exists in localStorage before attempting to parse it

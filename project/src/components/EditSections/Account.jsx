@@ -28,7 +28,7 @@ const Account = () => {
   const fetchUpdatedUser = async () => {
     try {
       if (!currentUser?._id) {
-        console.log("No valid user ID found")
+        // console("No valid user ID found")
         return
       }
       const response = await axios.get(
@@ -37,7 +37,7 @@ const Account = () => {
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)
       } else {
-        console.log("Invalid response received")
+        // console("Invalid response received")
       }
     } catch (error) {
       console.error("Unable to fetch user", error)
@@ -54,7 +54,7 @@ const Account = () => {
       await fetchUpdatedUser()
       toast.success("Profile updated successfully ..!")
       setEditMode(false)
-      console.log("User updated successfully")
+      // console("User updated successfully")
     } else {
       toast.success("Failed to update Profile ..!")
     }

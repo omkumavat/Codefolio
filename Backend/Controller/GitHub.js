@@ -14,7 +14,7 @@ export const addGitHubBasics = async (req, res) => {
     const findUser = await User.findOne({ email }).exec();
 
     if (!findUser) {
-      console.log("User not found in the database.");
+      // console("User not found in the database.");
       return res.status(400).json({ success: false, message: "User does not exist in database" });
     }
 
@@ -82,7 +82,7 @@ export const addGitHubBasics = async (req, res) => {
     const followersCount = followersRes && Array.isArray(followersRes.data) ? followersRes.data.length : 0;
     const followingCount = followingRes && Array.isArray(followingRes.data) ? followingRes.data.length : 0;
 
-    console.log(processedRepos);
+    // console(processedRepos);
     const newGitHubUser = new GitHubUser({
       username: profileData.login,
       avatar: profileData.avatar_url,
@@ -126,7 +126,7 @@ export const updateGitHubAdvanced = async (req, res) => {
     const findUser = await User.findOne({ username }).exec();
 
     if (!findUser) {
-      console.log("User not found in the database.");
+      // console("User not found in the database.");
       return res.status(400).json({ success: false, message: "User does not exist in database" });
     }
 
@@ -231,7 +231,7 @@ export const updateGitHubAdvanced = async (req, res) => {
       });
     });
 
-    console.log(submissionsByYear)
+    // console(submissionsByYear)
 
     // Process collaborated repositories, filtering only public ones.
     const collaboratedRepos = userData.repositoriesContributedTo.nodes
@@ -295,7 +295,7 @@ export const fetchFromDB = async (req, res) => {
     let existingUser = await GitHubUser.findById(geetid).exec();
 
     if (!existingUser) {
-      console.log("GitHubUser user not found, creating a new one.");
+      // console("GitHubUser user not found, creating a new one.");
       return res.status(400).json({
         success: false,
         message: "GitHubUser user not found"
@@ -319,7 +319,7 @@ export const updateGitHubData = async (req, res) => {
     // Get username from request parameters
     const { username } = req.params;
     const updatedData = await updateGitHubUserData(username);
-    // console.log(updatedData)
+    // // console(updatedData)
     return res.status(200).json({
       success: true,
       message: "GitHub data updated successfully",

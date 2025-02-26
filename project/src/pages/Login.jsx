@@ -59,7 +59,7 @@ const Login = () => {
       )
 
       const data = await response.data.user
-      console.log(data)
+      // console(data)
       if (!response.data.success) {
         toast.error("Login failed, try again later..")
       } else {

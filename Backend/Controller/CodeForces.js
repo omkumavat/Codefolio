@@ -23,7 +23,7 @@ const formatDate = (dateString) => {
 
 // Fetch Codeforces user info, rating, and status
 export const fetchCodeForces = async (req, res) => {
-  console.log(CodeforcesUser);
+  // console(CodeforcesUser);
 
   try {
     const { username } = req.body;
@@ -264,7 +264,7 @@ export const UpdateCodeForcesAccount = async (req, res) => {
 export const fetchCodeforcesContestData = async (req, res) => {
   try {
     const { handle } = currentUser.email;
-    console.log(handle);
+    // console(handle);
 
     if (!handle) {
       return res.status(400).json({ message: "Handle is required" });
@@ -344,7 +344,7 @@ export const fetchCodeforcesFromDB = async (req, res) => {
     let existingUser = await CodeforcesUser.findById(codeforcesid).exec();
 
     if (!existingUser) {
-      console.log("Codeforces user not found, creating a new one.");
+      // console("Codeforces user not found, creating a new one.");
       return res.status(400).json({
         success: false,
         message: "Codeforces user not found",

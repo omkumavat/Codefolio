@@ -130,7 +130,7 @@ export const checkUserProfile = async (req, res) => {
             const gitActivity = processGitHubActivity(githubProfile.submissions);
             allActivityData.push(...gitActivity);
         }
-        console.log(allActivityData.length);
+        // console(allActivityData.length);
 
         // --- CodeForces Activity ---
         if (codeforcesProfile && codeforcesProfile.submissions) {
@@ -139,7 +139,7 @@ export const checkUserProfile = async (req, res) => {
             });
         }
 
-        console.log(allActivityData.length);
+        // console(allActivityData.length);
         // --- CodeChef Activity ---
         if (codechefProfile) {
             ["ActivityCalender2022", "ActivityCalender2023", "ActivityCalender2024", "ActivityCalender2025"].forEach((key) => {
@@ -148,7 +148,7 @@ export const checkUserProfile = async (req, res) => {
                 }
             });
         }
-        console.log(allActivityData.length);
+        // console(allActivityData.length);
 
         // --- LeetCode Activity ---
         if (leetCodeProfile) {
@@ -158,10 +158,10 @@ export const checkUserProfile = async (req, res) => {
                 }
             });
         }
-        console.log(allActivityData.length);
+        // console(allActivityData.length);
 
         const aggregatedActivity = aggregateActivity(allActivityData);
-        console.log(allActivityData.length);
+        // console(allActivityData.length);
         const heatMapData = groupByYear(aggregatedActivity);
 
         // --- Calculate Summary Metrics ---
@@ -220,13 +220,13 @@ export const checkUserProfile = async (req, res) => {
         }
 
         if (geeksforgeeksProfile && geeksforgeeksProfile.difficultyLevels) {
-            // console.log(geeksforgeeksProfile.difficultyLevels[4].solved)
+            // // console(geeksforgeeksProfile.difficultyLevels[4].solved)
             hardProblemsSolved += geeksforgeeksProfile.difficultyLevels[4].solved;
         }
 
         if (codeforcesProfile && codeforcesProfile?.problemsSolvedByRating) {
             const arr = codeforcesProfile?.problemsSolvedByRating;
-            // console.log(arr);
+            // // console(arr);
             if (arr[arr.length - 1][0] >= 1400) {
                 hardProblemsSolved += arr[arr.length - 1][1].length;
             }
@@ -282,7 +282,7 @@ export const refreshWholeProfile = async (req, res) => {
             return res.status(400).json({ error: "Username is required" });
         }
 
-        console.log("Refreshing profile for:", username);
+        // console("Refreshing profile for:", username);
 
         // Run all update functions concurrently, each with its own try-catch block
         const results = await Promise.allSettled([

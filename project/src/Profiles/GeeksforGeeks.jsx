@@ -108,12 +108,12 @@ const GeeksforGeeks = () => {
       }
 
       if (!response || !response.data || response.status !== 200) {
-        window.location.href = "/notfound"
+        window.location.href = "/"
         return
       }
 
       const data = response.data.data
-      console.log("GFG Data:", data)
+      // console("GFG Data:", data)
 
       setUsernameGFG(data.username)
       setStars(data.stars)
@@ -134,7 +134,7 @@ const GeeksforGeeks = () => {
 
       setHasAccount(true)
     } catch (error) {
-      window.location.href = "/notfound"
+      window.location.href = "/"
       console.error("Error fetching LeetCode data:", error)
     } finally {
       setLoading(false)
@@ -145,19 +145,19 @@ const GeeksforGeeks = () => {
     try {
       let response = null
 
-      console.log(currentUser)
+      // console(currentUser)
       if (currentUser) {
         if (currentUser?.username === username) {
           if (currentUser?.GeeksforGeeks) {
             setShowRefresh(true)
             setShowDelete(true)
             const gfgid = currentUser?.GeeksforGeeks
-            console.log("1212", gfgid)
+            // console("1212", gfgid)
             response = await axios.get(
               `https://codefolio-backend.vercel.app/server/gfg/fetch-gfg-db/${gfgid}`
             )
           } else {
-            console.log(hasAccount)
+            // console(hasAccount)
             setHasAccount(false)
             return
           }
@@ -176,13 +176,13 @@ const GeeksforGeeks = () => {
         setShowDelete(false)
       }
 
-      // console.log(response)
+      // // console(response)
       if (!response || !response.data || response.status !== 200) {
-        window.location.href = "/notfound"
+        window.location.href = "/"
         return
       }
       const data = response.data.data
-      console.log("LeetCode Data:", data)
+      // console("LeetCode Data:", data)
 
       setUsernameGFG(data.username)
       setStars(data.stars)
@@ -200,12 +200,12 @@ const GeeksforGeeks = () => {
         ...level,
         color: getDifficultyColor(level.difficulty)
       }))
-      console.log(coloredLevels)
+      // console(coloredLevels)
       setdifficultyLevels(coloredLevels)
 
       setHasAccount(true)
     } catch (error) {
-      window.location.href = "/notfound"
+      window.location.href = "/"
       console.error("Error fetching LeetCode data:", error)
     } finally {
       setLoading(false)
@@ -228,18 +228,18 @@ const GeeksforGeeks = () => {
   const fetchUpdatedUser = async () => {
     try {
       if (!currentUser?._id) {
-        console.log("No valid user ID found")
+        // console("No valid user ID found")
         return
       }
 
       const response = await axios.get(
         `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
       )
-      console.log("111", response.data?.data)
+      // console("111", response.data?.data)
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)
       } else {
-        console.log("Invalid response received")
+        // console("Invalid response received")
       }
     } catch (error) {
       console.error("Unable to fetch user", error)

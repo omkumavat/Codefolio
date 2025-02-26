@@ -4,7 +4,7 @@ import LeetCodeUser from '../../Models/LeetCode.js';
 
 export const updateLeetCodeUserData = async (username) => {
   try {
-    console.log("Username:", username);
+    // console("Username:", username);
     // Find User in the database
     const findUser = await User.findOne({ username }).exec();
     if (!findUser) {
@@ -67,7 +67,7 @@ export const updateLeetCodeUserData = async (username) => {
         }))
       : [];
 
-    console.log("Acceptance Rate:", acceptanceRate);
+    // console("Acceptance Rate:", acceptanceRate);
     existingUser.profile = profileData
       ? {
           ranking: profileData.ranking,
@@ -80,7 +80,7 @@ export const updateLeetCodeUserData = async (username) => {
         }
       : existingUser.profile;
 
-    console.log("Contest Data:", contestData);
+    // console("Contest Data:", contestData);
     existingUser.contests = contestData
       ? {
           contestAttend: contestData.contestAttend,

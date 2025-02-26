@@ -39,7 +39,7 @@ const AutoCompleteInput = ({
   }
 
   const handleSelect = value => {
-    console.log("Option selected:", value)
+    // console("Option selected:", value)
     setInputValue(value)
     onSelect(value)
     setIsOpen(false)
@@ -137,7 +137,7 @@ const BasicInfo = () => {
         setCollegeOptions(res.data)
       })
       .catch(err => console.error("Error fetching colleges:", err))
-    console.log(currentUser)
+    // console(currentUser)
   }, [])
 
   // When selected country changes, update states and reset state/city fields
@@ -168,10 +168,10 @@ const BasicInfo = () => {
   }
 
   const fetchUpdatedUser = async () => {
-    // setloading(true);
+    setloading(true);
     try {
       if (!currentUser?._id) {
-        console.log("No valid user ID found")
+        // console("No valid user ID found")
         return
       }
 
@@ -181,18 +181,18 @@ const BasicInfo = () => {
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)
       } else {
-        console.log("Invalid response received")
+        // console("Invalid response received")
       }
     } catch (error) {
       console.error("Unable to fetch user", error)
     } finally {
-      // setloading(false); // Always reset loading state
+      setloading(false); // Always reset loading state
     }
   }
 
   // Dummy save handler
   const handleSave = async () => {
-    console.log("Saved fields:", fields)
+    // console("Saved fields:", fields)
     const id = currentUser._id
     const response = await axios.put(
       `https://codefolio-backend.vercel.app/server/user/edituser/${id}`,
@@ -202,7 +202,7 @@ const BasicInfo = () => {
       toast.success("Profile updated successfully ..!")
       fetchUpdatedUser()
       setEditMode(false)
-      console.log("User updated successfully")
+      // console("User updated successfully")
     } else {
       toast.success("Failed to update Profile ..!")
     }

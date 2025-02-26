@@ -61,7 +61,7 @@ const CodeforcesModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     const response = await axios.get(
       `https://codefolio-backend.vercel.app/server/codeforces/fetch-codeforces/${username}`
     )
-    console.log(response)
+    // console(response)
     if (response.data.success) {
       setToast({
         success: true,
@@ -78,7 +78,7 @@ const CodeforcesModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
         "3)  Do this within time and click on refresh after time ends !"
       )
     } else {
-      console.log("hiii")
+      // console("hiii")
       setToast({
         success: false,
         text: "CodeForces account not found..!"

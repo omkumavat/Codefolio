@@ -122,7 +122,7 @@ export const fetchAuthData = async (githubUser) => {
         }))
       }));
 
-      console.log(submissionsByYear["2025"]);
+      // console(submissionsByYear["2025"]);
 
 
     // Update the GitHubUser document with advanced data.
@@ -138,7 +138,7 @@ export const fetchAuthData = async (githubUser) => {
     githubUser.totalContributions = totalContribution;
     await githubUser.save();
   } else {
-    console.log("Authenticated GitHub data not found for user.");
+    // console("Authenticated GitHub data not found for user.");
   }
 };
 

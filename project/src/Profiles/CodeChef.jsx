@@ -87,7 +87,7 @@ const CodeChef = () => {
             )
           } else {
             //account not added
-            console.log(hasAccount)
+            // console(hasAccount)
             setHasAccount(false)
             return
           }
@@ -109,11 +109,11 @@ const CodeChef = () => {
       }
 
       if (!response || !response.data) {
-        window.location.href = "/notfound"
+        window.location.href = "/"
         return
       }
       const data = response.data.data
-      console.log("LeetCode Data:", data)
+      // console("LeetCode Data:", data)
 
       setUsernameCode(data.username)
       setStars(data.stars)
@@ -158,7 +158,7 @@ const CodeChef = () => {
 
       setHasAccount(true)
     } catch (error) {
-      window.location.href = "/notfound"
+      window.location.href = "/"
       console.error("Error fetching LeetCode data:", error)
     } finally {
       setloading(false)
@@ -169,7 +169,7 @@ const CodeChef = () => {
     try {
       let response = null
 
-      console.log(currentUser)
+      // console(currentUser)
       if (currentUser) {
         if (currentUser?.username === username) {
           if (currentUser?.CodeChef) {
@@ -180,7 +180,7 @@ const CodeChef = () => {
               `https://codefolio-backend.vercel.app/server/codechef/fetch-codechef-from-db/${codechefid}`
             )
           } else {
-            console.log(hasAccount)
+            // console(hasAccount)
             setHasAccount(false)
             return
           }
@@ -199,14 +199,14 @@ const CodeChef = () => {
         setShowDelete(false)
       }
 
-      console.log(response)
+      // console(response)
       if (!response || !response.data || response.status !== 200) {
-        window.location.href = "/notfound"
+        window.location.href = "/"
         return
       }
 
       const data = response.data.data
-      console.log("LeetCode Data:", data)
+      // console("LeetCode Data:", data)
 
       setUsernameCode(data.username)
       setStars(data.stars)
@@ -249,11 +249,11 @@ const CodeChef = () => {
       setsubmissionCalendar2023(parseSubmissions(data.ActivityCalender2023))
       setsubmissionCalendar2022(parseSubmissions(data.ActivityCalender2022))
       setcontestParticipation(parseSubmissions2(data.contests) || [])
-      console.log(parseSubmissions2(data.contests))
+      // console(parseSubmissions2(data.contests))
 
       setHasAccount(true)
     } catch (error) {
-      window.location.href = "/notfound"
+      window.location.href = "/"
       console.error("Error fetching LeetCode data:", error)
     } finally {
       setloading(false)
@@ -276,18 +276,18 @@ const CodeChef = () => {
   const fetchUpdatedUser = async () => {
     try {
       if (!currentUser?._id) {
-        console.log("No valid user ID found")
+        // console("No valid user ID found")
         return
       }
 
       const response = await axios.get(
         `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
       )
-      console.log("111", response.data?.data)
+      // console("111", response.data?.data)
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)
       } else {
-        console.log("Invalid response received")
+        // console("Invalid response received")
       }
     } catch (error) {
       console.error("Unable to fetch user", error)
@@ -529,7 +529,7 @@ const CodeChef = () => {
                     value={selectedYear}
                     onChange={e => {
                       const year = parseInt(e.target.value)
-                      console.log("Year Selected:", year)
+                      // console("Year Selected:", year)
                       setSelectedYear(year)
                     }}
                     className="px-4 py-2 border rounded-lg text-gray-700 bg-white dark:bg-gray-700 dark:text-white"

@@ -38,7 +38,7 @@ const GeeksforGeeksModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
           email: currentUser?.email
         }
       )
-      console.log(response)
+      // console(response)
       if (response.data.success) {
         setToast({
           success: true,

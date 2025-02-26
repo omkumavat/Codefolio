@@ -89,7 +89,7 @@ const Codeforces = () => {
             )
           } else {
             // Account not added
-            console.log(hasAccount)
+            // console(hasAccount)
             setHasAccount(false)
             return
           }
@@ -111,12 +111,12 @@ const Codeforces = () => {
       }
 
       if (!response || !response.data || response.status !== 200) {
-        window.location.href = "/notfound"
+        window.location.href = "/"
         return
       }
 
       const data = response.data.data
-      console.log("Codeforces Data:", data)
+      // console("Codeforces Data:", data)
 
       setCfUsername(data?.username)
       setMaxRating(data?.maxRating)
@@ -135,7 +135,7 @@ const Codeforces = () => {
 
       setHasAccount(true)
     } catch (error) {
-      window.location.href = "/notfound"
+      window.location.href = "/"
       console.error("Error fetching Codeforces data:", error)
     } finally {
       setloading(false)
@@ -157,7 +157,7 @@ const Codeforces = () => {
             )
           } else {
             // Account not added
-            console.log(hasAccount)
+            // console(hasAccount)
             setHasAccount(false)
             return
           }
@@ -179,12 +179,12 @@ const Codeforces = () => {
       }
 
       if (!response || !response.data || response.status !== 200) {
-        window.location.href = "/notfound"
+        window.location.href = "/"
         return
       }
 
       const data = response.data.data
-      console.log("Codeforces Data:", data)
+      // console("Codeforces Data:", data)
 
       setCfUsername(data?.username)
       setMaxRating(data?.maxRating)
@@ -203,7 +203,7 @@ const Codeforces = () => {
 
       setHasAccount(true)
     } catch (error) {
-      window.location.href = "/notfound"
+      window.location.href = "/"
       console.error("Error fetching Codeforces data:", error)
     } finally {
       setloading(false)
@@ -491,7 +491,7 @@ const Codeforces = () => {
                     value={selectedYear}
                     onChange={e => {
                       const year = parseInt(e.target.value)
-                      console.log("Year Selected:", year)
+                      // console("Year Selected:", year)
                       setSelectedYear(year)
                     }}
                     className="px-4 py-2 border rounded-lg text-gray-700 bg-white dark:bg-gray-700 dark:text-white"

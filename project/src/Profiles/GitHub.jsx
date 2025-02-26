@@ -115,7 +115,7 @@ const GitHub = () => {
     try {
       let response = null
 
-      console.log(currentUser)
+      // console(currentUser)
       if (currentUser) {
         if (currentUser?.username === username) {
           if (currentUser?.Github) {
@@ -126,7 +126,7 @@ const GitHub = () => {
             )
             setShowContributions(response.data.data.auth)
           } else {
-            console.log(hasAccount)
+            // console(hasAccount)
             setHasAccount(false)
             return
           }
@@ -146,12 +146,12 @@ const GitHub = () => {
       }
 
       if (!response || !response.data) {
-        window.location.href = "/notfound"
+        window.location.href = "/"
         return
       }
 
       const data = response.data.data
-      console.log(data)
+      // console(data)
       setShowContributions(data.auth)
       setHasAccount(true)
       setAuths(data.auth)
@@ -172,7 +172,7 @@ const GitHub = () => {
       setGitUsername(data.username)
     } catch (error) {
       console.error("Error fetching GitHub data:", error)
-      window.location.href = "/notfound"
+      window.location.href = "/"
     } finally {
       setloading(false)
     }
@@ -183,7 +183,7 @@ const GitHub = () => {
     try {
       let response = null
 
-      console.log(currentUser)
+      // console(currentUser)
       if (currentUser) {
         if (currentUser?.username === username) {
           if (currentUser?.Github) {
@@ -195,7 +195,7 @@ const GitHub = () => {
             )
             setShowContributions(response.data.data.auth)
           } else {
-            console.log(hasAccount)
+            // console(hasAccount)
             setHasAccount(false)
             return
           }
@@ -215,7 +215,7 @@ const GitHub = () => {
       }
 
       if (!response || !response.data) {
-        window.location.href = "/notfound"
+        window.location.href = "/"
         return
       }
       const data = response.data.data
@@ -239,7 +239,7 @@ const GitHub = () => {
       setHasAccount(true)
     } catch (error) {
       console.error("Error fetching GitHub data:", error)
-      window.location.href = "/notfound"
+      window.location.href = "/"
     } finally {
       setloading(false)
     }
@@ -262,7 +262,7 @@ const GitHub = () => {
     // setloading(true);
     try {
       if (!currentUser?._id) {
-        console.log("No valid user ID found")
+        // console("No valid user ID found")
         return
       }
 
@@ -272,7 +272,7 @@ const GitHub = () => {
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)
       } else {
-        console.log("Invalid response received")
+        // console("Invalid response received")
       }
     } catch (error) {
       console.error("Unable to fetch user", error)
@@ -288,8 +288,8 @@ const GitHub = () => {
   }, [currentUser])
 
   useEffect(() => {
-    // console.log("Year Selected:", selectedYear);
-    // console.log("Data for Selected Year:", selectedData);
+    // // console("Year Selected:", selectedYear);
+    // // console("Data for Selected Year:", selectedData);
   }, [selectedYear, selectedData])
 
   const cardAnimation = useSpring({
@@ -666,8 +666,8 @@ const GitHub = () => {
                         value={selectedYear}
                         onChange={e => {
                           const year = parseInt(e.target.value)
-                          console.log("Year Selected:", year)
-                          console.log("Year Selected:", selectedData)
+                          // console("Year Selected:", year)
+                          // console("Year Selected:", selectedData)
                           setSelectedYear(year)
                         }}
                         className="px-4 py-2 border rounded-lg text-gray-700 bg-white dark:bg-gray-700 dark:text-white"

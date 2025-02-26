@@ -35,7 +35,7 @@ const Contact = () => {
             }
 
             const data = await response.json();
-            console.log("Response from server:", data);
+            // console("Response from server:", data);
             alert("Message sent successfully!");
         } catch (error) {
             console.error("Error:", error);
