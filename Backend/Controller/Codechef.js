@@ -57,112 +57,103 @@ export const getfuturecontest = async (requestAnimationFrame, res) => {
     }
 }
 
-let chrome;
-let puppeteer;
-
-if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
-    // In serverless (e.g., Vercel, AWS Lambda), use chrome-aws-lambda and puppeteer-core
-    (async () => {
-        chrome = await import("chrome-aws-lambda");
-        puppeteer = await import("puppeteer-core");
-    })();
-} else {
-    // Locally, use the full puppeteer package (which includes Chromium)
-    (async () => {
-        puppeteer = await import("puppeteer");
-    })();
-}
-
-
 export const fetchUserNameExists = async (req, res) => {
-    try {
-        const { username } = req.params;
-        console.log("Fetching for username:", username);
+  try {
+    const { username } = req.params;
+    console.log("Fetching for username:", username);
 
-        if (!username) {
-            return res.status(400).json({ error: 'Username is required in the request body.' });
-        }
-
-        const url = `https://www.codechef.com/users/${username}`;
-        let browser;
-
-        if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
-            console.log("Running on AWS Lambda/Vercel environment");
-
-            // Get the Chromium executable path from chrome-aws-lambda
-            const execPath = await chrome.executablePath();
-            if (!execPath) {
-                console.error("Chromium executablePath not found");
-                throw new Error("Chromium executablePath not found");
-            }
-            console.log("Chromium executablePath:", execPath);
-
-            browser = await puppeteer.launch({
-                args: [...chrome.args, '--no-sandbox', '--disable-setuid-sandbox'],
-                defaultViewport: chrome.defaultViewport,
-                executablePath: execPath,
-                headless: true,
-            });
-        } else {
-            console.log("Running locally");
-            browser = await puppeteer.launch({
-                headless: true,
-                args: ["--no-sandbox", "--disable-setuid-sandbox"],
-            });
-        }
-
-        const page = await browser.newPage();
-        console.log("Navigating to URL:", url);
-        await page.goto(url, { waitUntil: 'networkidle2' });
-        console.log("Page loaded");
-
-        // Fetch the page content and check if the profile exists
-        const pageContent = await page.content();
-        if (
-            pageContent.includes("The user you are looking for does not exist") ||
-            !(await page.$(".user-details-container"))
-        ) {
-            await browser.close();
-            return res.status(200).json({
-                success: false,
-                message: "CodeChef account not found for the given username.",
-            });
-        }
-
-        // Wait for table selector; ignore timeout errors if not found
-        await page.waitForSelector("#rankContentDiv .dataTable tbody tr", { timeout: 5000 }).catch(() => { });
-        const html = await page.content();
-        await browser.close();
-
-        const dom = new JSDOM(html);
-        const document = dom.window.document;
-        const rows = document.querySelectorAll("#rankContentDiv .dataTable tbody tr");
-        console.log("Rows found:", rows.length);
-
-        let firstProblemInfo = "No solved problems found";
-        // Loop through rows to extract the first solved problem
-        for (let row of rows) {
-            const problem = row.querySelector("td:nth-child(2) a")?.textContent.trim();
-            if (problem) {
-                firstProblemInfo = problem;
-                break;
-            }
-        }
-
-        res.status(200).json({
-            success: true,
-            message: 'First problem fetched successfully',
-            problemsolved: firstProblemInfo
-        });
-
-    } catch (error) {
-        console.error("Error fetching data:", error);
-        res.status(500).json({
-            success: false,
-            message: 'An error occurred while fetching contests.',
-        });
+    if (!username) {
+      return res.status(400).json({ error: 'Username is required in the request body.' });
     }
+
+    const url = `https://www.codechef.com/users/${username}`;
+    let browser;
+    let puppeteer;
+    let chrome;
+
+    if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+      console.log("Running on AWS Lambda/Vercel environment");
+      // Dynamically import in the function to ensure they are loaded before use
+      chrome = await import("chrome-aws-lambda");
+      puppeteer = await import("puppeteer-core");
+
+      // Get the Chromium executable path from chrome-aws-lambda
+      const execPath = await chrome.executablePath();
+      if (!execPath) {
+        console.error("Chromium executablePath not found");
+        throw new Error("Chromium executablePath not found");
+      }
+      console.log("Chromium executablePath:", execPath);
+
+      browser = await puppeteer.launch({
+        args: [...chrome.args, '--no-sandbox', '--disable-setuid-sandbox'],
+        defaultViewport: chrome.defaultViewport,
+        executablePath: execPath,
+        headless: true,
+      });
+    } else {
+      console.log("Running locally");
+      // Import the full puppeteer package locally
+      puppeteer = await import("puppeteer");
+      browser = await puppeteer.launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      });
+    }
+
+    const page = await browser.newPage();
+    console.log("Navigating to URL:", url);
+    await page.goto(url, { waitUntil: 'networkidle2' });
+    console.log("Page loaded");
+
+    // Fetch the page content and check if the profile exists
+    const pageContent = await page.content();
+    if (
+      pageContent.includes("The user you are looking for does not exist") ||
+      !(await page.$(".user-details-container"))
+    ) {
+      await browser.close();
+      return res.status(200).json({
+        success: false,
+        message: "CodeChef account not found for the given username.",
+      });
+    }
+
+    // Wait for the table selector; ignore timeout errors if not found
+    await page.waitForSelector("#rankContentDiv .dataTable tbody tr", { timeout: 5000 }).catch(() => {});
+    const html = await page.content();
+    await browser.close();
+
+    const dom = new JSDOM(html);
+    const document = dom.window.document;
+    const rows = document.querySelectorAll("#rankContentDiv .dataTable tbody tr");
+    console.log("Rows found:", rows.length);
+
+    let firstProblemInfo = "No solved problems found";
+    // Extract the first solved problem
+    for (let row of rows) {
+      const problem = row.querySelector("td:nth-child(2) a")?.textContent.trim();
+      if (problem) {
+        firstProblemInfo = problem;
+        break;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'First problem fetched successfully',
+      problemsolved: firstProblemInfo
+    });
+
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred while fetching contests.',
+    });
+  }
 };
+
 
 
 export const AddCodeChefAccount = async (req, res) => {
