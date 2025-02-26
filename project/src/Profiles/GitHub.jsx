@@ -122,7 +122,7 @@ const GitHub = () => {
             setShowRefresh(true)
             setShowDelete(true)
             response = await axios.get(
-              `http://localhost:4000/server/github/fetch-git/${username}`
+              `https://codefolio-backend.vercel.app/server/github/fetch-git/${username}`
             )
             setShowContributions(response.data.data.auth)
           } else {
@@ -132,14 +132,14 @@ const GitHub = () => {
           }
         } else {
           response = await axios.get(
-            `http://localhost:4000/server/github/fetch-git/${username}`
+            `https://codefolio-backend.vercel.app/server/github/fetch-git/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
         }
       } else {
         response = await axios.get(
-          `http://localhost:4000/server/github/fetch-git/${username}`
+          `https://codefolio-backend.vercel.app/server/github/fetch-git/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -191,7 +191,7 @@ const GitHub = () => {
             setShowDelete(true)
             const geetid = currentUser?.Github
             response = await axios.get(
-              `http://localhost:4000/server/github/fetch-git-from-db/${geetid}`
+              `https://codefolio-backend.vercel.app/server/github/fetch-git-from-db/${geetid}`
             )
             setShowContributions(response.data.data.auth)
           } else {
@@ -201,14 +201,14 @@ const GitHub = () => {
           }
         } else {
           response = await axios.get(
-            `http://localhost:4000/server/github/fetch-git/${username}`
+            `https://codefolio-backend.vercel.app/server/github/fetch-git/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
         }
       } else {
         response = await axios.get(
-          `http://localhost:4000/server/github/fetch-git/${username}`
+          `https://codefolio-backend.vercel.app/server/github/fetch-git/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -250,7 +250,7 @@ const GitHub = () => {
       if (currentUser && currentUser.LeetCode) {
         const leetid = currentUser.LeetCode
         const response = await axios.delete(
-          `http://localhost:4000/server/leetcode/delete-leetcode/${leetid}`
+          `https://codefolio-backend.vercel.app/server/leetcode/delete-leetcode/${leetid}`
         )
       }
     } catch (error) {
@@ -267,7 +267,7 @@ const GitHub = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:4000/server/user/get-user/${currentUser._id}`
+        `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
       )
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)

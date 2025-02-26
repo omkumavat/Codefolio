@@ -81,7 +81,7 @@ const LeetCode = () => {
             setShowDelete(true)
             //this is self account and logged in
             response = await axios.get(
-              `http://localhost:4000/server/leetcode/fetch/${username}`
+              `https://codefolio-backend.vercel.app/server/leetcode/fetch/${username}`
             )
           } else {
             //account not added and and logged in
@@ -92,7 +92,7 @@ const LeetCode = () => {
         } else {
           //not self account and logged in
           response = await axios.get(
-            `http://localhost:4000/server/leetcode/fetch/${username}`
+            `https://codefolio-backend.vercel.app/server/leetcode/fetch/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
@@ -100,7 +100,7 @@ const LeetCode = () => {
       } else {
         //not self account and not logged in
         response = await axios.get(
-          `http://localhost:4000/server/leetcode/fetch/${username}`
+          `https://codefolio-backend.vercel.app/server/leetcode/fetch/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -200,7 +200,7 @@ const LeetCode = () => {
             setShowDelete(true)
             const leetid = currentUser?.LeetCode
             response = await axios.get(
-              `http://localhost:4000/server/leetcode/fetch-from-db/${leetid}`
+              `https://codefolio-backend.vercel.app/server/leetcode/fetch-from-db/${leetid}`
             )
           } else {
             console.log(hasAccount)
@@ -209,14 +209,14 @@ const LeetCode = () => {
           }
         } else {
           response = await axios.get(
-            `http://localhost:4000/server/leetcode/fetch/${username}`
+            `https://codefolio-backend.vercel.app/server/leetcode/fetch/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
         }
       } else {
         response = await axios.get(
-          `http://localhost:4000/server/leetcode/fetch/${username}`
+          `https://codefolio-backend.vercel.app/server/leetcode/fetch/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -312,7 +312,7 @@ const LeetCode = () => {
         ;() => {
           setIsDeleteModal(true)
         }
-        // const response = await axios.delete(`http://localhost:4000/server/leetcode/delete-leetcode/${leetid}`)
+        // const response = await axios.delete(`https://codefolio-backend.vercel.app/server/leetcode/delete-leetcode/${leetid}`)
       }
     } catch (error) {
       console.error("Error deleting LeetCode data:", error)
@@ -327,7 +327,7 @@ const LeetCode = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:4000/server/user/get-user/${currentUser._id}`
+        `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
       )
       console.log("111", response.data?.data)
       if (response.status === 200 && response.data?.data) {

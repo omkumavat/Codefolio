@@ -22,7 +22,7 @@ const Contact = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://localhost:4000/server/contact/contact", {
+            const response = await fetch("https://codefolio-backend.vercel.app/server/contact/contact", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

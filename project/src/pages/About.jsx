@@ -19,7 +19,7 @@ const About = () => {
   useEffect(() => {
     async function fetchStat() {
       try {
-        const response = await axios.get('http://localhost:4000/server/user/stat')
+        const response = await axios.get('https://codefolio-backend.vercel.app/server/user/stat')
         console.log(response)
         setStat(response.data);
       } catch (error) {

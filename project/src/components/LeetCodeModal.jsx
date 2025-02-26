@@ -61,7 +61,7 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     }
 
     const response = await axios.get(
-      `http://localhost:4000/server/leetcode/check-username/${username}`
+      `https://codefolio-backend.vercel.app/server/leetcode/check-username/${username}`
     )
     // const data = response.data;
     console.log(response)
@@ -94,7 +94,7 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     setVerificationStep3("")
 
     const response = await axios.get(
-      `http://localhost:4000/server/leetcode/check-username/${username}`
+      `https://codefolio-backend.vercel.app/server/leetcode/check-username/${username}`
     )
     console.log(response)
     if (response.data.success === true) {
@@ -111,7 +111,7 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
 
         try {
           const response = await axios.post(
-            `http://localhost:4000/server/leetcode/add-leetcode`,
+            `https://codefolio-backend.vercel.app/server/leetcode/add-leetcode`,
             {
               username: username,
               email: currentUser?.email

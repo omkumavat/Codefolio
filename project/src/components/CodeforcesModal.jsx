@@ -59,7 +59,7 @@ const CodeforcesModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     }
 
     const response = await axios.get(
-      `http://localhost:4000/server/codeforces/fetch-codeforces/${username}`
+      `https://codefolio-backend.vercel.app/server/codeforces/fetch-codeforces/${username}`
     )
     console.log(response)
     if (response.data.success) {
@@ -99,7 +99,7 @@ const CodeforcesModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     setVerificationStep2("")
     setVerificationStep3("")
     const response = await axios.get(
-      `http://localhost:4000/server/codeforces/fetch-codeforces/${username}`
+      `https://codefolio-backend.vercel.app/server/codeforces/fetch-codeforces/${username}`
     )
     if (response.data.success) {
       if (response.data.data.submissions === Problem) {
@@ -110,7 +110,7 @@ const CodeforcesModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
         })
         try {
           const response = await axios.post(
-            `http://localhost:4000/server/codeforces/add-codeforces`,
+            `https://codefolio-backend.vercel.app/server/codeforces/add-codeforces`,
             {
               username: username,
               email: currentUser?.email

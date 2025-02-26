@@ -32,7 +32,7 @@ const GeeksforGeeksModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
     })
     try {
       const response = await axios.post(
-        `http://localhost:4000/server/gfg/add-gfg`,
+        `https://codefolio-backend.vercel.app/server/gfg/add-gfg`,
         {
           username: username,
           email: currentUser?.email

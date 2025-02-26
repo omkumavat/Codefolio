@@ -113,7 +113,7 @@ function Profile() {
       try {
         console.log("Fetching user data...");
         const response = await axios.get(
-          `http://localhost:4000/server/user/check-user-profile/${username}`
+          `https://codefolio-backend.vercel.app/server/user/check-user-profile/${username}`
         );
         console.log(response.data);
 
@@ -222,7 +222,7 @@ function Profile() {
     );
 
     try {
-      const response = await axios.get(`http://localhost:4000/server/user/refresh-user-profile/${username}`);
+      const response = await axios.get(`https://codefolio-backend.vercel.app/server/user/refresh-user-profile/${username}`);
 
       if (response.data.success) {
         toast.update(toastId, {
