@@ -50,10 +50,10 @@ const Footer = () => {
                 href="https://github.com/omkumavat/Codefolio"
                 icon={<Github className="h-5 w-5" />}
               />
-              <SocialIcon href="" icon={<Linkedin className="h-5 w-5" />} />
-              <SocialIcon href="#" icon={<Twitter className="h-5 w-5" />} />
+              <SocialIcon href="/" icon={<Linkedin className="h-5 w-5" />} />
+              <SocialIcon href="/" icon={<Twitter className="h-5 w-5" />} />
               <SocialIcon
-                href="omkumavat1212@gmail.com"
+                href="/"
                 icon={<Mail className="h-5 w-5" />}
               />
             </div>
@@ -68,7 +68,7 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <FooterLink href="/" text="Home" />
-              <FooterLink href="/profiles" text="Privacy & Rules" />
+              <FooterLink href="/docs" text="Documentation" />
               <FooterLink href="/about" text="About" />
               <FooterLink href="/contact" text="Contact" />
             </ul>
