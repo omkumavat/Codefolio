@@ -73,12 +73,13 @@ export const fetchUserNameExists = async (req, res) => {
 
     if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
       console.log("Running on AWS Lambda/Vercel environment");
-      // Dynamically import in the function to ensure they are loaded before use
-      chrome = await import("chrome-aws-lambda");
-      puppeteer = await import("puppeteer-core");
+      
+      // Dynamically import modules and use their default exports
+      chrome = (await import("chrome-aws-lambda")).default;
+      puppeteer = (await import("puppeteer-core")).default;
 
-      // Get the Chromium executable path from chrome-aws-lambda
-      const execPath = await chrome.executablePath();
+      // Get the Chromium executable path
+      const execPath = await chrome.executablePath;
       if (!execPath) {
         console.error("Chromium executablePath not found");
         throw new Error("Chromium executablePath not found");
@@ -93,8 +94,7 @@ export const fetchUserNameExists = async (req, res) => {
       });
     } else {
       console.log("Running locally");
-      // Import the full puppeteer package locally
-      puppeteer = await import("puppeteer");
+      puppeteer = (await import("puppeteer")).default;
       browser = await puppeteer.launch({
         headless: true,
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -106,7 +106,7 @@ export const fetchUserNameExists = async (req, res) => {
     await page.goto(url, { waitUntil: 'networkidle2' });
     console.log("Page loaded");
 
-    // Fetch the page content and check if the profile exists
+    // Check if the profile exists
     const pageContent = await page.content();
     if (
       pageContent.includes("The user you are looking for does not exist") ||
@@ -119,7 +119,7 @@ export const fetchUserNameExists = async (req, res) => {
       });
     }
 
-    // Wait for the table selector; ignore timeout errors if not found
+    // Wait for table selector (ignore timeout errors)
     await page.waitForSelector("#rankContentDiv .dataTable tbody tr", { timeout: 5000 }).catch(() => {});
     const html = await page.content();
     await browser.close();
@@ -130,7 +130,7 @@ export const fetchUserNameExists = async (req, res) => {
     console.log("Rows found:", rows.length);
 
     let firstProblemInfo = "No solved problems found";
-    // Extract the first solved problem
+    // Loop through rows to extract the first solved problem
     for (let row of rows) {
       const problem = row.querySelector("td:nth-child(2) a")?.textContent.trim();
       if (problem) {
@@ -153,6 +153,7 @@ export const fetchUserNameExists = async (req, res) => {
     });
   }
 };
+
 
 
 
