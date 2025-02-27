@@ -13,7 +13,7 @@ export const ProtectedRoute = ({ children }) => {
     const checkUserExists = async () => {
       try {
         const response = await axios.get(
-          `https://codefolio-backend.vercel.app/server/user/check-user/${username}`
+          `${import.meta.env.VITE_BACKEND_URL}/server/user/check-user/${username}`
         )
         // // console(response.data.exists)
         if (response.data.exists) {

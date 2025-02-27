@@ -85,7 +85,7 @@ const GeeksforGeeks = () => {
             setShowDelete(true)
             //this is self account and logged in
             response = await axios.get(
-              `https://codefolio-backend.vercel.app/server/gfg/fetch-gfg/${username}`
+              `${import.meta.env.VITE_BACKEND_URL}/server/gfg/fetch-gfg/${username}`
             )
           } else {
             setHasAccount(false)
@@ -94,7 +94,7 @@ const GeeksforGeeks = () => {
         } else {
           //not self account and logged in
           response = await axios.get(
-            `https://codefolio-backend.vercel.app/server/gfg/fetch-gfg/${username}`
+            `${import.meta.env.VITE_BACKEND_URL}/server/gfg/fetch-gfg/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
@@ -102,7 +102,7 @@ const GeeksforGeeks = () => {
       } else {
         //not self account and not logged in
         response = await axios.get(
-          `https://codefolio-backend.vercel.app/server/gfg/fetch-gfg/${username}`
+          `${import.meta.env.VITE_BACKEND_URL}/server/gfg/fetch-gfg/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -155,7 +155,7 @@ const GeeksforGeeks = () => {
             const gfgid = currentUser?.GeeksforGeeks
             // console("1212", gfgid)
             response = await axios.get(
-              `https://codefolio-backend.vercel.app/server/gfg/fetch-gfg-db/${gfgid}`
+              `${import.meta.env.VITE_BACKEND_URL}/server/gfg/fetch-gfg-db/${gfgid}`
             )
           } else {
             // console(hasAccount)
@@ -164,14 +164,14 @@ const GeeksforGeeks = () => {
           }
         } else {
           response = await axios.get(
-            `https://codefolio-backend.vercel.app/server/gfg/fetch-gfg/${username}`
+            `${import.meta.env.VITE_BACKEND_URL}/server/gfg/fetch-gfg/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
         }
       } else {
         response = await axios.get(
-          `https://codefolio-backend.vercel.app/server/gfg/fetch-gfg/${username}`
+          `${import.meta.env.VITE_BACKEND_URL}/server/gfg/fetch-gfg/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -218,7 +218,7 @@ const GeeksforGeeks = () => {
       if (currentUser && currentUser.GeeksforGeeks) {
         const leetid = currentUser.GeeksforGeeks
         const response = await axios.delete(
-          `https://codefolio-backend.vercel.app/server/leetcode/delete-leetcode/${leetid}`
+          `${import.meta.env.VITE_BACKEND_URL}/server/leetcode/delete-leetcode/${leetid}`
         )
       }
     } catch (error) {
@@ -234,7 +234,7 @@ const GeeksforGeeks = () => {
       }
 
       const response = await axios.get(
-        `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
+        `${import.meta.env.VITE_BACKEND_URL}/server/user/get-user/${currentUser._id}`
       )
       // console("111", response.data?.data)
       if (response.status === 200 && response.data?.data) {

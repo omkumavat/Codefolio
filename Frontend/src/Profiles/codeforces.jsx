@@ -87,7 +87,7 @@ const Codeforces = () => {
             setShowRefresh(true)
             setShowDelete(true)
             response = await axios.get(
-              `https://codefolio-backend.vercel.app/server/codeforces/fetch/${username}`
+              `${import.meta.env.VITE_BACKEND_URL}/server/codeforces/fetch/${username}`
             )
           } else {
             // Account not added
@@ -98,7 +98,7 @@ const Codeforces = () => {
         } else {
           // Not self account and logged in
           response = await axios.get(
-            `https://codefolio-backend.vercel.app/server/codeforces/fetch/${username}`
+            `${import.meta.env.VITE_BACKEND_URL}/server/codeforces/fetch/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
@@ -106,7 +106,7 @@ const Codeforces = () => {
       } else {
         // Not self account and not logged in
         response = await axios.get(
-          `https://codefolio-backend.vercel.app/server/codeforces/fetch/${username}`
+          `${import.meta.env.VITE_BACKEND_URL}/server/codeforces/fetch/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -155,7 +155,7 @@ const Codeforces = () => {
             setShowDelete(true)
             const codeforcesid = currentUser?.CodeForces
             response = await axios.get(
-              `https://codefolio-backend.vercel.app/server/codeforces/fetch-codeforces-from-db/${codeforcesid}`
+              `${import.meta.env.VITE_BACKEND_URL}/server/codeforces/fetch-codeforces-from-db/${codeforcesid}`
             )
           } else {
             // Account not added
@@ -166,7 +166,7 @@ const Codeforces = () => {
         } else {
           // Not self account and logged in
           response = await axios.get(
-            `https://codefolio-backend.vercel.app/server/codeforces/fetch/${username}`
+            `${import.meta.env.VITE_BACKEND_URL}/server/codeforces/fetch/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
@@ -174,7 +174,7 @@ const Codeforces = () => {
       } else {
         // Not self account and not logged in
         response = await axios.get(
-          `https://codefolio-backend.vercel.app/server/codeforces/fetch/${username}`
+          `${import.meta.env.VITE_BACKEND_URL}/server/codeforces/fetch/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -218,7 +218,7 @@ const Codeforces = () => {
       if (currentUser && currentUser.CodeForces) {
         const cfId = currentUser.CodeForces
         await axios.delete(
-          `https://codefolio-backend.vercel.app/server/codeforces/delete-codeforces/${cfId}`
+          `${import.meta.env.VITE_BACKEND_URL}/server/codeforces/delete-codeforces/${cfId}`
         )
         setToast("Codeforces account removed successfully")
         fetchUpdatedUser()
@@ -236,7 +236,7 @@ const Codeforces = () => {
       if (!currentUser?._id) return
 
       const response = await axios.get(
-        `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
+        `${import.meta.env.VITE_BACKEND_URL}/server/user/get-user/${currentUser._id}`
       )
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)

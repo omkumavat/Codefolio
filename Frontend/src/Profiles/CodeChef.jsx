@@ -85,7 +85,7 @@ const CodeChef = () => {
             setShowDelete(true)
             //this is self account and logged in
             response = await axios.get(
-              `https://codefolio-backend.vercel.app/server/codechef/fetch-codechef/${username}`
+              `${import.meta.env.VITE_BACKEND_URL}/server/codechef/fetch-codechef/${username}`
             )
           } else {
             //account not added
@@ -96,7 +96,7 @@ const CodeChef = () => {
         } else {
           //not self account and logged in
           response = await axios.get(
-            `https://codefolio-backend.vercel.app/server/codechef/fetch-codechef/${username}`
+            `${import.meta.env.VITE_BACKEND_URL}/server/codechef/fetch-codechef/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
@@ -104,7 +104,7 @@ const CodeChef = () => {
       } else {
         //not self account and not logged in
         response = await axios.get(
-          `https://codefolio-backend.vercel.app/server/codechef/fetch-codechef/${username}`
+          `${import.meta.env.VITE_BACKEND_URL}/server/codechef/fetch-codechef/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -179,7 +179,7 @@ const CodeChef = () => {
             setShowDelete(true)
             const codechefid = currentUser?.CodeChef
             response = await axios.get(
-              `https://codefolio-backend.vercel.app/server/codechef/fetch-codechef-from-db/${codechefid}`
+              `${import.meta.env.VITE_BACKEND_URL}/server/codechef/fetch-codechef-from-db/${codechefid}`
             )
           } else {
             // console(hasAccount)
@@ -188,14 +188,14 @@ const CodeChef = () => {
           }
         } else {
           response = await axios.get(
-            `https://codefolio-backend.vercel.app/server/codechef/fetch-codechef/${username}`
+            `${import.meta.env.VITE_BACKEND_URL}/server/codechef/fetch-codechef/${username}`
           )
           setShowRefresh(false)
           setShowDelete(false)
         }
       } else {
         response = await axios.get(
-          `https://codefolio-backend.vercel.app/server/codechef/fetch-codechef/${username}`
+          `${import.meta.env.VITE_BACKEND_URL}/server/codechef/fetch-codechef/${username}`
         )
         setShowRefresh(false)
         setShowDelete(false)
@@ -267,7 +267,7 @@ const CodeChef = () => {
       if (currentUser && currentUser.LeetCode) {
         const leetid = currentUser.LeetCode
         const response = await axios.delete(
-          `https://codefolio-backend.vercel.app/server/leetcode/delete-leetcode/${leetid}`
+          `${import.meta.env.VITE_BACKEND_URL}/server/leetcode/delete-leetcode/${leetid}`
         )
       }
     } catch (error) {
@@ -283,7 +283,7 @@ const CodeChef = () => {
       }
 
       const response = await axios.get(
-        `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
+        `${import.meta.env.VITE_BACKEND_URL}/server/user/get-user/${currentUser._id}`
       )
       // console("111", response.data?.data)
       if (response.status === 200 && response.data?.data) {

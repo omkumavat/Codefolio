@@ -52,7 +52,7 @@ const Signup = () => {
     const handler = setTimeout(() => {
       axios
         .get(
-          `https://codefolio-backend.vercel.app/server/user/check-username/${formData.username}`
+          `${import.meta.env.VITE_BACKEND_URL}/server/user/check-username/${formData.username}`
         )
         .then(response => {
           setUsernameAvailable(response.data.available)
@@ -108,7 +108,7 @@ const Signup = () => {
 
     try {
       const response = await axios.post(
-        "https://codefolio-backend.vercel.app/server/user/sign-up",
+        `${import.meta.env.VITE_BACKEND_URL}/server/user/sign-up`,
         {
           username: formData.username,
           name: formData.name,
@@ -121,8 +121,9 @@ const Signup = () => {
 
       if (response.data.success) {
         const res = await axios.post(
-          "https://codefolio-backend.vercel.app/server/user/email/email-signup",
+          `${import.meta.env.VITE_BACKEND_URL}/server/user/email/email-signup`,
           {
+            username:formData.username,
             name: formData.name,
             email: formData.email
           }
@@ -201,8 +202,7 @@ const Signup = () => {
     setOtpSent(true)
 
     axios
-      // .post("https://codefolio-backend.vercel.app/server/user/email/email-otp",
-      .post("http://localhost:4000/server/user/email/email-otp", {
+      .post(`${import.meta.env.VITE_BACKEND_URL}/server/user/email/email-otp`, {
         email: formData.email,
         name: formData.name,
         otp

@@ -71,7 +71,7 @@ const ContestSection = () => {
       try {
         // Fetch Codeforces contests
         const codeforcesResponse = await axios.get(
-          "https://codefolio-backend.vercel.app/server/codeforces/contestfetch"
+          `${import.meta.env.VITE_BACKEND_URL}/server/codeforces/contestfetch`
         )
         if (codeforcesResponse.data.success) {
           setCodeforcesData(codeforcesResponse.data.contest)
@@ -80,7 +80,7 @@ const ContestSection = () => {
 
         // Fetch CodeChef contests
         const codechefResponse = await axios.get(
-          "https://codefolio-backend.vercel.app/server/codechef/contestfetch"
+          `${import.meta.env.VITE_BACKEND_URL}/server/codechef/contestfetch`
         )
         if (codechefResponse.data.success) {
           setCodechefData(codechefResponse.data.contests)

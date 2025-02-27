@@ -33,7 +33,7 @@ const GitHubModal1 = ({ isModalOpen, setToast, setIsModalOpen }) => {
     })
     try {
       const response = await axios.post(
-        `https://codefolio-backend.vercel.app/server/github/add-github-basics/`,
+        `${import.meta.env.VITE_BACKEND_URL}/server/github/add-github-basics/`,
         {
           username: username,
           email: currentUser?.email

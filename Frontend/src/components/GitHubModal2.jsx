@@ -34,7 +34,7 @@ const GitHubModal2 = ({ showTokenModal, setToast2, setShowTokenModal }) => {
 
     try {
       const response = await axios.post(
-        `https://codefolio-backend.vercel.app/server/github/add-github-advanced`,
+        `${import.meta.env.VITE_BACKEND_URL}/server/github/add-github-advanced`,
         {
           pat: token,
           username: currentUser?.username

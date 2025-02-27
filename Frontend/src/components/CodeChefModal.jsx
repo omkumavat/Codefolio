@@ -36,7 +36,7 @@ const CodeChefModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
         text: "Verification process started.",
       });
       const response = await axios.post(
-        `https://codefolio-backend.vercel.app/server/codechef/add-codechef`,
+        `${import.meta.env.VITE_BACKEND_URL}/server/codechef/add-codechef`,
         {
           username: username,
           email: currentUser?.email,

@@ -32,7 +32,7 @@ const Account = () => {
         return
       }
       const response = await axios.get(
-        `https://codefolio-backend.vercel.app/server/user/get-user/${currentUser._id}`
+        `${import.meta.env.VITE_BACKEND_URL}/server/user/get-user/${currentUser._id}`
       )
       if (response.status === 200 && response.data?.data) {
         await updateProfile(response.data.data)
@@ -47,7 +47,7 @@ const Account = () => {
   const handleSave = async () => {
     const id = currentUser._id
     const response = await axios.put(
-      `https://codefolio-backend.vercel.app/server/user/edituser/${id}`,
+      `${import.meta.env.VITE_BACKEND_URL}/server/user/edituser/${id}`,
       fields
     )
     if (response.data.success) {

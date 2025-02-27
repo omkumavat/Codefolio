@@ -58,11 +58,11 @@ export const sendOTPEmail = async (req, res) => {
 
 export const sendSignUpSuccessfulEmail = async (req, res) => {
     // console(req.body);
-    const { name, email } = req.body;
+    const { name, email,username } = req.body;
     const templatePath = path.join(__dirname, "../views", 'SignupSuccess.hbs');
     const templateSource = fs.readFileSync(templatePath, "utf-8");
     const template = Handlebars.compile(templateSource);
-    let htmlContent = template({ name });
+    let htmlContent = template({ name,username });
 
     const mailOptions = {
         from: `CodeFolio <${process.env.MAIL_USER}>`,
