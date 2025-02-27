@@ -21,12 +21,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const sendOTPEmail = async (req, res) => {
-    // console(req.body);
+    console.log(req.body); // Check request body
     const { name, email, otp } = req.body;
-    const templatePath = path.join(__dirname, "../views", 'SignupOTP.hbs');
+
+    if (!otp) {
+        return res.status(400).json({ error: "OTP is missing in request body" });
+    }
+
+    console.log(typeof otp, otp); // Check OTP value
+
+    const Otp = typeof otp === "string" ? otp.split("") : [];
+    
+    const templatePath = path.join(__dirname, "../views", "SignupOTP.hbs");
     const templateSource = fs.readFileSync(templatePath, "utf-8");
     const template = Handlebars.compile(templateSource);
-    let htmlContent = template({ name, email, otp });
+    let htmlContent = template({ name, email, Otp });
+
+    console.log(htmlContent); // Ensure OTP is rendering correctly
 
     const mailOptions = {
         from: `CodeFolio <${process.env.MAIL_USER}>`,
@@ -37,13 +48,13 @@ export const sendOTPEmail = async (req, res) => {
 
     try {
         await transporter.sendMail(mailOptions);
-        // console("OTP email sent successfully.");
         res.status(200).json({ message: "Email sent successfully" });
     } catch (error) {
         console.error("Error sending OTP email:", error);
         res.status(500).json({ error: "Failed to send email" });
     }
 };
+
 
 export const sendSignUpSuccessfulEmail = async (req, res) => {
     // console(req.body);

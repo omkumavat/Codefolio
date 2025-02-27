@@ -52,11 +52,12 @@ app.use(express.static(path.join(__dirname, '..', 'src', 'public')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 app.get("/s", (req, res) => {
-  res.render("SignupSuccess", { name: "OM"});
+  const otp="123456"
+  res.render("SignupOTP", { name: "OKM",Otp:otp.split('')});
 });
 
 
-app.listen(4000, () => {
-   // console("app is listening on port 4000");
-});
+// app.listen(4000, () => {
+//   //  console.log("app is listening on port 4000");
+// });
 export default app;
