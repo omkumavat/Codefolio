@@ -12,9 +12,9 @@ import { ToastContainer, toast } from "react-toastify"
 const menuItems = [
   { id: "basic-info", label: "Basic Info", icon: User },
   { id: "account", label: "Account", icon: User },
-  { id: "privacy", label: "Privacy", icon: User },
-  { id: "billing", label: "Billing", icon: User },
-  { id: "notifications", label: "Notifications", icon: User }
+  // { id: "privacy", label: "Privacy", icon: User },
+  // { id: "billing", label: "Billing", icon: User },
+  // { id: "notifications", label: "Notifications", icon: User }
 ]
 
 function EditProfile() {
@@ -73,7 +73,7 @@ function EditProfile() {
       const base64data = reader.result // this is a data URI string (e.g., "data:image/png;base64,...")
       try {
         const id = currentUser._id
-        // console(base64data)
+        setProfilePictureFile(false);
         const response = await axios.put(
           `${import.meta.env.VITE_BACKEND_URL}/server/user/edituser/${id}`,
           { imageData: base64data }

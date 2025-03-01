@@ -61,7 +61,7 @@ const Home = () => {
               transition={{ delay: 0.4 }}
               className="text-xl md:text-2xl mb-8"
             >
-              One platform to showcase all your competitive programming profiles
+              One platform to showcase all your competitive programming and development profiles
             </motion.p>
             {!currentUser && (
               <motion.button
