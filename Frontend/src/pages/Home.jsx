@@ -180,7 +180,7 @@ const Home = () => {
                 isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              Why Choose CodeFolio?
+              Why Choose CodeVerse?
             </motion.h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

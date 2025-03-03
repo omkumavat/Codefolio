@@ -57,7 +57,7 @@ const About = () => {
             transition={{ delay: 0.2 }}
             className="text-4xl md:text-6xl font-bold text-white text-center mb-6"
           >
-            About CodeFolio
+            About CodeVerse
           </motion.h1>
           <motion.p
             initial={{ y: 20, opacity: 0 }}

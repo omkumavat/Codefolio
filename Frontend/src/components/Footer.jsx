@@ -38,7 +38,7 @@ const Footer = () => {
           >
             <div className="flex items-center space-x-2">
               <Code className="h-6 w-6 text-blue-400" />
-              <h3 className="text-xl font-bold">CodeFolio</h3>
+              <h3 className="text-xl font-bold">CodeVerse</h3>
             </div>
             <p className="text-gray-400 text-sm">
               Your one-stop platform for managing and showcasing your coding
@@ -47,7 +47,7 @@ const Footer = () => {
             </p>
             <div className="flex space-x-4">
               <SocialIcon
-                href="https://github.com/omkumavat/Codefolio"
+                href="https://github.com/omkumavat/CodeVerse"
                 icon={<Github className="h-5 w-5" />}
               />
               <SocialIcon href="/" icon={<Linkedin className="h-5 w-5" />} />
@@ -124,7 +124,7 @@ const Footer = () => {
           className="mt-8 pt-8 border-t border-gray-800 text-center"
         >
           <p className="text-gray-400 text-sm">
-            &copy; {new Date().getFullYear()} CodeFolio. All rights reserved.
+            &copy; {new Date().getFullYear()} CodeVerse. All rights reserved.
           </p>
         </motion.div>
       </div>

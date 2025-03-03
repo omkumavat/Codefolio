@@ -82,7 +82,7 @@ const Navbar = () => {
               <Code className="h-8 w-8 text-white" />
             </motion.div>
             <span className="text-white font-bold text-xl transition-colors queen">
-              CodeFolio
+              CodeVerse
             </span>
           </Link>
 

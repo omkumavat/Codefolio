@@ -40,7 +40,7 @@ export const sendOTPEmail = async (req, res) => {
     console.log(htmlContent); // Ensure OTP is rendering correctly
 
     const mailOptions = {
-        from: `CodeFolio <${process.env.MAIL_USER}>`,
+        from: `CodeVerse <${process.env.MAIL_USER}>`,
         to: email,
         subject: "Your OTP Verification Code",
         html: htmlContent,
@@ -65,7 +65,7 @@ export const sendSignUpSuccessfulEmail = async (req, res) => {
     let htmlContent = template({ name,username });
 
     const mailOptions = {
-        from: `CodeFolio <${process.env.MAIL_USER}>`,
+        from: `CodeVerse <${process.env.MAIL_USER}>`,
         to: email,
         subject: "Welcome to Our Platform",
         html: htmlContent,

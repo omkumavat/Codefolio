@@ -355,7 +355,7 @@ export const editUserbyId = async (req, res) => {
         const uploadResponse = await cloudinary.uploader.upload(
             `data:image/png;base64,${base64Image}`,
             {
-                folder: "CodeFolio",
+                folder: "CodeVerse",
                 use_filename: true,
                 unique_filename: true,
                 quality: "auto:best",
