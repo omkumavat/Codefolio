@@ -14,6 +14,7 @@ import codechef from "../../public/images/codechef.png"
 import codeforces from "../../public/images/codeforces.png"
 import github from "../../public/images/github.png"
 import home1 from '../../public/images/home1.avif'
+import Developers from "../components/Developers"
 
 const Home = () => {
   const { currentUser } = useAuth()
@@ -210,6 +211,10 @@ const Home = () => {
               ))}
             </div>
           </div>
+        </section>
+
+        <section>
+          <Developers/>
         </section>
       </div>
       <Footer />
