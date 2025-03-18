@@ -34,7 +34,7 @@ const Home = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className={`min-h-screen flex items-center justify-center text-white relative overflow-hidden ${
-            isDarkMode ? "bg-gray-100" : "bg-gradient-to-br from-white-500"
+            isDarkMode ? "bg-gray-900" : "bg-gradient-to-br from-white-500"
           }`}
         >
           <div className="absolute inset-0">
@@ -86,13 +86,13 @@ const Home = () => {
             )}
           </div>
         </motion.section>
-        <div className="py-8">
+        <div className="py-1 -mt-5">
           <ContestSection />
         </div>
 
         {/* Platforms Section */}
         <section
-          className={`py-20 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}
+          className={`py-20 -mt-5 -mb-10 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}
         >
           <div className="container mx-auto px-4">
             <motion.h2
@@ -172,12 +172,12 @@ const Home = () => {
         </section>
 
         {/* Benefits Section */}
-        <section className={`py-20 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+        <section className={`py-20 ${isDarkMode ? "bg-gray-900" : "bg-white"}`}>
           <div className="container mx-auto px-4">
             <motion.h2
               initial={{ y: 0, opacity: 90 }}
               animate={inView ? { y: 0, opacity: 1 } : {}}
-              className={`text-4xl font-bold text-center mb-10 ${
+              className={`text-4xl font-bold text-center mb-10 -mt-10 ${
                 isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >

@@ -5,6 +5,9 @@ import Navbar from '../components/Navbar';
 import { motion } from 'framer-motion';
 import { useTheme } from '../App';
 import contact2 from '../../public/images/contact2.avif'
+import axios from 'axios';
+import { ToastContainer, toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 const Contact = () => {
     const { isDarkMode } = useTheme();
@@ -23,24 +26,20 @@ const Contact = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/server/contact/contact`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            });
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/server/contact`, formData);
 
-            if (!response.ok) {
-                throw new Error("Failed to send data");
+            if (response.data.success) {
+                toast.success("Message sent successfuly !")
+                setFormData({
+                    fullName: '',
+                    email: '',
+                    message: '',
+                })
+            } else {
+                toast.error("Error sending message, try again later !")
             }
-
-            const data = await response.json();
-            // console("Response from server:", data);
-            alert("Message sent successfully!");
         } catch (error) {
-            console.error("Error:", error);
-            alert("Failed to send message.");
+            toast.error("Error sending message, try again later !")
         }
     };
 
@@ -48,6 +47,7 @@ const Contact = () => {
         <>
             <Navbar />
             {/* Header Section */}
+            <ToastContainer position="top-right" autoClose={3000} />
             <motion.section
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -84,14 +84,14 @@ const Contact = () => {
             </motion.section>
 
             {/* Intro Text */}
-            <div className={`text-center w-full max-w-4xl mx-auto p-10 ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
+            <div className={`text-center w-full max-w-4xl mx-auto p-10 ${isDarkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
                 <p>
                     "Contact Us" – Have a question or need assistance? We're here to help! Reach out via the form or email us directly, and we'll respond as soon as possible.
                 </p>
             </div>
 
             {/* Contact Form & Information Section */}
-            <div className={`flex items-center justify-center min-h-screen p-7 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-50 to-purple-50 text-black'}`}>
+            <div className={`flex items-center justify-center min-h-screen p-7 ${isDarkMode ? 'bg-black text-white' : 'bg-gradient-to-br from-blue-50 to-purple-50 text-black'}`}>
                 <div className={`w-full max-w-7xl rounded-xl shadow-2xl overflow-hidden flex flex-col md:flex-row ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
 
                     {/* Left Section - Contact Information */}
@@ -130,6 +130,7 @@ const Contact = () => {
                                     Full Name
                                 </label>
                                 <input
+                                required
                                     type="text"
                                     name="fullName"
                                     placeholder="Your Name"
@@ -146,6 +147,7 @@ const Contact = () => {
                                     Email
                                 </label>
                                 <input
+                                required
                                     type="email"
                                     name="email"
                                     placeholder="example@mail.com"
@@ -162,6 +164,7 @@ const Contact = () => {
                                     Message
                                 </label>
                                 <textarea
+                                required
                                     name="message"
                                     placeholder="Type your message here"
                                     value={formData.message}

@@ -261,7 +261,7 @@ const Signup = () => {
     <>
       <Navbar />
       <div
-        className={`min-h-screen flex items-center justify-center px-4 mt-[50px] ${isDarkMode
+        className={`min-h-screen flex items-center justify-center px-8   ${isDarkMode
             ? "bg-gray-900 text-white"
             : "bg-gradient-to-br from-white-600 to-blue-600 text-gray-900"
           }`}
@@ -271,12 +271,12 @@ const Signup = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className={`p-8 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden ${isDarkMode ? "bg-gray-800" : "bg-white"
+          className={`p-8 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden mt-20 ${isDarkMode ? "bg-gray-800" : "bg-white"
             }`}
         >
           {/* Animated background effect */}
           <div
-            className={`absolute inset-0 top-[30px] opacity-10 animate-pulse ${isDarkMode
+            className={`absolute inset-0 top-[0px] opacity-10 animate-pulse ${isDarkMode
                 ? "bg-gradient-to-r from-blue-900 to-indigo-900"
                 : "bg-gradient-to-r from-blue-200 to-indigo-200"
               }`}

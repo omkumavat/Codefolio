@@ -425,21 +425,21 @@ import Contactus from "../Models/Contact.js";  // Ensure correct path
 
 export const submitContactForm = async (req, res) => {
     try {
-        // console("Received Request Body:", req.body);
+       // console("Received Request Body:", req.body);
 
-        const { fullName, email, phone, message } = req.body;
+        const { fullName, email, message } = req.body;
 
-        if (!fullName || !email || !phone || !message) {
+        if (!fullName || !email || !message) {
             return res.status(400).json({ error: "All fields required" });
         }
 
-        const newContact = new Contactus({ fullName, email, phone, message });
+        const newContact = new Contactus({ fullName, email, message });
 
-        console.time("DB Save");
+        // console.time("DB Save");
         await newContact.save();
-        console.timeEnd("DB Save");
+        // console.timeEnd("DB Save");
 
-        res.status(201).json({ message: "Message sent successfully!" });
+        res.status(201).json({ success:true, message: "Message sent successfully!" });
     } catch (error) {
         console.error("Error in submitContactForm:", error);
         res.status(500).json({ error: "Server Error" });

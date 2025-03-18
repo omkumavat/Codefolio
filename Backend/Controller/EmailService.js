@@ -21,14 +21,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const sendOTPEmail = async (req, res) => {
-    console.log(req.body); // Check request body
+   // console(req.body); // Check request body
     const { name, email, otp } = req.body;
 
     if (!otp) {
         return res.status(400).json({ error: "OTP is missing in request body" });
     }
 
-    console.log(typeof otp, otp); // Check OTP value
+   // console(typeof otp, otp); // Check OTP value
 
     const Otp = typeof otp === "string" ? otp.split("") : [];
     
@@ -37,7 +37,7 @@ export const sendOTPEmail = async (req, res) => {
     const template = Handlebars.compile(templateSource);
     let htmlContent = template({ name, email, Otp });
 
-    console.log(htmlContent); // Ensure OTP is rendering correctly
+   // console(htmlContent); // Ensure OTP is rendering correctly
 
     const mailOptions = {
         from: `CodeVerse <${process.env.MAIL_USER}>`,

@@ -29,11 +29,11 @@ const Section = ({ title, icon, items, isDarkMode }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className={`section-card mb-8 p-4 rounded-xl shadow-lg ${isDarkMode ? "bg-black text-white" : "bg-white text-gray-900"
+            className={`section-card mb-8 p-4 rounded-xl shadow-lg ${isDarkMode ? "bg-black" : "bg-white"
                 }`}
         >
             <div className="icon-wrapper mb-4 bg-blue-100">{icon}</div>
-            <h2 className="text-2xl font-bold mb-6 taxt-black">{title}</h2>
+            <h2 className="text-2xl font-bold mb-6 text-black">{title}</h2>
             <ul className="space-y-4">
                 {items.map((item, index) => (
                     <li
