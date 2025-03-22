@@ -188,7 +188,7 @@ export const checkUserProfile = async (req, res) => {
             contestRatings.push(leetCodeProfile.contests.contestRating);
         }
 
-        if (geeksforgeeksProfile && geeksforgeeksProfile.contestRating) {
+        if (geeksforgeeksProfile && geeksforgeeksProfile?.contestRating) {
             contestRatings.push(parseInt(geeksforgeeksProfile.contestRating[2]));
         }
         const avgContestRating = contestRatings.length > 0
