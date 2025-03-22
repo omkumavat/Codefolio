@@ -534,7 +534,7 @@ function Profile() {
                         <Trophy className="text-yellow-500" />
                       </div>
                       <p className={`text-3xl font-bold mt-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                        {user.avgContestRating.toFixed(2)}
+                        {user?.avgContestRating?.toFixed(2)}
                       </p>
                     </div>
                   )

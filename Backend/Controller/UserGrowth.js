@@ -164,9 +164,6 @@ export const checkUserProfile = async (req, res) => {
         // console(allActivityData.length);
         const heatMapData = groupByYear(aggregatedActivity);
 
-        // --- Calculate Summary Metrics ---
-
-        // Total active days: count unique dates with any activity.
         const totalActiveDays = Object.keys(aggregatedActivity).length;
 
         // Sum total submissions and contributions.
@@ -203,9 +200,7 @@ export const checkUserProfile = async (req, res) => {
         if (codeforcesProfile && codeforcesProfile.problemSolved) {
             totalProblemsSolved += codeforcesProfile.problemSolved;
         }
-        // if (codechefProfile && codechefProfile.problemSolved) {
-        //     totalProblemsSolved += codechefProfile.problemSolved;
-        // }
+
         if (leetCodeProfile && leetCodeProfile.profile && leetCodeProfile.profile.totalSolved) {
             totalProblemsSolved += leetCodeProfile.profile.totalSolved;
         }
@@ -227,7 +222,7 @@ export const checkUserProfile = async (req, res) => {
         if (codeforcesProfile && codeforcesProfile?.problemsSolvedByRating) {
             const arr = codeforcesProfile?.problemsSolvedByRating;
             // // console(arr);
-            if (arr[arr.length - 1][0] >= 1400) {
+            if ((arr.length-1)>2 && arr[arr.length - 1][0] >= 1400) {
                 hardProblemsSolved += arr[arr.length - 1][1].length;
             }
         }
