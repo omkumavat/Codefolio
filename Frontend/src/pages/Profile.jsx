@@ -179,14 +179,17 @@ function Profile() {
         } else {
           alert("Username not found");
         }
+
       } catch (error) {
         // console(error);
       } finally {
+        // console.log(platforms)
         setloading(false); // Stop loading once data is fetched
       }
     };
 
     fetchUser();
+    // console.log(platforms)
   }, [username]);
 
 
@@ -697,7 +700,7 @@ function Profile() {
                 {platforms.map((platform, index) => (
 
                   platform.show && (
-                    <Link to={`/user/${username}/${platform.name.toLowerCase()}`} key={index}>
+                    <Link to={`/user/${username}/${platform?.name?.toLowerCase()}`} key={index}>
                       <div
                         className={`p-6 rounded-xl transition-transform duration-300 hover:scale-105 ${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-lg'} cursor-pointer`}
                       >
@@ -705,8 +708,8 @@ function Profile() {
                           <div className="flex items-center space-x-3">
                             <div className="flex justify-center items-center">
                               <img
-                                src={platform.logo}
-                                alt={`${platform.name} Logo`}
+                                src={platform?.logo}
+                                alt={`${platform?.name} Logo`}
                                 className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 object-cover rounded-lg"
                               />
                             </div>
@@ -719,20 +722,20 @@ function Profile() {
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-                          {platform.solved && platform.solved !== 0 && (
+                          {platform?.solved && platform?.solved !== 0 && (
                             <div>
                               <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Problems Solved</p>
                               <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                                {platform.solved || 0}
+                                {platform?.solved}
                               </p>
                             </div>
                           )}
 
-                          {platform.rating && platform.rating !== 0 && (
+                          {platform?.rating && platform?.rating !== 0 && (
                             <div>
                               <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Rating</p>
                               <p className="text-2xl font-bold text-sky-500">
-                                {platform.rating || 1}
+                                {platform?.rating}
                               </p>
                             </div>
                           )}
@@ -740,39 +743,39 @@ function Profile() {
 
 
                           {/* Conditional Rendering for Rank */}
-                          {platform.pos && platform.pos !== "" && (
+                          {platform?.pos && platform?.pos !== "" && (
                             <div className="col-span-2">
                               <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Rank</p>
                               <p className="text-2xl font-bold text-yellow-500">
-                                {platform.pos}
+                                {platform?.pos}
                               </p>
                             </div>
                           )}
 
-                          {platform.rank && platform.rank !== 0 && (
+                          {platform?.rank && parseInt(platform?.rank) !== 0 && (
                             <div className="col-span-2">
                               <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Rank</p>
                               <p className="text-2xl font-bold text-yellow-500">
-                                {platform.rank}
+                                {platform?.rank}
                               </p>
                             </div>
                           )}
 
                           {/* Conditional Rendering for Stars */}
-                          {platform.stars && (
+                          {platform?.stars && (
                             <div className="col-span-2">
                               <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Stars</p>
                               <p className="text-2xl font-bold text-yellow-500">
-                                {platform.stars}
+                                {platform?.stars}
                               </p>
                             </div>
                           )}
 
-                          {platform.repo && platform.repo !== 0 && (
+                          {platform?.repo && platform?.repo !== 0 && (
                             <div>
                               <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Repositories</p>
                               <p className="text-2xl font-bold text-yellow-500">
-                                {platform.repo}
+                                {platform?.repo}
                               </p>
                             </div>
                           )}
@@ -781,7 +784,7 @@ function Profile() {
                             <div>
                               <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Contributions</p>
                               <p className="text-2xl font-bold text-yellow-500">
-                                {platform.contributions}
+                                {platform?.contributions}
                               </p>
                             </div>
                           )}
