@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ArrowRight, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import { useAuth } from "../Context/AuthProvider"
+import { useAuth } from "../../Context/AuthProvider"
 import { useNavigate } from "react-router-dom";
 function Login({ onSwitchToSignup }) {
   const [showPassword, setShowPassword] = useState(false);
