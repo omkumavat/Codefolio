@@ -144,7 +144,7 @@ const Navbar = () => {
               >
                 <Link
                   onClick={() => window.scrollTo(0, 0)}
-                  to="/login"
+                  to="/signup"
                   className="bg-white text-sky-600 px-4 py-2 rounded-full font-medium hover:bg-sky-50 transition-colors flex items-center space-x-1"
                 >
                   <LogIn className="h-4 w-4" />

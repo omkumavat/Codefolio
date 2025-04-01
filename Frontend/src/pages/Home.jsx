@@ -66,7 +66,7 @@ const Home = () => {
             </motion.p>
             {!currentUser && (
               <motion.button
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/signup")}
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.6 }}

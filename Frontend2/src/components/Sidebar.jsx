@@ -1,0 +1,57 @@
+import React from "react"
+import { NavLink } from "react-router-dom"
+import {
+  LayoutDashboard,
+  Users,
+  BarChart2,
+  Settings,
+  ChevronLeft,
+  ChevronRight
+} from "lucide-react"
+
+const Sidebar = ({ isOpen, toggle }) => {
+  const menuItems = [
+    { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    {
+      path: "/dashboard/compare",
+      icon: BarChart2,
+      label: "Compare Candidates"
+    },
+    { path: "/dashboard/candidates", icon: Users, label: "Candidates" },
+    { path: "/dashboard/settings", icon: Settings, label: "Settings" }
+  ]
+
+  return (
+    <aside
+      className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white shadow-lg transition-all duration-300 ${
+        isOpen ? "w-64" : "w-20"
+      }`}
+    >
+      <button
+        onClick={toggle}
+        className="absolute -right-3 top-6 bg-indigo-600 text-white rounded-full p-1 shadow-lg"
+      >
+        {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+      </button>
+
+      <div className="py-4">
+        {menuItems.map(item => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) =>
+              `flex items-center px-4 py-3 ${
+                isActive ? "bg-indigo-50 text-indigo-600" : "text-gray-700"
+              } hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200`
+            }
+          >
+            <item.icon className="h-5 w-5" />
+            <span className={`ml-4 ${!isOpen && "hidden"}`}>{item.label}</span>
+          </NavLink>
+        ))}
+      </div>
+    </aside>
+  )
+}
+
+export default Sidebar

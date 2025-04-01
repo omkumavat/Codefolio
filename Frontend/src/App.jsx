@@ -2,7 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from "react"
 import { Routes, Route } from "react-router-dom"
 import Home from "./pages/Home"
 import Login from "./pages/Login"
-import Signup from "./pages/Signup"
+// import Signup2 from "./pages/Signup2"
+import AuthForm from "./components/AuthComponents/AuthForm"
 import About from "./pages/About"
 import LeetCode from "./Profiles/LeetCode"
 import CodeChef from "./Profiles/CodeChef"
@@ -53,19 +54,19 @@ function App() {
         <main className="flex-grow pt-0">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route
+            {/* <Route
               path="/login"
               element={
                 <ProtectedRouteForLogin>
                   <Login />
                 </ProtectedRouteForLogin>
               }
-            />
+            /> */}
             <Route
               path="/signup"
               element={
                 <ProtectedRouteForLogin>
-                  <Signup />
+                  <AuthForm />
                 </ProtectedRouteForLogin>
               }
             />
