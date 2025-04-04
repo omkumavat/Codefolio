@@ -26,9 +26,9 @@ export const updateCodeforcesUserData = async (username) => {
   }
 
   // Construct API URLs using environment variables
-  const submissionsUrl = `${process.env.CODEFORCES_API_STATUS}${username}&from=1&count=1000`;
-  const userInfoUrl = `${process.env.CODEFORCES_API_USER}${username}`;
-  const contestRatingUrl = `${process.env.CODEFORCES_API_RATING}${username}`;
+  const submissionsUrl = `${process.env.CODEFORCES_API_STATUS}${existingCodeforcesUser.username}&from=1&count=1000`;
+  const userInfoUrl = `${process.env.CODEFORCES_API_USER}${existingCodeforcesUser.username}`;
+  const contestRatingUrl = `${process.env.CODEFORCES_API_RATING}${existingCodeforcesUser.username}`;
 
   // Fetch data concurrently from Codeforces APIs
   const [submissionsResponse, userInfoResponse, contestRatingResponse] = await Promise.all([
@@ -62,6 +62,8 @@ export const updateCodeforcesUserData = async (username) => {
   const problemsSolvedByRating = Object.entries(problemsByRating)
     .map(([rating, problemSet]) => [parseInt(rating), Array.from(problemSet)])
     .sort((a, b) => a[0] - b[0]);
+  console.log(problemsByRating);
+  
 
   // Process contest rating info from Codeforces
   const contestRatingInfo = contestRatingRaw.map((contest) => ({

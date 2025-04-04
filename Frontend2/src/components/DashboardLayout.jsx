@@ -11,7 +11,6 @@ const DashboardLayout = () => {
       <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
       <Sidebar
         isOpen={sidebarOpen}
-        toggle={() => setSidebarOpen(!sidebarOpen)}
       />
       <main
         className={`pt-16 ${

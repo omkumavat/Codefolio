@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import DashboardLayout from "./components/DashboardLayout"
 import Dashboard from "./pages/Dashboard"
 import CompareCandidate from "./pages/CompareCandidate"
+import ComparisonResultPage from "./components/CompareCandidates/ComparisonResultPage"
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="compare" element={<CompareCandidate />} />
-          {/* Add more routes as needed */}
+          <Route path="compare/result/:username1/:username2" element={<ComparisonResultPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

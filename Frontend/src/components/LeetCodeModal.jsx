@@ -12,7 +12,7 @@ const LeetCodeModal = ({ isModalOpen, setToast, setIsModalOpen }) => {
   const { isDarkMode } = useTheme()
   const [username, setUsername] = useState("")
   const [isVerifying, setIsVerifying] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(60)
+  const [timeLeft, setTimeLeft] = useState(30)
   const [notValid, setNotValid] = useState("")
   const [verificationStep1, setVerificationStep1] = useState("")
   const [verificationStep2, setVerificationStep2] = useState("")

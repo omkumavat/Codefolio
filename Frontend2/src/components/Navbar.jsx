@@ -16,19 +16,11 @@ const Navbar = ({ toggleSidebar }) => {
           <div className="flex items-center">
             <button
               onClick={toggleSidebar}
-              className="p-2 rounded-md text-gray-700 hover:bg-gray-100 lg:hidden"
+              className="p-2 rounded-md text-gray-700 hover:bg-gray-100 "
             >
               <Menu className="h-6 w-6" />
             </button>
-            {showBackButton && (
-              <button
-                onClick={() => navigate(-1)}
-                className="mr-4 p-2 rounded-md text-gray-700 hover:bg-gray-100 flex items-center"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
-            )}
-            <h1 className="text-2xl font-bold text-indigo-600">DevMetrics</h1>
+            <h1 className="text-2xl font-bold text-indigo-600">CodeVerse - Dashboard</h1>
           </div>
 
           <div className="relative">
@@ -37,9 +29,8 @@ const Navbar = ({ toggleSidebar }) => {
               className="flex items-center space-x-2"
             >
               <div className="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center">
-                <span className="text-white font-semibold">A</span>
+                <span className="text-white font-semibold">C</span>
               </div>
-              <ChevronDown className="h-4 w-4 text-gray-500" />
             </button>
 
             {profileOpen && (
@@ -50,8 +41,8 @@ const Navbar = ({ toggleSidebar }) => {
                   }}
                   className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  <span>Logout</span>
+                  <LogOut className="h-4 w-4 mr-2 text-red-500" />
+                  <span className="text-red-500">Logout</span>
                 </button>
               </div>
             )}
