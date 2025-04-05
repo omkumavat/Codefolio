@@ -41,9 +41,6 @@ const rankMap = {
     "legendary grandmaster": 10
 };
 
-// comparePlatform uses a switch-case to compare metrics for each platform.
-// It returns an object with the comparison metrics (a row of metrics for each candidate),
-// individual scores and a platform winner.
 export const comparePlatform = (platform, data1, data2) => {
     let score1 = 0;
     let score2 = 0;

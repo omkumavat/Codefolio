@@ -5,4 +5,6 @@ import { searchCandidates,compareTwoCandidates } from '../../Controller/Dashboar
 
 router.get('/search/candidates', searchCandidates);
 router.post('/compare/two', compareTwoCandidates);
+
+
 export default router;

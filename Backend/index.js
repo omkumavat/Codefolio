@@ -50,6 +50,9 @@ app.use('/server/github',GitHub);
 import CompareCandidate from './Routes/Dashboard/CompareCandidate.js';
 app.use('/server/dashboard/comparecandidate',CompareCandidate);
 
+import Stats from './Routes/Dashboard/Stats.js';
+app.use('/server/dashboard/stats',Stats);
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, '..', 'src', 'public')));

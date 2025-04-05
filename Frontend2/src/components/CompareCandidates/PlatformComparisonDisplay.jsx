@@ -20,7 +20,7 @@ const PlatformComparisonDisplay = ({ platform, data, candidate1, candidate2 }) =
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl shadow-2xl mb-6 transition-transform transform hover:scale-105">
+    <div className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl shadow-2xl mb-6 transition-transform transform ">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-2xl font-bold text-indigo-700">{platformName} Comparison</h3>
         {data?.platformWinner !== 'tie' ? (
