@@ -11,7 +11,7 @@ function Login({ onSwitchToSignup }) {
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login, currentUser } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate()
 
   const togglePasswordVisibility = () => {

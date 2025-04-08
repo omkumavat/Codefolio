@@ -83,7 +83,7 @@ export const sendSignUpSuccessfulEmail = async (req, res) => {
 
 
 export const sendVerificationEmail = async (email, token) => {
-    const verificationUrl = `http://localhost:5173/verify?token=${token}`;
+    const verificationUrl = `https://admin-codeverse.vercel.app/verify?token=${token}`;
 
     const templatePath = path.join(__dirname, "../views", 'Verification.hbs');
     const templateSource = fs.readFileSync(templatePath, "utf-8");

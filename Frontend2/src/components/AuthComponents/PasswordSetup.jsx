@@ -60,7 +60,7 @@ const PasswordSetup = () => {
         setToken(t);
 
         if (!t) {
-            setIsValidToken(false); // 🔴 Token not found in URL, treat as invalid
+            navigate('/', { replace: true });
             return;
         }
 
@@ -125,7 +125,7 @@ const PasswordSetup = () => {
                         <h2 className="text-3xl font-bold text-white mb-4">Registration Complete!</h2>
                         <p className="text-gray-300 mb-8">{message}</p>
                         <a
-                            href="/login"
+                            href="/"
                             className="inline-block bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 transition-all duration-200 hover:scale-105 transform"
                         >
                             Proceed to Login

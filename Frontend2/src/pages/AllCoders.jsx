@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
     Search,
-    Trophy,
     RefreshCw,
     ChevronUp,
     ChevronDown,
@@ -12,74 +11,6 @@ import {
 import { DownloadTableExcel } from "react-export-table-to-excel";
 import { Link } from "react-router-dom";
 import { useTheme } from "../App";
-
-const mockUsers = [
-    {
-        username: "john_doe",
-        name: "John Doe",
-        email: "john@example.com",
-        college: "MIT",
-        branch: "Computer Science",
-        totalActiveDays: 30,
-        GeeksforGeeks: 150,
-        LeetCode: 200,
-        CodeChef: 100,
-        CodeForces: 120,
-        Github: 50,
-    },
-    {
-        username: "jane_smith",
-        name: "Jane Smith",
-        email: "jane@example.com",
-        college: "Stanford",
-        branch: "Electrical Engineering",
-        totalActiveDays: 45,
-        GeeksforGeeks: 180,
-        LeetCode: 250,
-        CodeChef: 130,
-        CodeForces: 140,
-        Github: 60,
-    },
-    {
-        username: "alex_wong",
-        name: "Alex Wong",
-        email: "alex@example.com",
-        college: "Harvard",
-        branch: "Computer Science",
-        totalActiveDays: 60,
-        GeeksforGeeks: 220,
-        LeetCode: 300,
-        CodeChef: 150,
-        CodeForces: 180,
-        Github: 80,
-    },
-    {
-        username: "sara_lee",
-        name: "Sara Lee",
-        email: "sara@example.com",
-        college: "MIT",
-        branch: "Electrical Engineering",
-        totalActiveDays: 25,
-        GeeksforGeeks: 120,
-        LeetCode: 180,
-        CodeChef: 90,
-        CodeForces: 100,
-        Github: 40,
-    },
-    {
-        username: "mike_chen",
-        name: "Mike Chen",
-        email: "mike@example.com",
-        college: "Stanford",
-        branch: "Computer Science",
-        totalActiveDays: 40,
-        GeeksforGeeks: 160,
-        LeetCode: 220,
-        CodeChef: 110,
-        CodeForces: 130,
-        Github: 55,
-    },
-];
 
 const AllCoders = () => {
     const {isDarkMode}=useTheme();
@@ -119,7 +50,7 @@ const AllCoders = () => {
         setIsLoading(true);
         try {
             setError(null);
-            const response = await fetch("http://localhost:4000/server/dashboard/allcoders/get-all");
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/dashboard/allcoders/get-all`);
             if (!response.ok)
                 throw new Error(`HTTP error! status: ${response.status}`);
             const result = await response.json();

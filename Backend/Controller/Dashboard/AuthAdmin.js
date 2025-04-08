@@ -129,7 +129,7 @@ export const LoginAdmin = async (req, res) => {
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        
+
         if (!isPasswordValid) {
             return res.status(403).json({
                 success: false,
@@ -180,3 +180,46 @@ export const LoginAdmin = async (req, res) => {
         });
     }
 };
+
+
+export const getAdmins = async (req, res) => {
+    try {
+
+        const admins = await Admin.find({})
+
+        if (!admins) {
+            return res.status(404).json({ message: "No admins found" })
+        }
+
+
+        res.status(200).json(admins)
+    } catch (error) {
+        // Log the error and return a 500 response
+        console.error("Error fetching admins:", error)
+        res.status(500).json({ error: "An error occurred while fetching admins." })
+    }
+}
+
+export const changeAdminStatus = async (req, res) => {
+    try {
+
+        const { id } = req.params;
+        const admins = await Admin.findById(id)
+
+        if (!admins) {
+            return res.status(404).json({ message: "No admins found" })
+        }
+
+        admins.isVerified = !admins.isVerified;
+        await admins.save()
+
+        res.status(200).json({
+            success: true
+        })
+    } catch (error) {
+        // Log the error and return a 500 response
+        console.error("Error fetching admins:", error)
+        res.status(500).json({ error: "An error occurred while fetching admins." })
+    }
+}
+

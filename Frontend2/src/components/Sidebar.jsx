@@ -1,17 +1,15 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, BarChart2, Settings } from "lucide-react";
+import { LayoutDashboard, Users, BarChart2 } from "lucide-react";
 import { useTheme } from "../App";
-import { useAuth } from "../Context/AuthProvider";
 
 const Sidebar = ({ isOpen }) => {
-  const {currentUser}=useAuth();
   const { isDarkMode } = useTheme();
   const menuItems = [
     { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { path: "/dashboard/compare", icon: BarChart2, label: "Compare Candidates" },
-    { path: "/dashboard/all-coders", icon: Users, label: "Candidates" },
-    { path: "/dashboard/settings", icon: Settings, label: "Settings" },
+    { path: "/dashboard/all-coders", icon: Users, label: "All Coders" },
+    { path: "/dashboard/all-admins", icon: Users, label: "All Admins" },
   ];
 
   return (

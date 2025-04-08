@@ -338,16 +338,16 @@ const Navbar = () => {
                       {
                         typeof item.icon === "string" ? (
                           <>
-                          <img
-                          src={item.icon}
-                          className="h-8 w-10"
-                          ></img>
+                            <img
+                              src={item.icon}
+                              className="h-8 w-10"
+                            ></img>
                           </>
-                        ): (
+                        ) : (
                           <span>{item.icon}</span>
                         )
                       }
-                      
+
                       <span>{item.text}</span>
                     </Link>
                   ))}

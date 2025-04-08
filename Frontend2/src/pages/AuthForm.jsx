@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
 import Login from "../components/AuthComponents/Login";
 import Signup from "../components/AuthComponents/Signup";
 import { motion } from "framer-motion";
@@ -10,12 +8,6 @@ function AuthForm() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center mt-10 p-4 bg-white relative">
-            {/* Back to Home Button */}
-            <Link to="/" className="absolute top-10 left-24 ml-24 -mt-10 flex items-center text-blue-600 hover:text-blue-800">
-                <ArrowLeft className="h-5 w-5 mr-1" />
-                Back to Home
-            </Link>
-
             {/* Main Container */}
             <div className="max-w-4xl w-full bg-white rounded-lg overflow-hidden">
                 <div className="flex flex-col lg:flex-row">
@@ -28,12 +20,6 @@ function AuthForm() {
                             Join our community of coders and developers. Share your journey, skills,
                             and connect with like-minded people.
                         </p>
-                        {/* <h2 className="text-4xl font-bold mb-4">Welcome to</h2>
-                        <h2 className="text-4xl font-bold mb-4">CodeVerse</h2>
-                        <p className="text-lg text-gray-600 text-center">
-                            Join our community of coders and developers. Share your journey, skills,
-                            and connect with like-minded people.
-                        </p> */}
                     </div>
 
                     {/* Right Side - Auth Forms */}
