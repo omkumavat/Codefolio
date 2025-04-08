@@ -215,7 +215,7 @@ const Navbar = () => {
 
                 <MobileNavLink
                   onClick={() => window.scrollTo(0, 0)}
-                  to="/login"
+                  to="/signup"
                   text="Login"
                   isDarkMode={isDarkMode}
                 />

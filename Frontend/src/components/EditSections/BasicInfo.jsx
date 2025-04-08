@@ -29,8 +29,8 @@ const AutoCompleteInput = ({
   // Filter options based on input (case-insensitive)
   const filteredOptions = inputValue
     ? optionsArray.filter(opt =>
-        opt.college.toLowerCase().includes(inputValue.toLowerCase())
-      )
+      opt.college.toLowerCase().includes(inputValue.toLowerCase())
+    )
     : optionsArray
 
   const handleChange = e => {
@@ -65,20 +65,18 @@ const AutoCompleteInput = ({
         value={inputValue}
         onChange={handleChange}
         disabled={disabled}
-        className={`px-3 py-2 border rounded-lg w-full ${
-          isDarkMode
+        className={`px-3 py-2 border rounded-lg w-full ${isDarkMode
             ? "bg-gray-800 text-white border-gray-700 disabled:bg-gray-600"
             : "bg-white text-gray-900 border-gray-300 disabled:bg-gray-100"
-        }`}
+          }`}
         placeholder="Search College"
       />
       {isOpen && filteredOptions.length > 0 && (
         <div
-          className={`absolute z-40 mt-1 rounded-lg ${
-            isDarkMode
+          className={`absolute z-40 mt-1 rounded-lg ${isDarkMode
               ? "bg-gray-800 border border-gray-700"
               : "bg-white border border-gray-300"
-          }`}
+            }`}
           style={{ width: "100%", maxHeight: 200 }}
         >
           <List
@@ -119,7 +117,7 @@ const BasicInfo = () => {
   // Local state for fetched options
   const [collegeOptions, setCollegeOptions] = useState([])
   const [editMode, setEditMode] = useState(false)
-
+  const [loading,setLoading]=useState(false);
   const [selectedCountry, setSelectedCountry] = useState(fields.country)
   const [selectedState, setSelectedState] = useState(fields.state)
   const [stateOptions, setStateOptions] = useState([])
@@ -168,13 +166,11 @@ const BasicInfo = () => {
   }
 
   const fetchUpdatedUser = async () => {
-    setloading(true);
     try {
       if (!currentUser?._id) {
         // console("No valid user ID found")
         return
       }
-
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/server/user/get-user/${currentUser._id}`
       )
@@ -185,13 +181,12 @@ const BasicInfo = () => {
       }
     } catch (error) {
       console.error("Unable to fetch user", error)
-    } finally {
-      setloading(false); // Always reset loading state
     }
   }
 
   // Dummy save handler
   const handleSave = async () => {
+    setLoading(true)
     // console("Saved fields:", fields)
     const id = currentUser._id
     const response = await axios.put(
@@ -199,60 +194,56 @@ const BasicInfo = () => {
       fields
     )
     if (response.data.success) {
+      await fetchUpdatedUser()
       toast.success("Profile updated successfully ..!")
-      fetchUpdatedUser()
       setEditMode(false)
       // console("User updated successfully")
     } else {
       toast.success("Failed to update Profile ..!")
     }
+    setLoading(false);
   }
   return (
     <>
       <div
-        className={`rounded-xl shadow-sm p-6 ${
-          isDarkMode ? "bg-gray-800" : "bg-white"
-        }`}
+        className={`rounded-xl shadow-sm p-6 ${isDarkMode ? "bg-gray-800" : "bg-white"
+          }`}
       >
         <ToastContainer position="top-right" autoClose={3000} />
         <h3
-          className={`text-lg font-semibold mb-6 ${
-            isDarkMode ? "text-gray-200" : "text-gray-800"
-          }`}
+          className={`text-lg font-semibold mb-6 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+            }`}
         >
           Basic Information
         </h3>
-        <button
+        {/* <button
           onClick={() => (editMode ? setEditMode(false) : setEditMode(true))}
-          className={`p-2 ${
-            isDarkMode
+          className={`p-2 ${isDarkMode
               ? "text-gray-400 hover:text-gray-300"
               : "text-gray-400 hover:text-gray-600"
-          }`}
+            }`}
         >
           <Pencil size={18} />
-        </button>
+        </button> */}
         <div className="space-y-6">
           {/* Name */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between">
             <label
-              className={`w-full sm:w-1/3 text-sm font-medium ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`w-full sm:w-1/3 text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Name
             </label>
             <div className="w-full sm:w-2/3">
               <input
-                disabled={!editMode}
+                // disabled={!editMode}
                 type="text"
                 value={fields.name}
                 onChange={e => handleChange("name", e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg ${
-                  isDarkMode
+                className={`w-full px-3 py-2 border rounded-lg ${isDarkMode
                     ? "bg-gray-700 text-white border-gray-600"
                     : "bg-white text-gray-900 border-gray-300"
-                }`}
+                  }`}
               />
             </div>
           </div>
@@ -260,33 +251,30 @@ const BasicInfo = () => {
           {/* Mobile */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between">
             <label
-              className={`w-full sm:w-1/3 text-sm font-medium ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`w-full sm:w-1/3 text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Mobile No.
             </label>
             <div className="w-full sm:w-2/3 flex items-center">
               <div className="flex items-center">
                 <span
-                  className={`px-3 py-2 border border-r-0 rounded-l-lg ${
-                    isDarkMode
+                  className={`px-3 py-2 border border-r-0 rounded-l-lg ${isDarkMode
                       ? "bg-gray-600 text-gray-200"
                       : "bg-gray-100 text-gray-700"
-                  }`}
+                    }`}
                 >
                   +91
                 </span>
                 <input
-                  disabled={!editMode}
+                  // disabled={!editMode}
                   type="text"
                   value={fields.mobileno}
                   onChange={e => handleChange("mobileno", e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-r-lg ${
-                    isDarkMode
+                  className={`w-full px-3 py-2 border rounded-r-lg ${isDarkMode
                       ? "bg-gray-700 text-white border-gray-600"
                       : "bg-white text-gray-900 border-gray-300"
-                  }`}
+                    }`}
                 />
               </div>
             </div>
@@ -295,23 +283,21 @@ const BasicInfo = () => {
           {/* Location */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between">
             <label
-              className={`w-full sm:w-1/3 text-sm font-medium ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`w-full sm:w-1/3 text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Location
             </label>
             <div className="w-full sm:w-2/3 flex items-center">
               <div className="grid grid-cols-3 gap-2 flex-1">
                 <select
-                  disabled={!editMode}
+                  // disabled={!editMode}
                   value={selectedCountry}
                   onChange={e => setSelectedCountry(e.target.value)}
-                  className={`px-3 py-2 border rounded-lg ${
-                    isDarkMode
+                  className={`px-3 py-2 border rounded-lg ${isDarkMode
                       ? "bg-gray-700 text-white border-gray-600"
                       : "bg-white text-gray-900 border-gray-300"
-                  }`}
+                    }`}
                 >
                   <option value="">Select Country</option>
                   {countries.map(ct => (
@@ -321,14 +307,13 @@ const BasicInfo = () => {
                   ))}
                 </select>
                 <select
-                  disabled={!editMode}
+                  // disabled={!editMode}
                   value={selectedState}
                   onChange={e => setSelectedState(e.target.value)}
-                  className={`px-3 py-2 border rounded-lg ${
-                    isDarkMode
+                  className={`px-3 py-2 border rounded-lg ${isDarkMode
                       ? "bg-gray-700 text-white border-gray-600"
                       : "bg-white text-gray-900 border-gray-300"
-                  }`}
+                    }`}
                 >
                   <option value="">Select State</option>
                   {stateOptions.map(st => (
@@ -338,14 +323,13 @@ const BasicInfo = () => {
                   ))}
                 </select>
                 <select
-                  disabled={!editMode}
+                  // disabled={!editMode}
                   value={fields.city}
                   onChange={e => handleChange("city", e.target.value)}
-                  className={`px-3 py-2 border rounded-lg ${
-                    isDarkMode
+                  className={`px-3 py-2 border rounded-lg ${isDarkMode
                       ? "bg-gray-700 text-white border-gray-600"
                       : "bg-white text-gray-900 border-gray-300"
-                  }`}
+                    }`}
                 >
                   <option value="">Select City</option>
                   {cityOptions.map(ct => (
@@ -361,23 +345,21 @@ const BasicInfo = () => {
           {/* Birthday */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between">
             <label
-              className={`w-full sm:w-1/3 text-sm font-medium ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`w-full sm:w-1/3 text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Birthday
             </label>
             <div className="w-full sm:w-2/3">
               <input
-                disabled={!editMode}
+                // disabled={!editMode}
                 type="date"
                 value={fields.birthdate}
                 onChange={e => handleChange("birthdate", e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg ${
-                  isDarkMode
+                className={`w-full px-3 py-2 border rounded-lg ${isDarkMode
                     ? "bg-gray-700 text-white border-gray-600"
                     : "bg-white text-gray-900 border-gray-300"
-                }`}
+                  }`}
               />
             </div>
           </div>
@@ -385,23 +367,21 @@ const BasicInfo = () => {
           {/* Bio */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between">
             <label
-              className={`w-full sm:w-1/3 text-sm font-medium ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`w-full sm:w-1/3 text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Bio
             </label>
             <div className="w-full sm:w-2/3">
               <textarea
-                disabled={!editMode}
+                // disabled={!editMode}
                 value={fields.bio}
                 onChange={e => handleChange("bio", e.target.value)}
                 rows={3}
-                className={`w-full px-3 py-2 border rounded-lg resize-none ${
-                  isDarkMode
+                className={`w-full px-3 py-2 border rounded-lg resize-none ${isDarkMode
                     ? "bg-gray-700 text-white border-gray-600"
                     : "bg-white text-gray-900 border-gray-300"
-                }`}
+                  }`}
               ></textarea>
             </div>
           </div>
@@ -409,23 +389,21 @@ const BasicInfo = () => {
           {/* Skills */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between">
             <label
-              className={`w-full sm:w-1/3 text-sm font-medium ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`w-full sm:w-1/3 text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Skills
             </label>
             <div className="w-full sm:w-2/3">
               <textarea
-                disabled={!editMode}
+                // disabled={!editMode}
                 value={fields.skills}
                 onChange={e => handleChange("skills", e.target.value)}
                 rows={3}
-                className={`w-full px-3 py-2 border rounded-lg resize-none ${
-                  isDarkMode
+                className={`w-full px-3 py-2 border rounded-lg resize-none ${isDarkMode
                     ? "bg-gray-700 text-white border-gray-600"
                     : "bg-white text-gray-900 border-gray-300"
-                }`}
+                  }`}
               ></textarea>
             </div>
           </div>
@@ -433,23 +411,21 @@ const BasicInfo = () => {
           {/* Website */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between">
             <label
-              className={`w-full sm:w-1/3 text-sm font-medium ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`w-full sm:w-1/3 text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Website
             </label>
             <div className="w-full sm:w-2/3">
               <input
-                disabled={!editMode}
+                // disabled={!editMode}
                 type="url"
                 value={fields.website}
                 onChange={e => handleChange("website", e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg ${
-                  isDarkMode
+                className={`w-full px-3 py-2 border rounded-lg ${isDarkMode
                     ? "bg-gray-700 text-white border-gray-600"
                     : "bg-white text-gray-900 border-gray-300"
-                }`}
+                  }`}
               />
             </div>
           </div>
@@ -457,23 +433,21 @@ const BasicInfo = () => {
           {/* Position */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between">
             <label
-              className={`w-full sm:w-1/3 text-sm font-medium ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`w-full sm:w-1/3 text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Position
             </label>
             <div className="w-full sm:w-2/3">
               <input
-                disabled={!editMode}
+                // disabled={!editMode}
                 type="text"
                 value={fields.position}
                 onChange={e => handleChange("position", e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg ${
-                  isDarkMode
+                className={`w-full px-3 py-2 border rounded-lg ${isDarkMode
                     ? "bg-gray-700 text-white border-gray-600"
                     : "bg-white text-gray-900 border-gray-300"
-                }`}
+                  }`}
               />
             </div>
           </div>
@@ -481,9 +455,8 @@ const BasicInfo = () => {
           {/* Education */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between">
             <label
-              className={`w-full sm:w-1/3 text-sm font-medium ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`w-full sm:w-1/3 text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Education
             </label>
@@ -491,45 +464,42 @@ const BasicInfo = () => {
               <div className="grid grid-cols-2 gap-4">
                 <AutoCompleteInput
                   isDarkMode={isDarkMode}
-                  disabled={!editMode}
+                  // disabled={!editMode}
                   options={collegeOptions}
                   selected={fields.college}
                   onSelect={value => handleChange("college", value)}
                 />
                 <input
-                  disabled={!editMode}
+                  // disabled={!editMode}
                   type="text"
                   value={fields.degree}
                   onChange={e => handleChange("degree", e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg ${
-                    isDarkMode
+                  className={`w-full px-3 py-2 border rounded-lg ${isDarkMode
                       ? "bg-gray-700 text-white border-gray-600"
                       : "bg-white text-gray-900 border-gray-300"
-                  }`}
+                    }`}
                   placeholder="Degree"
                 />
                 <input
-                  disabled={!editMode}
+                  // disabled={!editMode}
                   type="text"
                   value={fields.branch}
                   onChange={e => handleChange("branch", e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg ${
-                    isDarkMode
+                  className={`w-full px-3 py-2 border rounded-lg ${isDarkMode
                       ? "bg-gray-700 text-white border-gray-600"
                       : "bg-white text-gray-900 border-gray-300"
-                  }`}
+                    }`}
                   placeholder="Field of Study"
                 />
                 <input
-                  disabled={!editMode}
+                  // disabled={!editMode}
                   type="text"
                   value={fields.gryear}
                   onChange={e => handleChange("gryear", e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg ${
-                    isDarkMode
+                  className={`w-full px-3 py-2 border rounded-lg ${isDarkMode
                       ? "bg-gray-700 text-white border-gray-600"
                       : "bg-white text-gray-900 border-gray-300"
-                  }`}
+                    }`}
                   placeholder="Graduation Year"
                 />
               </div>
@@ -540,6 +510,7 @@ const BasicInfo = () => {
       {/* Save Button */}
       <div className="mt-8 flex justify-end">
         <button
+        disabled={loading}
           onClick={handleSave}
           className="px-6 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 flex items-center space-x-2"
         >

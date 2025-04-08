@@ -54,14 +54,6 @@ function App() {
         <main className="flex-grow pt-0">
           <Routes>
             <Route path="/" element={<Home />} />
-            {/* <Route
-              path="/login"
-              element={
-                <ProtectedRouteForLogin>
-                  <Login />
-                </ProtectedRouteForLogin>
-              }
-            /> */}
             <Route
               path="/signup"
               element={

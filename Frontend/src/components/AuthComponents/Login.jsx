@@ -2,17 +2,20 @@ import React, { useState } from "react";
 import { ArrowRight, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import { useAuth } from "../../Context/AuthProvider"
+import { useAuth } from "../../Context/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../App";
+
 function Login({ onSwitchToSignup }) {
+  const { isDarkMode } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login, currentUser } = useAuth();
-  const navigate = useNavigate()
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -50,11 +53,10 @@ function Login({ onSwitchToSignup }) {
         `${import.meta.env.VITE_BACKEND_URL}/server/user/login`,
         {
           email,
-          password
+          password,
         }
-      )
+      );
       toast.success("Login successful!", { id: toastId });
-      console.log(response.data.user);
       login(response.data.user);
       navigate(`/user/${response.data.user.username}/edit`);
     } catch (error) {
@@ -66,14 +68,42 @@ function Login({ onSwitchToSignup }) {
     }
   };
 
+  // Define dark/light mode classes for reuse
+
+  // Container for the form
+  const formContainerClass = isDarkMode
+    ? "bg-gray-800 text-white"
+    : "bg-white text-gray-900";
+
+  // Label
+  const labelClass = isDarkMode
+    ? "text-sm font-medium text-gray-300"
+    : "text-sm font-medium text-gray-700";
+
+  // Input for email; also applies to text inputs
+  const inputClass = isDarkMode
+    ? "w-full pl-10 pr-4 py-3 border-2 border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-700 bg-gray-700 text-white"
+    : "w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-100";
+
+  // Input for password (with extra right padding for the toggle button)
+  const passwordInputClass = isDarkMode
+    ? "w-full pl-10 pr-10 py-3 border-2 border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-700 bg-gray-700 text-white"
+    : "w-full pl-10 pr-10 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-100";
+
+  // Button class
+  const buttonClass = "w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors";
+
+  // Divider line (we slightly change the border color in dark mode)
+  const dividerLineClass = isDarkMode ? "border-t border-gray-600" : "border-t border-gray-200";
+
   return (
     <>
       <Toaster position="top-right" />
-      <form onSubmit={handleSubmit} className="space-y-6">
+
+      <form onSubmit={handleSubmit} className={`space-y-6 p-6 rounded-lg shadow-md ${formContainerClass}`}>
+        {/* Email Field */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
-            Email Address
-          </label>
+          <label className={labelClass}>Email Address</label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             <input
@@ -81,7 +111,7 @@ function Login({ onSwitchToSignup }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
-              className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-100"
+              className={inputClass}
               placeholder="Enter your email"
             />
           </div>
@@ -90,8 +120,9 @@ function Login({ onSwitchToSignup }) {
           )}
         </div>
 
+        {/* Password Field */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Password</label>
+          <label className={labelClass}>Password</label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             <input
@@ -99,7 +130,7 @@ function Login({ onSwitchToSignup }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
-              className="w-full pl-10 pr-10 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-100"
+              className={passwordInputClass}
               placeholder="Enter your password"
             />
             <button
@@ -120,23 +151,25 @@ function Login({ onSwitchToSignup }) {
           )}
         </div>
 
+        {/* Server Error Display */}
         {serverError && (
           <p className="text-sm text-red-500">{serverError}</p>
         )}
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          className={buttonClass}
         >
           {loading ? "Signing In..." : "Sign In"}
         </button>
 
         {/* Divider */}
         <div className="mt-8 flex items-center">
-          <div className="flex-1 border-t border-gray-200"></div>
+          <div className={`flex-1 ${dividerLineClass}`}></div>
           <div className="px-4 text-sm text-gray-500">or</div>
-          <div className="flex-1 border-t border-gray-200"></div>
+          <div className={`flex-1 ${dividerLineClass}`}></div>
         </div>
 
         {/* Switch to Signup */}

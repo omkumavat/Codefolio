@@ -3,6 +3,7 @@ import { ArrowRight, Mail, Lock, User, Eye, EyeOff, XCircle, CheckCircle } from 
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../App";
 
 const Signup2 = ({ onSwitchToLogin }) => {
   // Steps: "initial" (collect name & email), "otp" (verify OTP), "password" (set password)
@@ -26,6 +27,7 @@ const Signup2 = ({ onSwitchToLogin }) => {
   const [usernameAvailable, setUsernameAvailable] = useState(null)
   const [checkingUsername, setCheckingUsername] = useState(false)
   // Countdown timer effect for OTP step.
+  const {isDarkMode}=useTheme();
   useEffect(() => {
     let interval = null;
     if (signupStep === "otp" && timer > 0) {
@@ -293,16 +295,28 @@ const Signup2 = ({ onSwitchToLogin }) => {
     }
   }, [username])
 
+  const labelClass = isDarkMode
+  ? "text-sm font-medium text-gray-300"
+  : "text-sm font-medium text-gray-700";
+
+const inputClass = isDarkMode
+  ? "w-full pl-10 pr-4 py-3 border-2 border-gray-700 bg-gray-800 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+  : "w-full pl-10 pr-4 py-3 border-2 border-gray-200 bg-white text-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors";
+
+const otpInputClass = isDarkMode
+  ? "w-14 h-14 text-center text-2xl font-semibold border-2 border-gray-700 bg-gray-800 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+  : "w-14 h-14 text-center text-2xl font-semibold border-2 border-gray-200 bg-white text-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors";
+
+const buttonClass = "w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors";
 
   const renderSignupStep = () => {
     switch (signupStep) {
       case "initial":
         return (
           <div className="space-y-6">
+            {/* Username */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
-                User Name
-              </label>
+              <label className={labelClass}>User Name</label>
               <div className="relative">
                 <User className="absolute left-3 top-7 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
@@ -310,7 +324,7 @@ const Signup2 = ({ onSwitchToLogin }) => {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={inputClass}
                   placeholder="Enter your user name"
                 />
                 <div className="absolute right-3 -mt-6 transform -translate-y-1/2">
@@ -349,10 +363,10 @@ const Signup2 = ({ onSwitchToLogin }) => {
                 <p className="text-sm text-red-500">{errors.username}</p>
               )}
             </div>
+
+            {/* Full Name */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
-                Full Name
-              </label>
+              <label className={labelClass}>Full Name</label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
@@ -360,19 +374,18 @@ const Signup2 = ({ onSwitchToLogin }) => {
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={inputClass}
                   placeholder="Enter your full name"
                 />
-
               </div>
               {errors.fullName && (
                 <p className="text-sm text-red-500">{errors.fullName}</p>
               )}
             </div>
+
+            {/* Email */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
-                Email Address
-              </label>
+              <label className={labelClass}>Email Address</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
@@ -380,7 +393,7 @@ const Signup2 = ({ onSwitchToLogin }) => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={inputClass}
                   placeholder="Enter your email"
                 />
               </div>
@@ -388,9 +401,11 @@ const Signup2 = ({ onSwitchToLogin }) => {
                 <p className="text-sm text-red-500">{errors.email}</p>
               )}
             </div>
+
+            {/* Continue Button */}
             <button
               onClick={handleInitialContinue}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+              className={`${buttonClass} flex items-center justify-center space-x-2`}
               disabled={loading}
             >
               {loading ? "Sending OTP..." : (
@@ -425,7 +440,7 @@ const Signup2 = ({ onSwitchToLogin }) => {
                   value={digit}
                   onChange={(e) => handleOtpChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="w-14 h-14 text-center text-2xl font-semibold border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={otpInputClass}
                 />
               ))}
             </div>
@@ -434,7 +449,7 @@ const Signup2 = ({ onSwitchToLogin }) => {
             )}
             <button
               onClick={handleOtpVerify}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+              className={`${buttonClass} flex items-center justify-center space-x-2`}
             >
               <span>Verify OTP</span>
               <ArrowRight className="h-5 w-5" />
@@ -445,10 +460,9 @@ const Signup2 = ({ onSwitchToLogin }) => {
       case "password":
         return (
           <div className="space-y-6">
+            {/* New Password */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
-                New Password
-              </label>
+              <label className={labelClass}>New Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
@@ -456,7 +470,7 @@ const Signup2 = ({ onSwitchToLogin }) => {
                   type={showNewPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={inputClass}
                   placeholder="Enter new password"
                 />
                 <button
@@ -475,10 +489,10 @@ const Signup2 = ({ onSwitchToLogin }) => {
                 <p className="text-sm text-red-500">{errors.password}</p>
               )}
             </div>
+
+            {/* Confirm Password */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
+              <label className={labelClass}>Confirm Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
@@ -486,7 +500,7 @@ const Signup2 = ({ onSwitchToLogin }) => {
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={inputClass}
                   placeholder="Confirm your password"
                 />
                 <button
@@ -505,9 +519,11 @@ const Signup2 = ({ onSwitchToLogin }) => {
                 <p className="text-sm text-red-500">{errors.confirmPassword}</p>
               )}
             </div>
+
+            {/* Create Account Button */}
             <button
               onClick={handleCreateAccount}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              className={buttonClass}
               disabled={loading}
             >
               {loading ? "Creating Account..." : "Create Account"}
@@ -528,9 +544,9 @@ const Signup2 = ({ onSwitchToLogin }) => {
         <>
           {/* Divider */}
           <div className="mt-8 flex items-center">
-            <div className="flex-1 border-t border-gray-200"></div>
+            <div className="flex-1 border-t border-gray-200 dark:border-gray-600"></div>
             <div className="px-4 text-sm text-gray-500">or</div>
-            <div className="flex-1 border-t border-gray-200"></div>
+            <div className="flex-1 border-t border-gray-200 dark:border-gray-600"></div>
           </div>
 
           {/* Switch to Login */}
@@ -547,6 +563,8 @@ const Signup2 = ({ onSwitchToLogin }) => {
       )}
     </>
   );
+
+
 }
 
 export default Signup2;
