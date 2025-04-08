@@ -2,6 +2,22 @@ import React from 'react';
 import { Award } from 'lucide-react';
 import { useTheme } from '../../App';
 
+
+const rankMap = {
+  0: "unranked",
+  1: "newbie",
+  2: "pupil",
+  3: "specialist",
+  4: "expert",
+  5: "candidate master",
+  6: "master",
+  7: "international master",
+  8: "grandmaster",
+  9: "international grandmaster",
+  10: "legendary grandmaster"
+};
+
+
 const PlatformComparisonDisplay = ({ platform, data, candidate1, candidate2 }) => {
   const { isDarkMode } = useTheme();
   let platformName = "";
@@ -33,11 +49,10 @@ const PlatformComparisonDisplay = ({ platform, data, candidate1, candidate2 }) =
 
   return (
     <div
-      className={`p-6 rounded-xl shadow-2xl mb-6 transition-transform transform ${
-        isDarkMode
+      className={`p-6 rounded-xl shadow-2xl mb-6 transition-transform transform ${isDarkMode
           ? 'bg-gradient-to-br from-gray-800 to-gray-700'
           : 'bg-gradient-to-br from-white to-gray-50'
-      }`}
+        }`}
     >
       <div className="flex justify-between items-center mb-4">
         <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-indigo-300' : 'text-indigo-700'}`}>
@@ -97,21 +112,19 @@ const PlatformComparisonDisplay = ({ platform, data, candidate1, candidate2 }) =
               className={`flex justify-between items-center py-1 ${isDarkMode ? 'border-t border-gray-600' : 'border-t border-gray-200'}`}
             >
               <div
-                className={`w-1/3 text-right text-sm transition-colors ${
-                  winner === 0 ? 'font-bold text-green-600 animate-bounce' : isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}
+                className={`w-1/3 text-right text-sm transition-colors ${winner === 0 ? 'font-bold text-green-600 animate-bounce' : isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}
               >
-                {metric.candidate1.toLocaleString()}
+                {platform === "codeforces" && metric.label === "Rank Value" ? rankMap[metric.candidate1] : metric.candidate1.toLocaleString()}
               </div>
               <div className={`w-1/3 text-center text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 {metric.label}
               </div>
               <div
-                className={`w-1/3 text-left text-sm transition-colors ${
-                  winner === 1 ? 'font-bold text-green-600 animate-bounce' : isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}
+                className={`w-1/3 text-left text-sm transition-colors ${winner === 1 ? 'font-bold text-green-600 animate-bounce' : isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}
               >
-                {metric.candidate2.toLocaleString()}
+                {platform === "codeforces" && metric.label === "Rank Value" ? rankMap[metric.candidate2] : metric.candidate2.toLocaleString()}
               </div>
             </div>
           );

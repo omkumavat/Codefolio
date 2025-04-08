@@ -21,23 +21,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const sendOTPEmail = async (req, res) => {
-   // console(req.body); // Check request body
+    // console(req.body); // Check request body
     const { name, email, otp } = req.body;
 
     if (!otp) {
         return res.status(400).json({ error: "OTP is missing in request body" });
     }
 
-   // console(typeof otp, otp); // Check OTP value
+    // console(typeof otp, otp); // Check OTP value
 
     const Otp = typeof otp === "string" ? otp.split("") : [];
-    
+
     const templatePath = path.join(__dirname, "../views", "SignupOTP.hbs");
     const templateSource = fs.readFileSync(templatePath, "utf-8");
     const template = Handlebars.compile(templateSource);
     let htmlContent = template({ name, email, Otp });
 
-   // console(htmlContent); // Ensure OTP is rendering correctly
+    // console(htmlContent); // Ensure OTP is rendering correctly
 
     const mailOptions = {
         from: `CodeVerse <${process.env.MAIL_USER}>`,
@@ -58,11 +58,11 @@ export const sendOTPEmail = async (req, res) => {
 
 export const sendSignUpSuccessfulEmail = async (req, res) => {
     // console(req.body);
-    const { name, email,username } = req.body;
+    const { name, email, username } = req.body;
     const templatePath = path.join(__dirname, "../views", 'SignupSuccess.hbs');
     const templateSource = fs.readFileSync(templatePath, "utf-8");
     const template = Handlebars.compile(templateSource);
-    let htmlContent = template({ name,username });
+    let htmlContent = template({ name, username });
 
     const mailOptions = {
         from: `CodeVerse <${process.env.MAIL_USER}>`,
@@ -79,4 +79,21 @@ export const sendSignUpSuccessfulEmail = async (req, res) => {
         console.error("Error sending OTP email:", error);
         res.status(500).json({ error: "Failed to send email" });
     }
+};
+
+
+export const sendVerificationEmail = async (email, token) => {
+    const verificationUrl = `http://localhost:5173/verify?token=${token}`;
+
+    const templatePath = path.join(__dirname, "../views", 'Verification.hbs');
+    const templateSource = fs.readFileSync(templatePath, "utf-8");
+    const template = Handlebars.compile(templateSource);
+    let htmlContent = template({ verificationUrl });
+
+    await transporter.sendMail({
+        from: `CodeVerse Admin <${process.env.MAIL_USER}`,
+        to: email,
+        subject: 'Complete Your Registration',
+        html: htmlContent
+    });
 };

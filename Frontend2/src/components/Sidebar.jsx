@@ -2,8 +2,10 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { LayoutDashboard, Users, BarChart2, Settings } from "lucide-react";
 import { useTheme } from "../App";
+import { useAuth } from "../Context/AuthProvider";
 
 const Sidebar = ({ isOpen }) => {
+  const {currentUser}=useAuth();
   const { isDarkMode } = useTheme();
   const menuItems = [
     { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },

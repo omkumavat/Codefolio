@@ -56,6 +56,9 @@ app.use('/server/dashboard/stats',Stats);
 import AllCoders from './Routes/Dashboard/AllCoders.js';
 app.use('/server/dashboard/allcoders',AllCoders)
 
+import AuthAdmin from './Routes/Dashboard/AuthAdmin.js';
+app.use('/server/auth/admin',AuthAdmin)
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, '..', 'src', 'public')));
@@ -63,7 +66,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 app.get("/s", (req, res) => {
   const otp="123456"
-  res.render("SignupOTP", { name: "OKM",Otp:otp.split('')});
+  res.render("Verification", { verificationUrl: "OKM"});
 });
 
 
