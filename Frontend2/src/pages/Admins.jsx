@@ -20,7 +20,7 @@ function Admins() {
     const [selectedAdmin, setSelectedAdmin] = useState(null)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false);
-    const {isDarkMode}=useTheme();
+    const { isDarkMode } = useTheme();
 
     // Fetch admins from backend
 
@@ -89,7 +89,7 @@ function Admins() {
 
             {/* Header */}
             <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} shadow`}>
-                <div className="max-w-7xl mx-auto px-4 py-6">
+                <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center">
                             <Shield className={`h-8 w-8 ${isDarkMode ? "text-indigo-400" : "text-indigo-600"}`} />
@@ -102,7 +102,7 @@ function Admins() {
             </div>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 py-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 {/* Search Bar */}
                 <div className="mb-6">
                     <div className="relative">
@@ -119,91 +119,88 @@ function Admins() {
 
                 {/* Admin List */}
                 <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-lg shadow overflow-hidden`}>
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className={`${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
-                            <tr>
-                                {["Admin", "Company", "Status", "Joins", "Actions"].map(heading => (
-                                    <th
-                                        key={heading}
-                                        className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? "text-gray-300" : "text-gray-500"}`}
-                                    >
-                                        {heading}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody className={isDarkMode ? "bg-gray-800 divide-y divide-gray-700" : "bg-white divide-y divide-gray-200"}>
-                            {filteredAdmins.map(admin => (
-                                <tr key={admin.id} className={`${isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center">
-                                            <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                                                <span className="text-indigo-700 font-medium text-sm">
-                                                    {admin.firstName
-                                                        .split(" ")
-                                                        .map(n => n[0])
-                                                        .join("")}
-                                                </span>
-                                            </div>
-                                            <div className="ml-4">
-                                                <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-                                                    {admin.firstName} {admin.lastName}
-                                                </div>
-                                                <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
-                                                    {admin.email}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-                                        {admin.company}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${admin.isAuthorized
-                                                ? "bg-green-100 text-green-800"
-                                                : "bg-red-100 text-red-800"
-                                                }`}
+                    {/* Responsive table container */}
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className={`${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
+                                <tr>
+                                    {["Admin", "Company", "Status", "Joins", "Actions"].map(heading => (
+                                        <th
+                                            key={heading}
+                                            className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? "text-gray-300" : "text-gray-500"}`}
                                         >
-                                            {admin.isVerified ? "Authorized" : "Unauthorized"}
-                                        </span>
-                                    </td>
-                                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
-                                        {new Date(admin.createdAt).toLocaleString("en-US", {
-                                            year: "numeric",
-                                            month: "long",
-                                            day: "numeric",
-                                            hour: "numeric",
-                                            minute: "2-digit",
-                                            hour12: true
-                                        })}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div className="flex items-center space-x-3">
-                                            <button
-                                               disabled={admin.email === "omkumavat2004@gmail.com" ? true : false}
-                                                onClick={() => openAccessModal(admin._id)}
-                                                className={`flex items-center px-3 py-1 rounded ${admin.isVerified
-                                                    ? "text-red-700 hover:text-red-900"
-                                                    : "text-green-700 hover:text-green-900"
+                                            {heading}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody className={isDarkMode ? "bg-gray-800 divide-y divide-gray-700" : "bg-white divide-y divide-gray-200"}>
+                                {filteredAdmins.map(admin => (
+                                    <tr key={admin.id} className={`${isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center">
+                                                <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                    <span className="text-indigo-700 font-medium text-sm">
+                                                        {admin.firstName.split(" ").map(n => n[0]).join("")}
+                                                    </span>
+                                                </div>
+                                                <div className="ml-4">
+                                                    <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                                                        {admin.firstName} {admin.lastName}
+                                                    </div>
+                                                    <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                                                        {admin.email}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                                            {admin.company}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span
+                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${admin.isAuthorized
+                                                        ? "bg-green-100 text-green-800"
+                                                        : "bg-red-100 text-red-800"
                                                     }`}
                                             >
-                                                {admin.isVerified ? (
-                                                    <UserX className="h-4 w-4 mr-1" />
-                                                ) : (
-                                                    <UserCheck className="h-4 w-4 mr-1" />
-                                                )}
-                                                {admin.isVerified ? "Revoke Access" : "Grant Access"}
-                                            </button>
-                                            <button className={`${isDarkMode ? "text-gray-400 hover:text-gray-300" : "text-gray-400 hover:text-gray-500"}`}>
-                                                <MoreVertical className="h-5 w-5" />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                                {admin.isVerified ? "Authorized" : "Unauthorized"}
+                                            </span>
+                                        </td>
+                                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                                            {new Date(admin.createdAt).toLocaleString("en-US", {
+                                                year: "numeric",
+                                                month: "long",
+                                                day: "numeric",
+                                                hour: "numeric",
+                                                minute: "2-digit",
+                                                hour12: true
+                                            })}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div className="flex items-center space-x-3">
+                                                <button
+                                                    disabled={admin.email === "omkumavat2004@gmail.com"}
+                                                    onClick={() => openAccessModal(admin._id)}
+                                                    className={`flex items-center px-3 py-1 rounded ${admin.isVerified
+                                                            ? "text-red-700 hover:text-red-900"
+                                                            : "text-green-700 hover:text-green-900"
+                                                        }`}
+                                                >
+                                                    {admin.isVerified ? (
+                                                        <UserX className="h-4 w-4 mr-1" />
+                                                    ) : (
+                                                        <UserCheck className="h-4 w-4 mr-1" />
+                                                    )}
+                                                    {admin.isVerified ? "Revoke Access" : "Grant Access"}
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -258,6 +255,7 @@ function Admins() {
             )}
         </div>
     );
+
 }
 
 export default Admins

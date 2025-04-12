@@ -15,7 +15,8 @@ function AuthForm() {
                     <div className="lg:w-1/2 flex flex-col justify-center items-center p-8 border-b lg:border-b-0 lg:border-r border-gray-200">
                         <h2 className="text-4xl font-bold mb-4">Welcome to</h2>
                         <h2 className="text-4xl font-bold mb-4">CodeVerse</h2>
-                        <h2 className="text-4xl font-bold mb-4">Admin Dashboard</h2>
+                        <h2 className="text-4xl font-bold mb-4">Admin</h2>
+                        <h2 className="text-4xl font-bold mb-4">Dashboard</h2>
                         <p className="text-lg text-gray-600 text-center">
                             Join our community of coders and developers. Share your journey, skills,
                             and connect with like-minded people.

@@ -124,6 +124,23 @@ const Navbar = () => {
               )}
             </motion.button>
 
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <a
+                href="https://admin-codeverse.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => window.scrollTo(0, 0)}
+                className="bg-white text-sky-600 px-4 py-2 rounded-full font-medium hover:bg-sky-50 transition-colors flex items-center space-x-1"
+              >
+                <LogIn className="h-4 w-4" />
+                <span>Admin Login</span>
+              </a>
+            </motion.div>
+
+
             {isLoggedIn ? (
               <motion.button
                 whileHover={{ scale: 1.1 }}
@@ -197,6 +214,22 @@ const Navbar = () => {
               <MobileNavLink to="/about" text="About" isDarkMode={isDarkMode} />
               <MobileNavLink to="/contact" text="Contact" isDarkMode={isDarkMode} />
               <MobileNavLink to="/docs" text="Docs" isDarkMode={isDarkMode} />
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <a
+                  href="https://admin-codeverse.vercel.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => window.scrollTo(0, 0)}
+                  className="bg-white text-sky-600 px-4 py-2 rounded-full font-medium hover:bg-sky-50 transition-colors flex items-center space-x-1"
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span>Admin Login</span>
+                </a>
+              </motion.div>
+
               {isLoggedIn && (
                 <button
                   onClick={() => {
@@ -212,13 +245,19 @@ const Navbar = () => {
                 </button>
               )}
               {!isLoggedIn && (
-
-                <MobileNavLink
-                  onClick={() => window.scrollTo(0, 0)}
-                  to="/signup"
-                  text="Login"
-                  isDarkMode={isDarkMode}
-                />
+                 <motion.div
+                 whileHover={{ scale: 1.05 }}
+                 whileTap={{ scale: 0.95 }}
+               >
+                 <Link
+                   onClick={() => window.scrollTo(0, 0)}
+                   to="/signup"
+                   className="bg-white text-sky-600 px-4 py-2 rounded-full font-medium hover:bg-sky-50 transition-colors flex items-center space-x-1"
+                 >
+                   <LogIn className="h-4 w-4" />
+                   <span>Login</span>
+                 </Link>
+               </motion.div>
               )}
             </div>
           </motion.div>
