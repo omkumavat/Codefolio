@@ -53,6 +53,9 @@ app.use('/server/dashboard/comparecandidate',CompareCandidate);
 import Stats from './Routes/Dashboard/Stats.js';
 app.use('/server/dashboard/stats',Stats);
 
+import AllCoders from './Routes/Dashboard/AllCoders.js';
+app.use('/server/dashboard/allcoders',AllCoders)
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, '..', 'src', 'public')));

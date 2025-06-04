@@ -48,11 +48,17 @@ const userSchema = new mongoose.Schema({
     totalActiveDays:{type:Number},
     overallScore : {type:Number},
 
-    GeeksforGeeks: { type: mongoose.Schema.Types.ObjectId, ref: 'GeeksforGeeks' },
-    LeetCode: { type: mongoose.Schema.Types.ObjectId, ref: 'LeetCode' },
-    CodeChef: { type: mongoose.Schema.Types.ObjectId, ref: 'CodeChef' },
-    CodeForces: { type: mongoose.Schema.Types.ObjectId, ref: 'CodeForces' },
-    Github: { type: mongoose.Schema.Types.ObjectId, ref: 'GitHub' },
+    GeeksforGeeks: { type: mongoose.Schema.Types.ObjectId, ref: 'GeeksForGeeksUser' },
+    LeetCode: { type: mongoose.Schema.Types.ObjectId, ref: 'LeetCodeUser' },
+    CodeChef: { type: mongoose.Schema.Types.ObjectId, ref: 'CodeChefUser' },
+    CodeForces: { type: mongoose.Schema.Types.ObjectId, ref: 'CodeforcesUser' },
+    Github: { type: mongoose.Schema.Types.ObjectId, ref: 'GitHubUser' },
+
+    // GeeksforGeeks: { type: mongoose.Schema.Types.ObjectId, ref: 'GeeksforGeeks' },
+    // LeetCode: { type: mongoose.Schema.Types.ObjectId, ref: 'LeetCode' },
+    // CodeChef: { type: mongoose.Schema.Types.ObjectId, ref: 'CodeChef' },
+    // CodeForces: { type: mongoose.Schema.Types.ObjectId, ref: 'CodeForces' },
+    // Github: { type: mongoose.Schema.Types.ObjectId, ref: 'GitHub' },
 
     userProfile: {
         geeksforgeeks: { type: String },
