@@ -21,7 +21,6 @@ function App() {
       return savedTheme ? JSON.parse(savedTheme) : false
     })
   
-    // Update localStorage whenever isDarkMode changes
     useEffect(() => {
       localStorage.setItem("isDarkMode", JSON.stringify(isDarkMode))
       document.documentElement.classList.toggle("dark", isDarkMode)
