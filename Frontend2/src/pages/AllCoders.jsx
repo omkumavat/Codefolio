@@ -7,10 +7,12 @@ import {
   Download,
   School,
   ListChecks,
+  Code
 } from "lucide-react";
 import { DownloadTableExcel } from "react-export-table-to-excel";
 import { Link } from "react-router-dom";
 import { useTheme } from "../App";
+
 
 const AllCoders = () => {
   const { isDarkMode } = useTheme();
@@ -258,109 +260,127 @@ const AllCoders = () => {
         />
       </div>
 
-      <div
-        className={`overflow-x-auto p-4 rounded-2xl border ${isDarkMode ? "border-gray-700" : "border-gray-300"
-          }`}
-      >
-        <table ref={tableRef} className="min-w-full table-auto ">
-          <thead>
-            <tr className="text-left">
-              <th className={` border border-black p-2 ${isDarkMode ? "text-gray-300 border-white" : "text-gray-700"}`}>No.</th>
-              <th onClick={() => handleSort("username")} className={` border border-black cursor-pointer p-2 ${isDarkMode ? "border-white text-gray-300" : "text-gray-700"}`}>
-                Username <SortIcon field="username" />
-              </th>
-              <th onClick={() => handleSort("name")} className={` border border-black cursor-pointer p-2 ${isDarkMode ? "border-white text-gray-300" : "text-gray-700"}`}>
-                Name <SortIcon field="name" />
-              </th>
-              <th onClick={() => handleSort("college")} className={` border border-black cursor-pointer p-2 ${isDarkMode ? "border-white text-gray-300" : "text-gray-700"}`}>
-                College <SortIcon field="college" />
-              </th>
-              <th onClick={() => handleSort("branch")} className={` border border-black cursor-pointer p-2 ${isDarkMode ? "border-white text-gray-300" : "text-gray-700"}`}>
-                Branch <SortIcon field="branch" />
-              </th>
-              <th onClick={() => handleSort("solved")} className={` border border-black cursor-pointer p-2 ${isDarkMode ? "border-white text-gray-300" : "text-gray-700"}`}>
-                {platform === "Github" ? "Contributions" : "Solved"} <SortIcon field="solved" />
-              </th>
-              <th onClick={() => handleSort("totalActiveDays")} className={` border border-black cursor-pointer p-2 ${isDarkMode ? "border-white text-gray-300" : "text-gray-700"}`}>
-                Total Active Days <SortIcon field="totalActiveDays" />
-              </th>
-            </tr>
-          </thead>
-          <tbody className="table-auto border-collapse">
-            {(userRange.start !== 1 || userRange.end !== 1 ? rangeFilteredUsers : paginatedUsers).map(
-              (user, index) => (
-                <tr key={user.username} className={`${isDarkMode ? "hover:text-black hover:bg-gray-100" : "hover:text-white hover:bg-gray-800"}`}>
-                  <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>
-                    {userRange.start !== 1 || userRange.end !== 1
-                      ? userRange.start + index
-                      : (currentPage - 1) * itemsPerPage + index + 1}
-                  </td>
-                  <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>
-                    <Link
-                      to={`https://codefolio-platform.vercel.app/user/${user.username}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:underline cursor-pointer transition-all duration-200"
-                    >
-                      {user.username}
-                    </Link>
-                  </td>
-                  <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>{user.name}</td>
-                  <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>{user.college}</td>
-                  <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>{user.branch}</td>
-                  <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>{user.solved}</td>
-                  <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>{user.totalActiveDays}</td>
-                </tr>
-              )
-            )}
-          </tbody>
-        </table>
-      </div>
+      {
+        !isLoading ? (
+          <>
+            <div
+              className={`overflow-x-auto p-4 rounded-2xl border ${isDarkMode ? "border-gray-700" : "border-gray-300"
+                }`}
+            >
+              <table ref={tableRef} className="min-w-full table-auto ">
+                <thead>
+                  <tr className="text-left">
+                    <th className={` border border-black p-2 ${isDarkMode ? "text-gray-300 border-white" : "text-gray-700"}`}>No.</th>
+                    <th onClick={() => handleSort("username")} className={` border border-black cursor-pointer p-2 ${isDarkMode ? "border-white text-gray-300" : "text-gray-700"}`}>
+                      Username <SortIcon field="username" />
+                    </th>
+                    <th onClick={() => handleSort("name")} className={` border border-black cursor-pointer p-2 ${isDarkMode ? "border-white text-gray-300" : "text-gray-700"}`}>
+                      Name <SortIcon field="name" />
+                    </th>
+                    <th onClick={() => handleSort("college")} className={` border border-black cursor-pointer p-2 ${isDarkMode ? "border-white text-gray-300" : "text-gray-700"}`}>
+                      College <SortIcon field="college" />
+                    </th>
+                    <th onClick={() => handleSort("branch")} className={` border border-black cursor-pointer p-2 ${isDarkMode ? "border-white text-gray-300" : "text-gray-700"}`}>
+                      Branch <SortIcon field="branch" />
+                    </th>
+                    <th onClick={() => handleSort("solved")} className={` border border-black cursor-pointer p-2 ${isDarkMode ? "border-white text-gray-300" : "text-gray-700"}`}>
+                      {platform === "Github" ? "Contributions" : "Solved"} <SortIcon field="solved" />
+                    </th>
+                    <th onClick={() => handleSort("totalActiveDays")} className={` border border-black cursor-pointer p-2 ${isDarkMode ? "border-white text-gray-300" : "text-gray-700"}`}>
+                      Total Active Days <SortIcon field="totalActiveDays" />
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="table-auto border-collapse">
+                  {(userRange.start !== 1 || userRange.end !== 1 ? rangeFilteredUsers : paginatedUsers).map(
+                    (user, index) => (
+                      <tr key={user.username} className={`${isDarkMode ? "hover:text-black hover:bg-gray-100" : "hover:text-white hover:bg-gray-800"}`}>
+                        <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>
+                          {userRange.start !== 1 || userRange.end !== 1
+                            ? userRange.start + index
+                            : (currentPage - 1) * itemsPerPage + index + 1}
+                        </td>
+                        <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>
+                          <Link
+                            to={`https://codefolio-platform.vercel.app/user/${user.username}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline cursor-pointer transition-all duration-200"
+                          >
+                            {user.username}
+                          </Link>
+                        </td>
+                        <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>{user.name}</td>
+                        <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>{user.college}</td>
+                        <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>{user.branch}</td>
+                        <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>{user.solved}</td>
+                        <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>{user.totalActiveDays}</td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-      <div className="flex justify-between rounded-md items-center mt-4">
-        <button
-          onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
-          disabled={
-            currentPage === 1 || (userRange.start !== 1 || userRange.end !== 1)
-          }
-          className="bg-blue-600 rounded-l-md hover:bg-blue-500 disabled:bg-gray-600 text-white px-6 py-2 rounded-lg"
-        >
-          Previous
-        </button>
-        <span className="px-4 py-2 rounded-lg">
-          {userRange.start !== 1 || userRange.end !== 1
-            ? `Showing ${userRange.start}-${userRange.end} of ${sortedUsers.length}`
-            : `Page ${currentPage} of ${Math.ceil(sortedUsers.length / itemsPerPage)}`}
-        </span>
-        <button
-          onClick={() => setCurrentPage(currentPage + 1)}
-          disabled={
-            currentPage * itemsPerPage >= sortedUsers.length ||
-            userRange.start !== 1 ||
-            userRange.end !== 1
-          }
-          className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 text-white px-6 py-2 rounded-lg"
-        >
-          Next
-        </button>
-      </div>
+            <div className="flex justify-between rounded-md items-center mt-4">
+              <button
+                onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+                disabled={
+                  currentPage === 1 || (userRange.start !== 1 || userRange.end !== 1)
+                }
+                className="bg-blue-600 rounded-l-md hover:bg-blue-500 disabled:bg-gray-600 text-white px-6 py-2 rounded-lg"
+              >
+                Previous
+              </button>
+              <span className="px-4 py-2 rounded-lg">
+                {userRange.start !== 1 || userRange.end !== 1
+                  ? `Showing ${userRange.start}-${userRange.end} of ${sortedUsers.length}`
+                  : `Page ${currentPage} of ${Math.ceil(sortedUsers.length / itemsPerPage)}`}
+              </span>
+              <button
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={
+                  currentPage * itemsPerPage >= sortedUsers.length ||
+                  userRange.start !== 1 ||
+                  userRange.end !== 1
+                }
+                className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 text-white px-6 py-2 rounded-lg"
+              >
+                Next
+              </button>
+            </div>
 
-      <div className="flex justify-center items-center my-6">
-        <DownloadTableExcel
-          filename={`coding-stats-${platform.toLowerCase()}`}
-          sheet={platform}
-          currentTableRef={tableRef.current}
-        >
-          <button className="relative w-64 overflow-hidden border-2 border-black bg-black text-white font-extrabold uppercase px-8 py-4 rounded-full transition duration-200 group">
-            <span className="relative z-10 flex items-center justify-center gap-2 mix-blend-difference">
-              <Download className="w-5 h-5" />
-              Export
-            </span>
-            <span className="absolute inset-0 -translate-y-full bg-[linear-gradient(90deg,white_25%,transparent_0,transparent_50%,white_0,white_75%,transparent_0)] transition-transform duration-200 group-hover:translate-y-0"></span>
-            <span className="absolute inset-0 translate-y-full bg-[linear-gradient(90deg,transparent_0,transparent_25%,white_0,white_50%,transparent_0,transparent_75%,white_0)] transition-transform duration-200 group-hover:translate-y-0 z-[-1]"></span>
-          </button>
-        </DownloadTableExcel>
-      </div>
+            <div className="flex justify-center items-center my-6">
+              <DownloadTableExcel
+                filename={`coding-stats-${platform.toLowerCase()}`}
+                sheet={platform}
+                currentTableRef={tableRef.current}
+              >
+                <button className="relative w-64 overflow-hidden border-2 border-black bg-black text-white font-extrabold uppercase px-8 py-4 rounded-full transition duration-200 group">
+                  <span className="relative z-10 flex items-center justify-center gap-2 mix-blend-difference">
+                    <Download className="w-5 h-5" />
+                    Export
+                  </span>
+                  <span className="absolute inset-0 -translate-y-full bg-[linear-gradient(90deg,white_25%,transparent_0,transparent_50%,white_0,white_75%,transparent_0)] transition-transform duration-200 group-hover:translate-y-0"></span>
+                  <span className="absolute inset-0 translate-y-full bg-[linear-gradient(90deg,transparent_0,transparent_25%,white_0,white_50%,transparent_0,transparent_75%,white_0)] transition-transform duration-200 group-hover:translate-y-0 z-[-1]"></span>
+                </button>
+              </DownloadTableExcel>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center justify-center h-full min-h-[200px]">
+              <Code
+                className={`h-12 w-12 animate-spin ${isDarkMode ? "text-indigo-400" : "text-indigo-600"
+                  }`}
+              />
+              <p className={`mt-0 text-xl ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                Retrieving Coders, please wait...
+              </p>
+            </div>
+          </>
+        )
+      }
     </div>
 
   );

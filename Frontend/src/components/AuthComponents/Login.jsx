@@ -3,7 +3,7 @@ import { ArrowRight, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from "../../Context/AuthProvider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import { useTheme } from "../../App";
 
 function Login({ onSwitchToSignup }) {
@@ -16,6 +16,10 @@ function Login({ onSwitchToSignup }) {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const params = new URLSearchParams(location.search);
+  const redirect = params.get("redirect") || "/";
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -58,7 +62,8 @@ function Login({ onSwitchToSignup }) {
       );
       toast.success("Login successful!", { id: toastId });
       login(response.data.user);
-      navigate(`/user/${response.data.user.username}/edit`);
+      navigate(redirect);
+      // navigate(`/user/${response.data.user.username}/edit`);
     } catch (error) {
       console.error("Login error:", error);
       setServerError("Login failed. Please check your credentials and try again.");

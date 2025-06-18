@@ -27,6 +27,7 @@ import geekforgeeks from '../../public/images/geekforgeeks.png'
 import codechef from '../../public/images/codechef.png';
 import codeforces from '../../public/images/codeforces.png';
 import github from '../../public/images/github.png';
+import { useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate()
@@ -36,6 +37,8 @@ const Navbar = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   // const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const location = useLocation();
+  const currentPath = location.pathname + location.search;
 
   useEffect(() => {
     // setLoading(true);
@@ -161,7 +164,7 @@ const Navbar = () => {
               >
                 <Link
                   onClick={() => window.scrollTo(0, 0)}
-                  to="/signup"
+                  to={`/signup?redirect=${encodeURIComponent(currentPath)}`}
                   className="bg-white text-sky-600 px-4 py-2 rounded-full font-medium hover:bg-sky-50 transition-colors flex items-center space-x-1"
                 >
                   <LogIn className="h-4 w-4" />
@@ -251,7 +254,7 @@ const Navbar = () => {
                >
                  <Link
                    onClick={() => window.scrollTo(0, 0)}
-                   to="/signup"
+                    to={`/signup?redirect=${encodeURIComponent(currentPath)}`}
                    className="bg-white text-sky-600 px-4 py-2 rounded-full font-medium hover:bg-sky-50 transition-colors flex items-center space-x-1"
                  >
                    <LogIn className="h-4 w-4" />
