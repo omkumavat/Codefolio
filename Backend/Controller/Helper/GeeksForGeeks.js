@@ -19,7 +19,6 @@ export const updateGFGUserData = async (username, timeout = 10000) => {
     throw new Error("GFG does not exist in the database");
   }
 
-  // Find the existing GFG profile document
   const gfgProfile = await GeeksforGeeksUser.findById(findUser.GeeksforGeeks);
   if (!gfgProfile) {
     throw new Error("GFG user data not found");
