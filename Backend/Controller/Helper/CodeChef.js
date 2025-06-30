@@ -59,7 +59,7 @@ export const updateCodeChefUserData = async (username) => {
   
   // Fetch CodeChef profile data via API
   const profileUrl = `${process.env.codechef_api_user}/${existingCodeChefUser.username}`;
-  const profileResponse = await axios.get(profileUrl).catch(() => null);
+  const profileResponse = await axios.get(profileUrl,{ timeout: 5000 }).catch(() => null);
   const profileData = profileResponse?.data || null;
   if (!profileData) {
     throw new Error("Failed to fetch user data from CodeChef APIs");

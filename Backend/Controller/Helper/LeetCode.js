@@ -18,10 +18,10 @@ export const updateLeetCodeUserData = async (username) => {
     }
 
     // Fetch data from LeetCode APIs
-    const profilePromise = axios.get(`${process.env.leetcode_api_to_check_user1}/${existingUser.username}`).catch(() => null);
-    const contestPromise = axios.get(`${process.env.leetcode_api}/${existingUser.username}/contest`).catch(() => null);
-    const submissionsPromise2025 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${existingUser.username}&year=2025`).catch(() => null);
-    const submissionsPromise2024 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${existingUser.username}&year=2024`).catch(() => null);
+    const profilePromise = axios.get(`${process.env.leetcode_api_to_check_user1}/${existingUser.username}`,{ timeout: 5000 }).catch(() => null);
+    const contestPromise = axios.get(`${process.env.leetcode_api}/${existingUser.username}/contest`,{ timeout: 5000 }).catch(() => null);
+    const submissionsPromise2025 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${existingUser.username}&year=2025`,{ timeout: 5000 }).catch(() => null);
+    const submissionsPromise2024 = axios.get(`${process.env.leetcode_api}/userProfileCalendar?username=${existingUser.username}&year=2024`,{ timeout: 5000 }).catch(() => null);
 
     // Await all API responses
     const [profileRes, contestRes, submissionsRes2024, submissionsRes2025] = await Promise.all([
@@ -33,12 +33,12 @@ export const updateLeetCodeUserData = async (username) => {
 
     let profileData;
     let acceptanceRate = 0;
-    const profilePromise2 = await axios.get(`${process.env.leetcode_api_to_check_user2}/${username}`).catch(() => null);
+    const profilePromise2 = await axios.get(`${process.env.leetcode_api_to_check_user2}/${username}`,{timeout:5000}).catch(() => null);
     if (profilePromise2?.data) {
       acceptanceRate = profilePromise2.data.acceptanceRate;
     }
     if (!profileRes?.data) {
-      const profilePromise2 = await axios.get(`${process.env.leetcode_api_to_check_user2}/${username}`).catch(() => null);
+      const profilePromise2 = await axios.get(`${process.env.leetcode_api_to_check_user2}/${username}`,{timeout:5000}).catch(() => null);
       profileData = profilePromise2?.data || null;
     } else {
       profileData = profileRes.data;

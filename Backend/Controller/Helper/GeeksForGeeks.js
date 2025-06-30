@@ -29,7 +29,7 @@ export const updateGFGUserData = async (username, timeout = 10000) => {
   const url = `https://www.geeksforgeeks.org/user/${gfgProfile.username}`;
 
   // Fetch the profile page with a timeout to avoid long delays
-  const response = await axios.get(url, { timeout }).catch(() => null);
+  const response = await axios.get(url, { timeout: 5000 }).catch(() => null);
   if (!response || response.status !== 200) {
     throw new Error("GFG user not found or request timed out");
   }

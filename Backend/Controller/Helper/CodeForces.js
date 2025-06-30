@@ -30,12 +30,12 @@ export const updateCodeforcesUserData = async (username) => {
   const userInfoUrl = `${process.env.CODEFORCES_API_USER}${existingCodeforcesUser.username}`;
   const contestRatingUrl = `${process.env.CODEFORCES_API_RATING}${existingCodeforcesUser.username}`;
 
-  // Fetch data concurrently from Codeforces APIs
-  const [submissionsResponse, userInfoResponse, contestRatingResponse] = await Promise.all([
-    axios.get(submissionsUrl),
-    axios.get(userInfoUrl),
-    axios.get(contestRatingUrl),
-  ]);
+ const [submissionsResponse, userInfoResponse, contestRatingResponse] = await Promise.all([
+  axios.get(submissionsUrl, { timeout: 5000 }),
+  axios.get(userInfoUrl, { timeout: 5000 }),
+  axios.get(contestRatingUrl, { timeout: 5000 }),
+]);
+
 
   const submissions = submissionsResponse.data.result;
   const userInfoRaw = userInfoResponse.data.result[0];
@@ -62,7 +62,7 @@ export const updateCodeforcesUserData = async (username) => {
   const problemsSolvedByRating = Object.entries(problemsByRating)
     .map(([rating, problemSet]) => [parseInt(rating), Array.from(problemSet)])
     .sort((a, b) => a[0] - b[0]);
-  console.log(problemsByRating);
+  // console.log(problemsByRating);
   
 
   // Process contest rating info from Codeforces

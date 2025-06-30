@@ -66,6 +66,7 @@ export const fetchAuthData = async (githubUser) => {
   const graphqlResponse = await axios.post(
     'https://api.github.com/graphql',
     { query, variables },
+    { timeout: 5000 },
     {
       headers: {
         'Authorization': `bearer ${githubUser.pat}`,
@@ -163,10 +164,10 @@ export const updateGitHubUserData = async (username) => {
   const ghUsername = githubUser.username;
 
   // Make unauthenticated API calls to GitHub for basic data
-  const profilePromise = axios.get(`${process.env.github_api1}/${ghUsername}`).catch(() => null);
-  const reposPromise = axios.get(`${process.env.github_api1}/${ghUsername}/repos`).catch(() => null);
-  const followersPromise = axios.get(`${process.env.github_api1}/${ghUsername}/followers`).catch(() => null);
-  const followingPromise = axios.get(`${process.env.github_api1}/${ghUsername}/following`).catch(() => null);
+  const profilePromise = axios.get(`${process.env.github_api1}/${ghUsername}`, { timeout: 5000 }).catch(() => null);
+  const reposPromise = axios.get(`${process.env.github_api1}/${ghUsername}/repos`, { timeout: 5000 }).catch(() => null);
+  const followersPromise = axios.get(`${process.env.github_api1}/${ghUsername}/followers`, { timeout: 5000 }).catch(() => null);
+  const followingPromise = axios.get(`${process.env.github_api1}/${ghUsername}/following`, { timeout: 5000 }).catch(() => null);
 
   const [profileRes, reposRes, followersRes, followingRes] = await Promise.all([
     profilePromise,
@@ -189,7 +190,7 @@ export const updateGitHubUserData = async (username) => {
     reposData.map(async (repo) => {
       let collaborators = [];
       try {
-        const contributorsRes = await axios.get(repo.contributors_url);
+        const contributorsRes = await axios.get(repo.contributors_url, { timeout: 5000 });
         const contributorsData = contributorsRes.data;
         collaborators = contributorsData.map(contributor => ({
           name: contributor.login,
@@ -201,7 +202,7 @@ export const updateGitHubUserData = async (username) => {
 
       let languages = [];
       try {
-        const languagesRes = await axios.get(repo.languages_url);
+        const languagesRes = await axios.get(repo.languages_url, { timeout: 5000 });
         languages = Object.keys(languagesRes.data);
       } catch (error) {
         console.error(`Error fetching languages for repo ${repo.name}:`, error.message);

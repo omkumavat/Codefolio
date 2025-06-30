@@ -225,7 +225,7 @@ function Profile() {
     );
 
     try {
-      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/server/user/refresh-user-profile/${username}`);
+      const response = await axios.get(`http://localhost:4000/server/user/refresh-user-profile/${username}`);
 
       if (response.data.success) {
         toast.update(toastId, {

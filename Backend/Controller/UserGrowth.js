@@ -277,9 +277,6 @@ export const refreshWholeProfile = async (req, res) => {
             return res.status(400).json({ error: "Username is required" });
         }
 
-        // console("Refreshing profile for:", username);
-
-        // Run all update functions concurrently, each with its own try-catch block
         const results = await Promise.allSettled([
             (async () => {
                 try {
@@ -321,7 +318,6 @@ export const refreshWholeProfile = async (req, res) => {
         return res.status(200).json({
             message: "Profile update process completed",
             success: true,
-            // details: responseSummary, // Return details of each update
         });
     } catch (error) {
         console.error("Error refreshing whole profile:", error);
