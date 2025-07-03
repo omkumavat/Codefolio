@@ -62,21 +62,24 @@ export const fetchAuthData = async (githubUser) => {
     }
   `;
   const variables = { login: githubUser.username };
+   console.log('#1')
 
   const graphqlResponse = await axios.post(
-    'https://api.github.com/graphql',
-    { query, variables },
-    { timeout: 5000 },
-    {
-      headers: {
-        'Authorization': `bearer ${githubUser.pat}`,
-        'Content-Type': 'application/json'
-      }
+  'https://api.github.com/graphql',
+  { query, variables },
+  {
+    timeout: 5000,
+    headers: {
+      'Authorization': `bearer ${githubUser.pat}`,
+      'Content-Type': 'application/json'
     }
-  );
+  }
+);
+
 
   const data = graphqlResponse.data.data;
   if (data && data.user) {
+     console.log('#1')
     const userData = data.user;
 
     // Group contributions by year
@@ -137,6 +140,7 @@ export const fetchAuthData = async (githubUser) => {
     githubUser.active_days = activeDays;
     githubUser.starred_repos = userData.starredRepositories.totalCount;
     githubUser.totalContributions = totalContribution;
+     console.log('#1')
     await githubUser.save();
   } else {
     // console("Authenticated GitHub data not found for user.");
@@ -176,21 +180,33 @@ export const updateGitHubUserData = async (username) => {
     followingPromise
   ]);
 
-    if (githubUser.auth && githubUser.pat) {
-      await fetchAuthData(githubUser);
-    }
-    // return githubUser;
+   if (githubUser.auth && githubUser.pat) {
+  try {
+    await fetchAuthData(githubUser);
+  } catch (err) {
+    console.error("Error in fetchAuthData:", err.message);
+  }
+}
+    console.log('#1')
+    // console.log(profileRes," hh")
 
 
   const profileData = profileRes.data;
   const reposData = reposRes.data;
 
+const headers = {
+  Authorization: `token ${githubUser.pat}`,
+  Accept: 'application/vnd.github+json'
+};
+
+// console.log(reposData);
   // Process repositories to extract needed data
   const processedRepos = await Promise.all(
     reposData.map(async (repo) => {
       let collaborators = [];
       try {
-        const contributorsRes = await axios.get(repo.contributors_url, { timeout: 5000 });
+         console.log('#1')
+        const contributorsRes = await axios.get(repo.contributors_url, { headers,timeout: 5000 });
         const contributorsData = contributorsRes.data;
         collaborators = contributorsData.map(contributor => ({
           name: contributor.login,
@@ -202,7 +218,8 @@ export const updateGitHubUserData = async (username) => {
 
       let languages = [];
       try {
-        const languagesRes = await axios.get(repo.languages_url, { timeout: 5000 });
+         console.log('#1')
+        const languagesRes = await axios.get(repo.languages_url, {headers, timeout: 5000 });
         languages = Object.keys(languagesRes.data);
       } catch (error) {
         console.error(`Error fetching languages for repo ${repo.name}:`, error.message);
@@ -221,6 +238,8 @@ export const updateGitHubUserData = async (username) => {
     })
   );
 
+   console.log('#1')
+
 
   const followersCount = (followersRes && Array.isArray(followersRes.data)) ? followersRes.data.length : 0;
   const followingCount = (followingRes && Array.isArray(followingRes.data)) ? followingRes.data.length : 0;
@@ -232,6 +251,7 @@ export const updateGitHubUserData = async (username) => {
   githubUser.repos = processedRepos;
   githubUser.followers = followersCount;
   githubUser.following = followingCount;
+   console.log('#1')
 
   // If authorized (PAT available), fetch advanced data
   if (githubUser.auth && githubUser.pat) {

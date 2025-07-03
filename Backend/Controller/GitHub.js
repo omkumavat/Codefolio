@@ -319,7 +319,6 @@ export const updateGitHubData = async (req, res) => {
     // Get username from request parameters
     const { username } = req.params;
     const updatedData = await updateGitHubUserData(username);
-    // // console(updatedData)
     return res.status(200).json({
       success: true,
       message: "GitHub data updated successfully",

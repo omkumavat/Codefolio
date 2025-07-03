@@ -146,6 +146,8 @@ const GitHub = () => {
         setShowDelete(false)
       }
 
+      // console.log(response);
+
       if (!response || !response.data) {
         window.location.href = "/"
         return
