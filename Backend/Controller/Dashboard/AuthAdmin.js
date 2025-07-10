@@ -51,7 +51,6 @@ export const verifyAndRegisterAdmin = async (req, res) => {
         const { token } = req.query;
         const { password } = req.body;
 
-        // Find pending user by token
         const pendingAdmin = await PendingAdmin.findOne({ token });
 
         if (!pendingAdmin || pendingAdmin.tokenExpires < new Date()) {
