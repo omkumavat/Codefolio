@@ -77,7 +77,7 @@ const Developers = () => {
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    href="https://www.linkedin.com/in/om-kumavat-a34296258/"
+                    href="https://www.linkedin.com/in/omkumavat/"
                     className="transition-transform hover:scale-110"
                   >
                     <div className="bg-blue-600 text-white p-2 rounded-full">
