@@ -87,7 +87,7 @@ const Developers = () => {
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    href="https://codefolio-platform.vercel.app/user/omkumavat"
+                    href="https://codeverse-platform.vercel.app/user/omkumavat"
                     className="transition-transform hover:scale-110"
                   >
                     <div className="bg-blue-600 text-white p-2 rounded-full">
