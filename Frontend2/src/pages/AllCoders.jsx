@@ -302,7 +302,7 @@ const AllCoders = () => {
                         </td>
                         <td className={`p-2 border border-black ${isDarkMode && "border-white"}`}>
                           <Link
-                            to={`https://codefolio-platform.vercel.app/user/${user.username}`}
+                            to={`https://codeverse-platform.vercel.app/user/${user.username}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="hover:underline cursor-pointer transition-all duration-200"

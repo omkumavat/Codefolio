@@ -212,24 +212,6 @@ const Codeforces = () => {
     }
   }
 
-  const deleteCodeforcesAccount = async () => {
-    setloading(true)
-    try {
-      if (currentUser && currentUser.CodeForces) {
-        const cfId = currentUser.CodeForces
-        await axios.delete(
-          `${import.meta.env.VITE_BACKEND_URL}/server/codeforces/delete-codeforces/${cfId}`
-        )
-        setToast("Codeforces account removed successfully")
-        fetchUpdatedUser()
-      }
-    } catch (error) {
-      console.error("Error deleting Codeforces data:", error)
-      setToast("Failed to remove Codeforces account", "error")
-    } finally {
-      setloading(false)
-    }
-  }
 
   const fetchUpdatedUser = async () => {
     try {
@@ -260,7 +242,7 @@ const Codeforces = () => {
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1 -translate-y-1/2">
         <Loader />
         <p className="relative right-1/2">
-          Wait upto minute, it needs some time...!
+          Hold on !
         </p>
       </div>
     )

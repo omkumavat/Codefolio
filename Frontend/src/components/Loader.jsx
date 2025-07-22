@@ -2,7 +2,6 @@ import * as React from "react"
 import Stack from "@mui/material/Stack"
 import CircularProgress from "@mui/material/CircularProgress"
 
-// From https://github.com/mui/material-ui/issues/9496#issuecomment-959408221
 function GradientCircularProgress() {
   return (
     <React.Fragment>

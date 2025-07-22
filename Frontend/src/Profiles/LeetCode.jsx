@@ -302,23 +302,6 @@ const LeetCode = () => {
     }
   }
 
-  const deleteLeetCodeAccount = async () => {
-    // try {
-    //   if (
-    //     currentUser &&
-    //     currentUser.username === username &&
-    //     currentUser.LeetCode
-    //   ) {
-    //     ;() => {
-    //       setIsDeleteModal(true)
-    //     }
-    //     // const response = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/server/leetcode/delete-leetcode/${leetid}`)
-    //   }
-    // } catch (error) {
-    //   console.error("Error deleting LeetCode data:", error)
-    // }
-  }
-
   const fetchUpdatedUser = async () => {
     try {
       if (!currentUser?._id) {
@@ -353,7 +336,7 @@ const LeetCode = () => {
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1 -translate-y-1/2">
         <Loader />
         <p className="relative right-1/2">
-          Wait upto minute, it needs some time...!
+          Hold on !
         </p>
       </div>
     )

@@ -251,13 +251,11 @@ function Profile() {
     }
   };
 
-
-
   if (loading) {
     return (
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1 -translate-y-1/2">
         <Loader />
-        <p className='relative right-1/2'>Wait upto minute, it needs some time...!</p>
+        <p className='relative right-1/2'>Hold on !</p>
       </div>
     );
   }

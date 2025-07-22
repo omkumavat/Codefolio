@@ -12,9 +12,6 @@ import { ToastContainer, toast } from "react-toastify"
 const menuItems = [
   { id: "basic-info", label: "Basic Info", icon: User },
   { id: "account", label: "Account", icon: User },
-  // { id: "privacy", label: "Privacy", icon: User },
-  // { id: "billing", label: "Billing", icon: User },
-  // { id: "notifications", label: "Notifications", icon: User }
 ]
 
 function EditProfile() {

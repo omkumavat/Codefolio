@@ -150,7 +150,7 @@ const ComparisonResultPage = () => {
                 />
               </div>
               <Link
-                to={`https://codefolio-platform.vercel.app/user/${candidate.username}`}
+                to={`https://codeverse-platform.vercel.app/user/${candidate.username}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline cursor-pointer transition-all duration-200"
