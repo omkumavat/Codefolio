@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { useRef, useState, useEffect } from "react"
 import { User, Pencil } from "lucide-react"
 import Navbar from "../components/Navbar"
 import Footer from "../components/Footer"
@@ -8,6 +8,7 @@ import { useAuth } from "../Context/AuthProvider"
 import axios from "axios"
 import { useTheme } from "../App"
 import { ToastContainer, toast } from "react-toastify"
+import { Navigate, useNavigate } from "react-router-dom"
 
 const menuItems = [
   { id: "basic-info", label: "Basic Info", icon: User },
@@ -19,14 +20,14 @@ function EditProfile() {
   const { currentUser, updateProfile } = useAuth()
   const [activeSection, setActiveSection] = useState("basic-info")
   const [editMode, setEditMode] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
 
-  // State to handle profile picture preview and file
   const [profilePicturePreview, setProfilePicturePreview] = useState(
     currentUser?.profilePicture
   )
   const [profilePictureFile, setProfilePictureFile] = useState(null)
 
-  // Reference for the hidden file input
   const fileInputRef = useRef(null)
 
   // Trigger file chooser when pencil is clicked
@@ -39,28 +40,7 @@ function EditProfile() {
     }
   }
 
-  const fetchUpdatedUser = async () => {
-    // setloading(true);
-    try {
-      if (!currentUser?._id) {
-        // console("No valid user ID found")
-        return
-      }
 
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/server/user/get-user/${currentUser._id}`
-      )
-      if (response.status === 200 && response.data?.data) {
-        await updateProfile(response.data.data)
-      } else {
-        // console("Invalid response received")
-      }
-    } catch (error) {
-      console.error("Unable to fetch user", error)
-    } finally {
-      // setloading(false); // Always reset loading state
-    }
-  }
   // Function to convert file to Base64 and then save it on the server
   const handleSaveProfilePic = async () => {
     if (!profilePictureFile) return
@@ -90,35 +70,78 @@ function EditProfile() {
     reader.readAsDataURL(profilePictureFile)
   }
 
+  const fetchUpdatedUser = async () => {
+    try {
+      if (!currentUser?._id) {
+        return
+      }
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/server/user/get-user/${currentUser._id}`
+      )
+      // console("111", response.data?.data)
+      if (response.status === 200 && response.data?.data && currentUser) {
+        if(response.data.data.username !== currentUser.username) {
+          navigate(`page-not-found`);
+        }
+        await updateProfile(response.data.data)
+      } else {
+        navigate("/page-not-found");
+      }
+    } catch (error) {
+      console.error("Unable to fetch user", error)
+    }
+  }
+
+  useEffect(() => {
+    setLoading(true)
+    if (currentUser) {
+      fetchUpdatedUser();
+    } else {
+      navigate("/page-not-found");
+    }
+    setLoading(false)
+  }, [currentUser]);
+
+
+    if (loading) {
+      return (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1 -translate-y-1/2">
+          <Loader />
+          <p className="relative right-1/2">
+            Hold on !
+          </p>
+        </div>
+      )
+    }
+
+
   return (
     <>
       <Navbar />
       <div
-        className={`min-h-screen mt-20 ${
-          isDarkMode ? "bg-gray-900" : "bg-gray-50"
-        }`}
+        className={`min-h-screen mt-20 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"
+          }`}
       >
         <ToastContainer position="top-right" autoClose={3000} />
         <div className="flex flex-col lg:flex-row">
           {/* Sidebar */}
           <aside
-            className={`w-full lg:w-64 ${
-              isDarkMode ? "bg-gray-800" : "bg-white"
-            } shadow-lg p-6 mb-6 lg:mb-0`}
+            className={`w-full lg:w-64 ${isDarkMode ? "bg-gray-800" : "bg-white"
+              } shadow-lg p-6 mb-6 lg:mb-0`}
           >
             <div className="border-b pb-4">
               <div className="relative w-24 h-24 mx-auto mb-4">
                 <img
-                  src={profilePicturePreview || currentUser.profilePicture}
+                  src={profilePicturePreview || currentUser?.profilePicture}
                   alt="Profile"
                   className="rounded-full w-full h-full object-cover"
                 />
                 <button
-                  className={`absolute bottom-0 right-0 p-1.5 rounded-full shadow ${
-                    isDarkMode
+                  className={`absolute bottom-0 right-0 p-1.5 rounded-full shadow ${isDarkMode
                       ? "bg-gray-700 hover:bg-gray-600"
                       : "bg-white hover:bg-gray-50"
-                  }`}
+                    }`}
                   onClick={() =>
                     fileInputRef.current && fileInputRef.current.click()
                   }
@@ -146,9 +169,8 @@ function EditProfile() {
                 </div>
               )}
               <p
-                className={`text-sm text-center ${
-                  isDarkMode ? "text-gray-400" : "text-gray-500"
-                }`}
+                className={`text-sm text-center ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
               >
                 {currentUser?.username}
               </p>
@@ -161,17 +183,15 @@ function EditProfile() {
                     setActiveSection(item.id)
                     setEditMode(null)
                   }}
-                  className={`w-full px-6 py-3 flex items-center space-x-3 hover:${
-                    isDarkMode ? "bg-gray-700" : "bg-gray-50"
-                  } ${
-                    activeSection === item.id
+                  className={`w-full px-6 py-3 flex items-center space-x-3 hover:${isDarkMode ? "bg-gray-700" : "bg-gray-50"
+                    } ${activeSection === item.id
                       ? isDarkMode
                         ? "text-sky-400 bg-sky-900"
                         : "text-sky-500 bg-sky-50"
                       : isDarkMode
-                      ? "text-gray-300"
-                      : "text-gray-700"
-                  }`}
+                        ? "text-gray-300"
+                        : "text-gray-700"
+                    }`}
                 >
                   <item.icon size={20} />
                   <span>{item.label}</span>
@@ -186,9 +206,9 @@ function EditProfile() {
               {activeSection === "basic-info" && (
                 <BasicInfo
                   editMode={editMode}
-                  handleInputChange={() => {}}
+                  handleInputChange={() => { }}
                   setEditMode={setEditMode}
-                  handleSave={() => {}}
+                  handleSave={() => { }}
                 />
               )}
               {activeSection === "account" && <Account />}
