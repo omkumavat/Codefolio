@@ -181,7 +181,7 @@ function Profile() {
         }
 
       } catch (error) {
-        // console(error);
+        console(error);
       } finally {
         // console.log(platforms)
         setloading(false); // Stop loading once data is fetched

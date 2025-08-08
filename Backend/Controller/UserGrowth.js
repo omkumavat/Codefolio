@@ -93,6 +93,7 @@ function processGitHubActivity(githubSubmissions) {
 export const checkUserProfile = async (req, res) => {
     try {
         const { username } = req.params;
+        // console.log("User found:", user);
 
         if (!username) {
             return res.status(400).json({ error: "Username parameter is required" });
@@ -107,6 +108,7 @@ export const checkUserProfile = async (req, res) => {
             });
         }
 
+        // console.log("User found:", user);
         // Get the platform IDs from the User document
         const leetid = user?.LeetCode || null;
         const codeforcesid = user?.CodeForces || null;
@@ -188,7 +190,7 @@ export const checkUserProfile = async (req, res) => {
             contestRatings.push(leetCodeProfile.contests.contestRating);
         }
 
-        if (geeksforgeeksProfile && geeksforgeeksProfile?.contestRating && geeksforgeeksProfile?.contestRating[2]!=='__') {
+        if (geeksforgeeksProfile && geeksforgeeksProfile?.contestRating && geeksforgeeksProfile?.contestRating[2] !== '__') {
             contestRatings.push(parseInt(geeksforgeeksProfile.contestRating[2]));
         }
         const avgContestRating = contestRatings.length > 0
@@ -222,7 +224,7 @@ export const checkUserProfile = async (req, res) => {
         if (codeforcesProfile && codeforcesProfile?.problemsSolvedByRating) {
             const arr = codeforcesProfile?.problemsSolvedByRating;
             // // console(arr);
-            if ((arr.length-1)>2 && arr[arr.length - 1][0] >= 1400) {
+            if ((arr.length - 1) > 2 && arr[arr.length - 1][0] >= 1400) {
                 hardProblemsSolved += arr[arr.length - 1][1].length;
             }
         }
@@ -237,14 +239,19 @@ export const checkUserProfile = async (req, res) => {
             (hardProblemsSolved * 0.2);
 
         // Use proper assignment to update the user fields
-        user.overallScore = typeof overallScore !== 'undefined' ? overallScore : user.overallScore;
-        user.totalActiveDays = typeof totalActiveDays !== 'undefined' ? totalActiveDays : user.totalActiveDays;
-        user.totalSubmissions = typeof totalSubmissions !== 'undefined' ? totalSubmissions : user.totalSubmissions;
-        user.totalContributions = typeof totalContributions !== 'undefined' ? totalContributions : user.totalContributions;
-        user.totalProblemSolved = typeof totalProblemsSolved !== 'undefined' ? totalProblemsSolved : user.totalProblemSolved;
-        user.avgContestRating = typeof avgContestRating !== 'undefined' ? avgContestRating : user.avgContestRating;
-        user.hardProblemsSolved = typeof hardProblemsSolved !== 'undefined' ? hardProblemsSolved : user.hardProblemsSolved;
+        user.overallScore = isValidNumber(overallScore) ? overallScore : user.overallScore;
+        user.avgContestRating = isValidNumber(avgContestRating) ? avgContestRating : user.avgContestRating;
+        user.totalActiveDays = isValidNumber(totalActiveDays) ? totalActiveDays : user.totalActiveDays;
+        user.totalSubmissions = isValidNumber(totalSubmissions) ? totalSubmissions : user.totalSubmissions;
+        user.totalContributions = isValidNumber(totalContributions) ? totalContributions : user.totalContributions;
+        user.totalProblemSolved = isValidNumber(totalProblemsSolved) ? totalProblemsSolved : user.totalProblemSolved;
+        user.hardProblemsSolved = isValidNumber(hardProblemsSolved) ? hardProblemsSolved : user.hardProblemsSolved;
         user.combinedSubmissions = heatMapData ? heatMapData : user.combinedSubmissions;
+
+        function isValidNumber(val) {
+            return typeof val !== 'undefined' && !isNaN(val);
+        }
+
 
         await user.save();
 
@@ -260,7 +267,7 @@ export const checkUserProfile = async (req, res) => {
 
     } catch (error) {
         console.error("Error checking username availability:", error);
-        return res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ error: error.message || "Internal server error" });
     }
 };
 
