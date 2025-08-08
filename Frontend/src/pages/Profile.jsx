@@ -111,7 +111,6 @@ function Profile() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        // console("Fetching user data...");
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/server/user/check-user-profile/${username}`
         );
