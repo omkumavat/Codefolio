@@ -23,7 +23,7 @@ import Rules from "./pages/Rules"
 
 // Create theme context
 export const ThemeContext = createContext({
-  isDarkMode: false,
+  isDarkMode: true,
   toggleTheme: () => {}
 })
 
@@ -35,10 +35,9 @@ function App() {
   // Initialize theme based on localStorage
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem("isDarkMode")
-    return savedTheme ? JSON.parse(savedTheme) : false
+    return savedTheme ? JSON.parse(savedTheme) : true
   })
 
-  // Update localStorage whenever isDarkMode changes
   useEffect(() => {
     localStorage.setItem("isDarkMode", JSON.stringify(isDarkMode))
     document.documentElement.classList.toggle("dark", isDarkMode)

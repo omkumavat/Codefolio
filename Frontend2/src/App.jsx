@@ -12,7 +12,7 @@ import { ProtectedRoute,ProtectedRoute2 } from "./Context/ProtectedRoute"
 
 
 export const ThemeContext = createContext({
-  isDarkMode: false,
+  isDarkMode: true,
   toggleTheme: () => { }
 })
 

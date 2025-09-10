@@ -85,8 +85,6 @@ export const addGFG = async (req, res) => {
       .filter(name => name !== null)
       .slice(0, 15); // Get only the top 15 problems
 
-
-
     const difficultyLevels = getDifficultyLevels();
 
     // Store Data in MongoDB

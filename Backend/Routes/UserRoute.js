@@ -20,8 +20,6 @@ router.get('/user/check-user/:username',checkUser)
 router.post('/user/email/email-signup',sendSignUpSuccessfulEmail)
 router.post('/user/email/email-otp',sendOTPEmail)
 
-// import { fetchGFG } from '../Controller/GeeksForGeeks.js';
-// router.post('/fetch/gfg',fetchGFG)
 import {updateUserProfile } from '../Controller/useredit.js'
 import { authMiddleware } from '../Middleware/authMiddleware.js';
 router.put('/user/edit-profile',updateUserProfile);
@@ -34,7 +32,7 @@ router.get('/user/refresh-user-profile/:username',refreshWholeProfile)
 
 import {submitContactForm} from '../Controller/AuthUser.js'
 // import Contactus from '../Models/Contactus.js';
-router.post("/contact", submitContactForm);  // Submit form
+router.post("/contact", submitContactForm);  
 
 
 export default router;

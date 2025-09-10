@@ -269,7 +269,7 @@ function Profile() {
       >
         <ToastContainer position="top-right" autoClose={3000} />
         {/* Animated Background */}
-        <div className="fixed inset-0 -z-10 overflow-hidden">
+        {/* <div className="fixed inset-0 -z-10 overflow-hidden">
           <div
             className={`absolute -inset-[100%] opacity-50 ${isDarkMode
               ? 'bg-gradient-to-r from-blue-500/20 via-blue-500/20 to-pink-500/20'
@@ -282,10 +282,10 @@ function Profile() {
               : 'bg-gradient-to-r from-indigo-100 via-blue-100 to-sky-100'
               } blur-3xl animate-[move_20s_linear_infinite_reverse] transform translate-x-full`}
           ></div>
-        </div>
+        </div> */}
 
         {/* Content Container */}
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-10 py-8">
           <div className="flex flex-col lg:flex-row">
             {/* Sidebar */}
             <div className="w-full lg:w-64 mb-8 lg:mb-0">

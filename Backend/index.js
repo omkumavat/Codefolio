@@ -1,11 +1,8 @@
 import express from "express";
-import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
-import fileuPload from 'express-fileupload';
 import connectDB from "./Database/database.js";
 import cors from 'cors';
-import { engine } from "express-handlebars";
 import path from "path";
 import { fileURLToPath } from "url";
 import cloudinaryConnect from "./Database/cloudinary.js";

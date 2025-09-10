@@ -54,12 +54,6 @@ const userSchema = new mongoose.Schema({
     CodeForces: { type: mongoose.Schema.Types.ObjectId, ref: 'CodeforcesUser' },
     Github: { type: mongoose.Schema.Types.ObjectId, ref: 'GitHubUser' },
 
-    // GeeksforGeeks: { type: mongoose.Schema.Types.ObjectId, ref: 'GeeksforGeeks' },
-    // LeetCode: { type: mongoose.Schema.Types.ObjectId, ref: 'LeetCode' },
-    // CodeChef: { type: mongoose.Schema.Types.ObjectId, ref: 'CodeChef' },
-    // CodeForces: { type: mongoose.Schema.Types.ObjectId, ref: 'CodeForces' },
-    // Github: { type: mongoose.Schema.Types.ObjectId, ref: 'GitHub' },
-
     userProfile: {
         geeksforgeeks: { type: String },
         leetcode: { type: String },
