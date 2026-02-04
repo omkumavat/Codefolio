@@ -93,6 +93,8 @@ function processGitHubActivity(githubSubmissions) {
 export const checkUserProfile = async (req, res) => {
     try {
         const { username } = req.params;
+        console.log(username);
+        
         // console.log("User found:", user);
 
         if (!username) {
@@ -218,7 +220,7 @@ export const checkUserProfile = async (req, res) => {
 
         if (geeksforgeeksProfile && geeksforgeeksProfile.difficultyLevels) {
             // // console(geeksforgeeksProfile.difficultyLevels[4].solved)
-            hardProblemsSolved += geeksforgeeksProfile.difficultyLevels[4].solved;
+            hardProblemsSolved += geeksforgeeksProfile.difficultyLevels[4]?.solved;
         }
 
         if (codeforcesProfile && codeforcesProfile?.problemsSolvedByRating) {

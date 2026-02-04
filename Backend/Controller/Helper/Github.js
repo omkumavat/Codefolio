@@ -62,7 +62,7 @@ export const fetchAuthData = async (githubUser) => {
     }
   `;
   const variables = { login: githubUser.username };
-   console.log('#1')
+  //  console.log('#1')
 
   const graphqlResponse = await axios.post(
   'https://api.github.com/graphql',
@@ -79,7 +79,7 @@ export const fetchAuthData = async (githubUser) => {
 
   const data = graphqlResponse.data.data;
   if (data && data.user) {
-     console.log('#1')
+    //  console.log('#1')
     const userData = data.user;
 
     // Group contributions by year
@@ -87,7 +87,8 @@ export const fetchAuthData = async (githubUser) => {
       "2024": [],
       "2025": [],
       "2023": [],
-      "2022": []
+      "2022": [],
+      "2026":[]
     };
 
     let totalContribution = 0;
@@ -134,13 +135,14 @@ export const fetchAuthData = async (githubUser) => {
     githubUser.submissions = {
       submissionCalendar2024: submissionsByYear["2024"],
       submissionCalendar2025: submissionsByYear["2025"],
+      submissionCalendar2026: submissionsByYear["2026"],
       submissionCalendar2023: submissionsByYear["2023"],
       submissionCalendar2022: submissionsByYear["2022"]
     };
     githubUser.active_days = activeDays;
     githubUser.starred_repos = userData.starredRepositories.totalCount;
     githubUser.totalContributions = totalContribution;
-     console.log('#1')
+    //  console.log('#1')
     await githubUser.save();
   } else {
     // console("Authenticated GitHub data not found for user.");
@@ -205,7 +207,7 @@ const headers = {
     reposData.map(async (repo) => {
       let collaborators = [];
       try {
-         console.log('#1')
+        //  console.log('#1')
         const contributorsRes = await axios.get(repo.contributors_url, { headers,timeout: 5000 });
         const contributorsData = contributorsRes.data;
         collaborators = contributorsData.map(contributor => ({
@@ -218,7 +220,7 @@ const headers = {
 
       let languages = [];
       try {
-         console.log('#1')
+        //  console.log('#1')
         const languagesRes = await axios.get(repo.languages_url, {headers, timeout: 5000 });
         languages = Object.keys(languagesRes.data);
       } catch (error) {
@@ -238,7 +240,7 @@ const headers = {
     })
   );
 
-   console.log('#1')
+  //  console.log('#1')
 
 
   const followersCount = (followersRes && Array.isArray(followersRes.data)) ? followersRes.data.length : 0;
@@ -251,7 +253,7 @@ const headers = {
   githubUser.repos = processedRepos;
   githubUser.followers = followersCount;
   githubUser.following = followingCount;
-   console.log('#1')
+  //  console.log('#1')
 
   // If authorized (PAT available), fetch advanced data
   if (githubUser.auth && githubUser.pat) {

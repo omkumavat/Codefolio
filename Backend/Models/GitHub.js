@@ -39,6 +39,7 @@ const GitHubUserSchema = new mongoose.Schema({
     submissions: {
         submissionCalendar2024: [{ date: { type: String }, submissions: { type: Number } }],
         submissionCalendar2025: [{ date: { type: String }, submissions: { type: Number } }],
+        submissionCalendar2026: [{ date: { type: String }, submissions: { type: Number } }],
         submissionCalendar2023: [{ date: { type: String }, submissions: { type: Number } }],
         submissionCalendar2022: [{ date: { type: String }, submissions: { type: Number } }]
     },

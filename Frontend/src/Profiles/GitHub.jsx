@@ -52,6 +52,7 @@ const GitHub = () => {
   const [repos, setRepos] = useState([])
   const [collaboratedRepos, setCollaboratedRepos] = useState([])
   const [submissionCalendar2025, setsubmissionCalendar2025] = useState([])
+  const [submissionCalendar2026, setsubmissionCalendar2026] = useState([])
   const [submissionCalendar2024, setsubmissionCalendar2024] = useState([])
   const [submissionCalendar2023, setsubmissionCalendar2023] = useState([])
   const [submissionCalendar2022, setsubmissionCalendar2022] = useState([])
@@ -64,7 +65,7 @@ const GitHub = () => {
   const [bio, setBio] = useState("")
   const [gitUsername, setGitUsername] = useState("")
   const [totalContributions, settotalContributions] = useState(0)
-  const [selectedYear, setSelectedYear] = useState(2025)
+  const [selectedYear, setSelectedYear] = useState(2026)
 
   const { isDarkMode } = useTheme()
 
@@ -86,7 +87,9 @@ const GitHub = () => {
 
   const selectedData =
     selectedYear === 2025
-      ? submissionCalendar2025
+      ? submissionCalendar2025 :
+      selectedYear === 2026
+      ? submissionCalendar2026
       : selectedYear === 2024
         ? submissionCalendar2024
         : selectedYear === 2023
@@ -172,6 +175,7 @@ const GitHub = () => {
       setsubmissionCalendar2023(data.submissions.submissionCalendar2023)
       setsubmissionCalendar2024(data.submissions.submissionCalendar2024)
       setsubmissionCalendar2025(data.submissions.submissionCalendar2025)
+      setsubmissionCalendar2026(data.submissions.submissionCalendar2026)
       setGitUsername(data.username)
     } catch (error) {
       console.error("Error fetching GitHub data:", error)
@@ -238,6 +242,7 @@ const GitHub = () => {
       setsubmissionCalendar2023(data.submissions.submissionCalendar2023)
       setsubmissionCalendar2024(data.submissions.submissionCalendar2024)
       setsubmissionCalendar2025(data.submissions.submissionCalendar2025)
+      setsubmissionCalendar2026(data.submissions.submissionCalendar2026)
       setGitUsername(data.username)
       setHasAccount(true)
     } catch (error) {
@@ -646,6 +651,7 @@ const GitHub = () => {
                         }}
                         className="px-4 py-2 border rounded-lg text-gray-700 bg-white dark:bg-gray-700 dark:text-white"
                       >
+                        <option value={2026}>2026</option>
                         <option value={2025}>2025</option>
                         <option value={2024}>2024</option>
                         <option value={2023}>2023</option>

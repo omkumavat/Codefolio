@@ -209,6 +209,7 @@ export const updateGitHubAdvanced = async (req, res) => {
 
     // Prepare submissions grouped by year as an object.
     const submissionsByYear = {
+      "2026":[],
       "2024": [],
       "2025": [],
       "2023": [],
@@ -266,6 +267,7 @@ export const updateGitHubAdvanced = async (req, res) => {
     existingUser.collaborated_repos = collaboratedRepos;
     existingUser.submissions = {
       submissionCalendar2024: submissionsByYear["2024"],
+      submissionCalendar2024: submissionsByYear["2026"],
       submissionCalendar2025: submissionsByYear["2025"],
       submissionCalendar2023: submissionsByYear["2023"],
       submissionCalendar2022: submissionsByYear["2022"]
